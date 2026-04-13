@@ -140,11 +140,14 @@
         <div v-if="!searchQ && remSize === 0 && fState === 'both'" style="text-align:center;padding:2.5rem;font-size:0.8rem;color:var(--ink3)">
           Type a school name or suburb to search, or use Filters above.
         </div>
-        <template v-else-if="searchResults.length">
-          <div class="r-meta"><strong>{{ searchResults.length }}</strong> school{{ searchResults.length !== 1 ? 's' : '' }} · sorted by {{ sortLabel }}</div>
+        <template v-else-if="searchTotal > 0 || searchLoading">
+          <div class="r-meta">
+            <template v-if="searchLoading">Loading…</template>
+            <template v-else><strong>{{ searchTotal }}</strong> school{{ searchTotal !== 1 ? 's' : '' }} · sorted by {{ sortLabel }}</template>
+          </div>
           <div class="school-list">
             <SchoolRow
-              v-for="s in searchPage"
+              v-for="s in searchListItems"
               :key="s.id"
               :school="s"
               :is-open="openRow === s.id"
@@ -156,7 +159,7 @@
               @view-lifestyle="handleViewLifestyle"
             />
           </div>
-          <AppPagination :total="searchResults.length" :page="currentPage" @change="goPage" />
+          <AppPagination :total="searchTotal" :page="currentPage" @change="goPage" />
         </template>
         <div v-else style="text-align:center;padding:2rem;font-size:0.8rem;color:var(--ink3)">
           No schools match — try adjusting filters.
@@ -165,7 +168,7 @@
     </div>
 
     <!-- ── Guided Path ── -->
-    <div v-else-if="view === 'guide'" class="guide-path anim-fadeup" :class="{ 'results-open': guideResults.length > 0 }">
+    <div v-else-if="view === 'guide'" class="guide-path anim-fadeup" :class="{ 'results-open': guideTotal > 0 }">
       <div class="back-row" @click="view = 'entry'">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
         Back
@@ -182,7 +185,7 @@
       </div>
 
       <!-- Questions -->
-      <div class="guide-q-wrap" :class="{ 'results-open': guideResults.length > 0 }">
+      <div class="guide-q-wrap" :class="{ 'results-open': guideTotal > 0 }">
         <Transition name="guide-q">
           <div v-if="guideStep === 0" class="guide-q visible" key="q1">
             <div class="gq-label">Step 1 of 3</div>
@@ -227,12 +230,12 @@
             </div>
           </div>
           <div v-else-if="guideStep === 3" key="results">
-            <div class="gq-label">{{ guideResults.length }} school{{ guideResults.length !== 1 ? 's' : '' }} matched</div>
-            <template v-if="guideResults.length">
+            <div class="gq-label">{{ guideLoading ? 'Loading…' : `${guideTotal} school${guideTotal !== 1 ? 's' : ''} matched` }}</div>
+            <template v-if="guideTotal > 0 || guideLoading">
               <div class="r-meta" style="margin-top:4px">sorted by {{ sortLabel }}</div>
               <div class="school-list">
                 <SchoolRow
-                  v-for="s in guidePage_"
+                  v-for="s in guideListItems"
                   :key="s.id"
                   :school="s"
                   :is-open="openRow === s.id"
@@ -244,7 +247,7 @@
                   @view-lifestyle="handleViewLifestyle"
                 />
               </div>
-              <AppPagination :total="guideResults.length" :page="guidePage" @change="goGuidePage" />
+              <AppPagination :total="guideTotal" :page="guidePage" @change="goGuidePage" />
             </template>
             <div v-else style="text-align:center;padding:1.5rem;font-size:0.8rem;color:var(--ink3)">No schools match — try different answers.</div>
           </div>
@@ -265,7 +268,6 @@
 <script setup>
 import { ref, computed, nextTick, watch } from 'vue'
 import { useExplorer } from '../composables/useExplorer.js'
-import { PAGE_SIZE } from '../data/db.js'
 import SchoolRow from '../components/SchoolRow.vue'
 import AppPagination from '../components/AppPagination.vue'
 import CompareTray from '../components/CompareTray.vue'
@@ -278,10 +280,20 @@ const {
   currentPage, guidePage,
   filterBadgeCount,
   selState, selEmp, toggleRem, setSort,
-  getFiltered, toggleCmp, clearCompare, isCmp,
+  toggleCmp, clearCompare, isCmp,
   toggleRow, viewLifestyle,
-  DB,
   remSize,
+  stateOpts,
+  remotenessOpts,
+  loadSearchLocations,
+  loadGuideLocations,
+  searchListItems,
+  searchTotal,
+  searchLoading,
+  guideListItems,
+  guideTotal,
+  guideLoading,
+  compareSchools,
 } = useExplorer()
 
 const view = ref('entry')
@@ -289,20 +301,28 @@ const filterOpen = ref(false)
 const searchInput = ref(null)
 const searchQ = ref('')
 
-// ── Search ──
-const searchResults = computed(() => {
-  if (!searchQ.value && remSize.value === 0 && fState.value === 'both') return []
-  return getFiltered(searchQ.value)
-})
-const searchPage = computed(() => {
-  const s = (currentPage.value - 1) * PAGE_SIZE
-  return searchResults.value.slice(s, s + PAGE_SIZE)
-})
+const guideStep = ref(0)
+const gqAnswers = ref([null, null, null])
+
+let searchDebounce
 
 watch(view, (v) => {
   if (v === 'search') nextTick(() => searchInput.value?.focus())
 })
-watch([searchQ, fState, remSize, fSort], () => { currentPage.value = 1 })
+watch([searchQ, fState, remSize, fSort, fEmp], () => { currentPage.value = 1 }) 
+
+watch([searchQ, fState, remSize, fSort, fEmp, currentPage, view], () => {
+  if (view.value !== 'search') return
+  clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(() => {
+    loadSearchLocations(searchQ.value)
+  }, 260)
+})
+
+watch([guidePage, guideStep, fState, remSize, fSort, fEmp], () => {
+  if (guideStep.value !== 3) return
+  loadGuideLocations()
+})
 
 function goPage(p) {
   currentPage.value = p
@@ -313,18 +333,12 @@ const sortLabel = computed(() => ({
   inc: 'incentive', hc: 'healthcare', dist: 'distance', az: 'name'
 }[fSort.value]))
 
-// ── Guide ──
-const guideStep = ref(0)
-const gqAnswers = ref([null, null, null])
-const guideResults = ref([])
-
 const guideProgress = computed(() => [0, 33, 66, 100][guideStep.value])
 
 function startGuide() {
   view.value = 'guide'
   guideStep.value = 0
   gqAnswers.value = [null, null, null]
-  guideResults.value = []
 }
 function gqSel(step, title) {
   gqAnswers.value[step] = title
@@ -344,22 +358,16 @@ function gqFinish() {
   if (a3.includes('Healthcare')) setSort('hc')
   else if (a3.includes('Close to a city')) setSort('dist')
   else setSort('inc')
-  guideResults.value = getFiltered('')
-  guideStep.value = 3
   guidePage.value = 1
+  guideStep.value = 3
 }
-
-const guidePage_ = computed(() => {
-  const s = (guidePage.value - 1) * PAGE_SIZE
-  return guideResults.value.slice(s, s + PAGE_SIZE)
-})
 function goGuidePage(p) {
   guidePage.value = p
   openRow.value = null
 }
 
 // ── Compare ──
-const cmpSchools = computed(() => cmpList.map(id => DB.find(x => x.id === id)).filter(Boolean))
+const cmpSchools = computed(() => compareSchools.value)
 const bestIncentiveIdx = computed(() => {
   if (!cmpSchools.value.length) return -1
   const vals = cmpSchools.value.map(s => s.annual_incentive || 0)
@@ -377,24 +385,11 @@ function closeCompare() {
 function handleToggleRow(id) {
   toggleRow(id)
 }
-function handleViewLifestyle(id) {
-  const dest = viewLifestyle(id)
+async function handleViewLifestyle(id) {
+  const dest = await viewLifestyle(id)
   if (dest) emit('navigate', dest)
 }
 
-// Filter options
-const stateOpts = [
-  { v: 'both', icon: '🗺️', label: 'Both' },
-  { v: 'qld', icon: '☀️', label: 'QLD' },
-  { v: 'nsw', icon: '🌉', label: 'NSW' },
-]
-const remotenessOpts = [
-  { v: '5', icon: '🔴', label: 'Very Remote' },
-  { v: '4', icon: '🟠', label: 'Remote' },
-  { v: '3', icon: '🟡', label: 'Outer Regional' },
-  { v: '2', icon: '🟢', label: 'Inner Regional' },
-  { v: '1', icon: '🔵', label: 'Major Cities' },
-]
 const sortOpts = [
   { v: 'inc', label: '💰 Incentive' },
   { v: 'hc', label: '🏥 Healthcare' },

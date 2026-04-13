@@ -197,10 +197,22 @@ import { RC, GC } from '../data/db.js'
 
 defineEmits(['navigate'])
 
-const { DB, insSchool, sbsMode, cmpList, selectIns: _selectIns, clearIns, toggleSbs, toggleCmp, isCmp } = useExplorer()
+const {
+  insSchool,
+  sbsMode,
+  cmpList,
+  selectIns: _selectIns,
+  clearIns,
+  toggleSbs,
+  toggleCmp,
+  isCmp,
+  compareSchools,
+  searchSchoolsForDropdown,
+} = useExplorer()
 
 const insQ = ref('')
 const insResults = ref([])
+let insSearchTimer
 
 function closeDropdown() {
   insResults.value = []
@@ -211,18 +223,19 @@ onMounted(() => document.addEventListener('click', (e) => {
 }))
 onUnmounted(() => document.removeEventListener('click', closeDropdown))
 
-function onInsSearch() {
+async function onInsSearch() {
   const q = insQ.value.toLowerCase().trim()
+  clearTimeout(insSearchTimer)
   if (!q) { insResults.value = []; return }
-  insResults.value = DB.filter(l =>
-    l.name.toLowerCase().includes(q) || l.suburb.toLowerCase().includes(q)
-  ).slice(0, 8)
+  insSearchTimer = setTimeout(async () => {
+    insResults.value = await searchSchoolsForDropdown(q)
+  }, 260)
 }
 
-function selectIns(id) {
-  _selectIns(id)
+async function selectIns(id) {
+  await _selectIns(id)
   insResults.value = []
-  insQ.value = DB.find(x => x.id === id)?.name || ''
+  insQ.value = insSchool.value?.name || ''
 }
 
 function doClearIns() {
@@ -231,12 +244,10 @@ function doClearIns() {
   insResults.value = []
 }
 
-const cmpSchools = computed(() =>
-  cmpList.map(id => DB.find(x => x.id === id)).filter(Boolean)
-)
+const cmpSchools = computed(() => compareSchools.value)
 
 function shortName(id) {
-  const l = DB.find(x => x.id === id)
+  const l = compareSchools.value.find((x) => String(x.id) === String(id))
   return l ? l.name.split(' ').slice(0, 3).join(' ') : '—'
 }
 

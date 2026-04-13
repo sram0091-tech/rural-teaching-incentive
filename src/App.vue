@@ -27,8 +27,8 @@ function navigate(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-function handleViewLifestyle(id) {
-  viewLifestyle(id)
+async function handleViewLifestyle(id) {
+  await viewLifestyle(id)
   navigate('insights')
 }
 </script>
