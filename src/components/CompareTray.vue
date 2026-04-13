@@ -16,15 +16,22 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useExplorer } from '../composables/useExplorer.js'
 
-const { DB } = useExplorer()
+const { compareSchools } = useExplorer()
 
 const props = defineProps({ cmpList: Array })
 defineEmits(['remove', 'clear', 'open-compare'])
 
+const byId = computed(() => {
+  const m = new Map()
+  for (const s of compareSchools.value) m.set(String(s.id), s)
+  return m
+})
+
 function shortName(id) {
-  const l = DB.find(x => x.id === id)
+  const l = byId.value.get(String(id))
   return l ? l.name.split(' ').slice(0, 3).join(' ') : '—'
 }
 </script>
