@@ -161,8 +161,7 @@ function buildLocationQuery({ page, searchText }) {
 }
 
 function shouldSkipSearchList(searchText) {
-  const t = (searchText || '').trim()
-  return !t && fRem.size === 0 && fState.value === 'both'
+  return false
 }
 
 // ── Filters ──
