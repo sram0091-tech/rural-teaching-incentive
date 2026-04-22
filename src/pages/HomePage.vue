@@ -10,16 +10,16 @@
       <div class="hero-content">
         <div class="hero-eyebrow">For Australian Teachers</div>
         <h1 class="hero-h1">Find where you<br><em>belong</em>, not just a job.</h1>
-        <p class="hero-sub">Real incentive data. Real lifestyle metrics. 1,080 schools across QLD and NSW so you can make the move with confidence.</p>
+        <p class="hero-sub">Real incentive data. Real lifestyle metrics. 645 schools across QLD and NSW so you can make an informed choice.</p>
         <div class="hero-acts">
           <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Explore Schools</button>
           <button class="btn-hero-s" @click="$emit('navigate', 'insights')">View Lifestyle Data</button>
         </div>
       </div>
       <div class="hero-stats-bar">
-        <div class="hstat"><div class="hstat-n">1,080</div><div class="hstat-l">Schools with incentives</div></div>
+        <div class="hstat"><div class="hstat-n">645</div><div class="hstat-l">Schools with incentives</div></div>
         <div class="hstat-sep"></div>
-        <div class="hstat"><div class="hstat-n">$30k+</div><div class="hstat-l">Top annual incentive</div></div>
+        <div class="hstat"><div class="hstat-n">$30k+</div><div class="hstat-l">On top of base salary</div></div>
         <div class="hstat-sep"></div>
         <div class="hstat"><div class="hstat-n">2</div><div class="hstat-l">States covered</div></div>
         <div class="hstat-sep"></div>
@@ -86,8 +86,8 @@
       <div class="snapshot-inner">
         <div class="section-header">
           <div class="section-eyebrow">What could you earn?</div>
-          <h2>Incentive by remoteness level</h2>
-          <p>The further from a city, the higher the package. Here is what teachers are earning across QLD and NSW right now.</p>
+          <h2>The further you go, the more you earn on top</h2>
+          <p>Remoteness tiers determine your incentive — more remote means a higher payment on top of your base salary. Here is what teachers are currently receiving across QLD and NSW.</p>
         </div>
         <div class="snap-grid">
 
@@ -155,7 +155,7 @@
           </div>
 
         </div>
-        <div class="snap-note">All figures are indicative annual incentive payments only and do not include base salary. Always verify eligibility with your state education department.</div>
+        <div class="snap-note">All figures are indicative annual incentive payments on top of your base salary. Always verify eligibility with your state education department.</div>
       </div>
     </section>
 
@@ -199,7 +199,7 @@
             <div class="how-card-body">
               <div class="how-card-num">01</div>
               <div class="how-card-title">Find by incentive</div>
-              <p class="how-card-text">Search 1,080 schools or answer 3 guided questions. Filter by state, remoteness, and role. Sort by highest package.</p>
+              <p class="how-card-text">Search 645 schools or answer 3 guided questions. Filter by state, remoteness, and role. Sort by highest package.</p>
               <button class="btn-ghost" @click="$emit('navigate', 'explorer')">Open Explorer</button>
             </div>
           </div>
@@ -277,7 +277,7 @@
         <div class="trust-div"></div>
         <div class="trust-item">
           <div class="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-          <div class="trust-title">1,080 schools</div>
+          <div class="trust-title">645 schools</div>
           <div class="trust-text">Government, Catholic, and Independent across QLD and NSW</div>
         </div>
         <div class="trust-div"></div>
@@ -300,7 +300,7 @@
       <div class="final-cta-overlay"></div>
       <div class="final-cta-inner">
         <h2>Ready to explore real placements?</h2>
-        <p>Browse 1,080 schools across QLD and NSW. Filter by pay, remoteness, and lifestyle then decide.</p>
+        <p>Browse 645 schools across QLD and NSW. Filter by pay, remoteness, and lifestyle then decide.</p>
         <div class="final-cta-btns">
           <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find Schools</button>
           <button class="btn-hero-s" @click="$emit('navigate', 'about')">Learn about the data</button>
@@ -332,6 +332,7 @@ onMounted(() => {
     { threshold: 0.1 }
   )
   document.querySelectorAll('.fade-section').forEach(el => observer.observe(el))
+
 })
 
 onUnmounted(() => window.removeEventListener('scroll', onScroll))

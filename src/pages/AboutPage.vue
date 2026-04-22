@@ -1,14 +1,10 @@
 <template>
   <div class="page active">
 
-    <!-- HERO — dark navy gradient, no broken image risk -->
-    <section class="about-hero">
-      <div class="about-hero-content">
-        <div class="about-eyebrow">About HardStaff Connect</div>
-        <h1 class="about-hero-h1">Real data.<br>Your decision.</h1>
-        <p class="about-hero-sub">HardStaff Connect helps Australian teachers compare rural school placements honestly, combining official government incentive data with real lifestyle metrics.</p>
-      </div>
-    </section>
+    <div class="page-topbar">
+      <div class="page-title">About HardStaff Connect</div>
+      <div class="page-sub">Official government data to help Australian teachers compare rural placements honestly.</div>
+    </div>
 
     <!-- MISSION STRIP -->
     <section class="mission-strip">
@@ -18,7 +14,7 @@
           <p>Every number on this platform comes from an official government or statistical source. We don't tell you where to go. We give you the data to decide for yourself.</p>
         </div>
         <div class="mission-stats">
-          <div class="ms"><div class="ms-n">1,080</div><div class="ms-l">Schools</div></div>
+          <div class="ms"><div class="ms-n">645</div><div class="ms-l">Schools</div></div>
           <div class="ms"><div class="ms-n">2</div><div class="ms-l">States</div></div>
           <div class="ms"><div class="ms-n">4</div><div class="ms-l">Data sources</div></div>
           <div class="ms"><div class="ms-n">Free</div><div class="ms-l">Always</div></div>
@@ -41,7 +37,7 @@
             <div class="data-card-body">
               <div class="data-card-source">ACARA My School 2025</div>
               <div class="data-card-title">School data</div>
-              <div class="data-card-text">1,080 government, Catholic and independent schools across QLD and NSW. Includes name, suburb, type, sector, GPS coordinates, and ABS remoteness classification. Updated annually.</div>
+              <div class="data-card-text">645 government, Catholic and independent schools across QLD and NSW. Includes name, suburb, type, sector, GPS coordinates, and ABS remoteness classification. Updated annually.</div>
               <a href="https://www.myschool.edu.au" target="_blank" rel="noopener" class="data-card-link">Visit ACARA My School</a>
             </div>
           </div>
@@ -99,8 +95,8 @@
             <div class="principle-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             </div>
-            <div class="principle-title">Differences, not rankings</div>
-            <div class="principle-text">We show higher vs lower, more vs less. We do not create composite scores or tell you which school is best.</div>
+            <div class="principle-title">Metrics, not verdicts</div>
+            <div class="principle-text">We show individual metrics per location but don't combine them into an overall school score.</div>
           </div>
           <div class="principle-card">
             <div class="principle-icon">
@@ -134,61 +130,33 @@ defineEmits(['navigate'])
 
 <style scoped>
 
-/* HERO — dark navy gradient, always renders, no broken image risk */
-.about-hero {
-  position: relative;
-  min-height: 60vh;
-  background: linear-gradient(135deg, #0D1F3C 0%, #1A3557 45%, #0F2D4A 100%);
-  display: flex;
-  align-items: center;
-  overflow: hidden;
+.page-topbar {
+  width: 100%;
+  padding: 56px 20px 40px;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(31,111,235,0.16) 0%, transparent 42%),
+    radial-gradient(circle at 80% 20%, rgba(30,158,86,0.10) 0%, transparent 34%),
+    linear-gradient(135deg, #0D1F3C 0%, #1A3557 45%, #0F2D4A 72%, #081828 100%);
+  color: #fff;
+  box-shadow: 0 20px 40px rgba(13,31,60,0.18);
 }
-
-.about-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 15% 50%, rgba(31,111,235,0.14) 0%, transparent 50%),
-    radial-gradient(circle at 85% 25%, rgba(30,158,86,0.07) 0%, transparent 40%);
-  pointer-events: none;
-}
-
-.about-hero-content {
+.page-title {
   position: relative;
   z-index: 1;
-  padding: 0 80px;
-  max-width: 820px;
-  margin-top: -40px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-}
-
-.about-eyebrow {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 18px;
-}
-
-.about-hero-h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 3.8rem;
+  max-width: 1180px;
+  margin: 0 auto 8px;
+  font-size: 2.1rem;
   font-weight: 900;
   line-height: 1.08;
-  color: #fff;
-  margin-bottom: 20px;
-  letter-spacing: -0.02em;
+  color: #fff !important;
 }
-
-.about-hero-sub {
+.page-sub {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
   font-size: 1rem;
-  color: rgba(255,255,255,0.68);
-  line-height: 1.72;
-  max-width: 500px;
+  color: rgba(255,255,255,0.82) !important;
 }
 
 /* MISSION */
