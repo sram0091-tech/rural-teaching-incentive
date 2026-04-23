@@ -52,7 +52,7 @@
     </div>
     <div class="foot-bottom">
       <div class="foot-bottom-in">
-        <span>© 2025 HardStaff Connect. All rights reserved.</span>
+        <span>© 2026 HardStaff Connect. All rights reserved.</span>
         <span class="foot-bottom-right">
           <span>Data indicative only</span>
           <span class="foot-sep">·</span>

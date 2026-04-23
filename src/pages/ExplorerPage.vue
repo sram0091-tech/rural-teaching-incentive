@@ -2,7 +2,7 @@
   <div class="page active">
     <div class="page-topbar">
       <div class="page-title">School Explorer</div>
-      <div class="page-sub">Find schools · view incentive packages · jump to lifestyle</div>
+      <div class="page-sub">Explore schools, understand what you'd earn on top of your base salary, and get a feel for life there.</div>
     </div>
 
     <!-- ── Compare View ── -->
@@ -44,7 +44,7 @@
               </tr>
               <tr class="cmp-sec"><td :colspan="compareSchools.length + 1">Incentives</td></tr>
               <tr>
-                <td>Annual incentive</td>
+                <td>Annual incentive (on top of base salary)</td>
                 <td v-for="(s, i) in compareSchools" :key="s.id" :class="bestIncentiveIdx === i ? 'cmp-best' : 'cmp-lo'">
                   <strong v-if="s.annual_incentive > 0">${{ Math.round(s.annual_incentive).toLocaleString() }}/yr</strong>
                   <span v-else>—</span>
@@ -117,7 +117,7 @@
 
       <div class="exp-stats-bar">
         <div class="exp-stat">
-          <span class="es-num">1,080</span>
+          <span class="es-num">645</span>
           <span class="es-lbl">schools with incentives</span>
         </div>
         <div class="exp-stat-div"></div>
@@ -196,7 +196,7 @@
               </div>
             </div>
             <div class="fp-sec">
-              <div class="fp-lbl">Remoteness</div>
+              <div class="fp-lbl">Remoteness <span style="font-weight:400;color:var(--ink3);font-size:0.6rem;text-transform:none;letter-spacing:0">· more remote = higher incentive</span></div>
               <div class="fp-tiles">
                 <div v-for="r in remotenessOpts" :key="r.v" class="fp-tile"
                   :class="fRem.has(r.v) ? 'sel-rem' : ''"
@@ -219,9 +219,17 @@
       </div>
 
       <div class="results-zone">
-        <div v-if="searchLoading" class="loading-state">
-          <div class="loading-spinner"></div>
-          <span>Loading schools…</span>
+        <div v-if="searchLoading" class="skel-list">
+          <div v-for="i in 5" :key="i" class="skel-row">
+            <div class="skel-left">
+              <div class="skel-line skel-name"></div>
+              <div class="skel-line skel-meta"></div>
+            </div>
+            <div class="skel-right">
+              <div class="skel-line skel-amt"></div>
+              <div class="skel-line skel-sub"></div>
+            </div>
+          </div>
         </div>
         <div v-else-if="searchError" class="error-state">{{ searchError }}</div>
         <template v-else-if="searchListItems.length">
@@ -238,7 +246,7 @@
               :sort="fSort"
               :emp-type="fEmp"
               @toggle="handleToggleRow"
-              @toggle-cmp="toggleCmp"
+              @toggle-cmp="handleToggleCmp"
               @view-lifestyle="handleViewLifestyle"
             />
           </div>
@@ -260,10 +268,17 @@
         </div>
 
         <div class="guide-progress">
-          <div class="gp-track"><div class="gp-fill" :style="{ width: guideProgress + '%' }"></div></div>
-          <div class="gp-labels">
-            <span v-for="(lbl, i) in ['State', 'Distance', 'Priority', 'Results']" :key="i"
-              class="gp-label" :class="{ done: guideStep > i, active: guideStep === i }">{{ lbl }}</span>
+          <div class="gp-steps">
+            <template v-for="(lbl, i) in ['State', 'Distance', 'Priority', 'Results']" :key="i">
+              <div class="gp-step" :class="{ done: guideStep > i, active: guideStep === i }">
+                <div class="gp-step-circle">
+                  <span v-if="guideStep > i">✓</span>
+                  <span v-else>{{ i + 1 }}</span>
+                </div>
+                <div class="gp-step-label">{{ lbl }}</div>
+              </div>
+              <div v-if="i < 3" class="gp-step-line" :class="{ done: guideStep > i }"></div>
+            </template>
           </div>
         </div>
 
@@ -318,9 +333,17 @@
               <div class="gq-label">
                 {{ guideLoading ? 'Loading…' : guideTotal + ' school' + (guideTotal !== 1 ? 's' : '') + ' matched' }}
               </div>
-              <div v-if="guideLoading" class="loading-state">
-                <div class="loading-spinner"></div>
-                <span>Finding schools…</span>
+              <div v-if="guideLoading" class="skel-list">
+                <div v-for="i in 4" :key="i" class="skel-row">
+                  <div class="skel-left">
+                    <div class="skel-line skel-name"></div>
+                    <div class="skel-line skel-meta"></div>
+                  </div>
+                  <div class="skel-right">
+                    <div class="skel-line skel-amt"></div>
+                    <div class="skel-line skel-sub"></div>
+                  </div>
+                </div>
               </div>
               <div v-else-if="guideError" class="error-state">{{ guideError }}</div>
               <template v-else-if="guideListItems.length">
@@ -335,7 +358,7 @@
                     :sort="fSort"
                     :emp-type="fEmp"
                     @toggle="handleToggleRow"
-                    @toggle-cmp="toggleCmp"
+                    @toggle-cmp="handleToggleCmp"
                     @view-lifestyle="handleViewLifestyle"
                   />
                 </div>
@@ -357,6 +380,14 @@
       @clear="clearCompare"
       @open-compare="openCompare"
     />
+
+    <Transition name="toast">
+      <button v-if="showBackTop" class="back-top-btn" @click="$el.ownerDocument.defaultView.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+    </Transition>
+
+    <Transition name="toast">
+      <div v-if="toastVisible" class="cmp-toast">✓ {{ toastMsg }}</div>
+    </Transition>
   </div>
 </template>
 
@@ -425,7 +456,7 @@ const topIncentive = computed(() => {
 })
 
 const sortLabel = computed(() =>
-  ({ inc: 'incentive', hc: 'healthcare', dist: 'distance', az: 'name' }[fSort.value] || 'incentive')
+  ({ inc: 'highest incentive first', hc: 'best healthcare first', dist: 'closest to nearest city first', az: 'A → Z by name' }[fSort.value] || 'highest incentive first')
 )
 
 const bestIncentiveIdx = computed(() => {
@@ -464,13 +495,38 @@ function closeCompare() { showCmp.value = false }
 
 function handleToggleRow(id) { toggleRow(id) }
 
+const toastMsg = ref('')
+const toastVisible = ref(false)
+let toastTimer = null
+
+function handleToggleCmp(id) {
+  const wasIn = isCmp(id)
+  toggleCmp(id)
+  if (!wasIn) {
+    const school = [...searchListItems.value, ...guideListItems.value].find(s => String(s.id) === String(id))
+    toastMsg.value = school ? `${school.name} added to compare` : 'Added to compare'
+    toastVisible.value = true
+    clearTimeout(toastTimer)
+    toastTimer = setTimeout(() => { toastVisible.value = false }, 2500)
+  }
+}
+
 async function handleViewLifestyle(id) {
   const dest = await viewLifestyle(id)
   if (dest) emit('navigate', dest)
 }
 
+function resetFilters() {
+  selState('both')
+  ;[...fRem].forEach(v => toggleRem(v))
+  setSort('inc')
+}
+
 watch(view, (v) => {
-  if (v === 'search') nextTick(() => { searchInput.value?.focus(); loadSearchLocations(searchQ.value) })
+  if (v === 'search') {
+    resetFilters()
+    nextTick(() => { searchInput.value?.focus(); loadSearchLocations(searchQ.value) })
+  }
   if (v === 'entry')  nextTick(() => {
     if (mapInstance) { mapInstance.remove(); mapInstance = null }
     initMap()
@@ -478,11 +534,18 @@ watch(view, (v) => {
   })
 })
 
+const showBackTop = ref(false)
+function onScroll() { showBackTop.value = window.scrollY > 400 }
+
 onMounted(() => {
   nextTick(() => initMap())
   loadMapSchools()
+  window.addEventListener('scroll', onScroll, { passive: true })
 })
-onUnmounted(() => { if (mapInstance) { mapInstance.remove(); mapInstance = null } })
+onUnmounted(() => {
+  if (mapInstance) { mapInstance.remove(); mapInstance = null }
+  window.removeEventListener('scroll', onScroll)
+})
 
 watch(mapSchools, (v) => { if (v.length && mapInstance) { plotMarkers() } })
 
@@ -529,12 +592,12 @@ function plotMarkers() {
         <div style="font-family:'DM Sans',sans-serif;min-width:150px">
           <div style="font-weight:700;font-size:0.8rem;margin-bottom:2px">${s.name}</div>
           <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:4px">${s.suburb} · ${isQld ? 'QLD' : 'NSW'} · ${s.remoteness}</div>
-          <div style="font-size:0.8rem;font-weight:700;color:${color}">$${Math.round(s.annual_incentive||0).toLocaleString()}/yr</div>
+          <div style="font-size:0.8rem;font-weight:700;color:${color}">+$${Math.round(s.annual_incentive||0).toLocaleString()}/yr on top of base</div>
         </div>
       `, { permanent: false, direction: 'top', offset: [0,-8], opacity: 1, className: 'school-tooltip' })
       marker.on('mouseover', function() { this.setRadius(10); this.setStyle({ weight: 3 }); this.openTooltip() })
       marker.on('mouseout',  function() { this.setRadius(7);  this.setStyle({ weight: 2 }); this.closeTooltip() })
-      marker.on('click', () => { view.value = 'search'; searchQ.value = s.suburb; nextTick(() => loadSearchLocations(s.suburb)) })
+      marker.on('click', () => { view.value = 'search'; searchQ.value = s.suburb })
     }, i * 8)
   })
 }
@@ -584,9 +647,9 @@ const q1opts = [
   { title: 'New South Wales', flag: new URL('../assets/flag-nsw.png', import.meta.url).href, sub: 'NSW Rural Teacher Incentive applies' },
 ]
 const q2opts = [
-  { title: 'Outer Regional', emoji: '🛣️', sub: '~100–300 km from a city · some incentives available' },
-  { title: 'Remote',         emoji: '🌾', sub: '300–600 km · good incentive packages' },
-  { title: 'Very Remote',    emoji: '🌵', sub: '600+ km · highest incentives available' },
+  { title: 'Outer Regional', emoji: '🛣️', sub: '~100–300 km from nearest city · incentives apply' },
+  { title: 'Remote',         emoji: '🌾', sub: '300–600 km from nearest city · higher incentives on top of base' },
+  { title: 'Very Remote',    emoji: '🌵', sub: '600+ km from nearest city · highest incentives on top of base' },
   { title: 'Open to all',    emoji: '✨', sub: 'Show me everything' },
 ]
 const q3opts = [
@@ -1140,41 +1203,77 @@ const q3opts = [
 .guide-inner { flex:1; }
 
 .guide-progress {
-  border-radius:16px;
-  padding:16px 18px;
-  margin-bottom:18px;
+  padding: 14px 18px 18px;
+  margin-bottom: 18px;
+  background: var(--s);
+  border: 1px solid var(--b);
+  border-radius: var(--r);
 }
 
-.gp-track {
-  height:10px;
-  background: var(--blue-s);
-  border-radius:999px;
-  overflow:hidden;
-  margin-bottom:10px;
+.gp-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
 }
 
-.gp-fill {
-  height:100%;
-  background: linear-gradient(90deg, var(--blue) 0%, var(--green) 100%);
-  border-radius:999px;
-  transition: width 0.25s ease;
+.gp-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
-.gp-labels {
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
+.gp-step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--b2);
+  background: var(--s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink3);
+  transition: all 0.2s ease;
 }
 
-.gp-label {
-  font-size:0.72rem;
-  font-weight:700;
-  color:var(--ink3);
+.gp-step.active .gp-step-circle {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--blue-s);
 }
 
-.gp-label.active { color: var(--blue-d); }
-.gp-label.done { color: var(--green-d); }
+.gp-step.done .gp-step-circle {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+
+.gp-step-label {
+  font-size: 0.63rem;
+  font-weight: 600;
+  color: var(--ink3);
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.gp-step.active .gp-step-label { color: var(--blue-d); }
+.gp-step.done  .gp-step-label  { color: var(--green-d); }
+
+.gp-step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--b);
+  margin: 0 4px;
+  margin-bottom: 22px;
+  border-radius: 99px;
+  transition: background 0.3s ease;
+}
+
+.gp-step-line.done { background: var(--green); }
 
 .guide-slide-enter-active { transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
 .guide-slide-leave-active { transition:all 0.18s ease; }
@@ -1393,4 +1492,74 @@ const q3opts = [
   .exp-stat-div { display: none; }
   .cmp-tbl { display:block; overflow-x:auto; }
 }
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skel-list { display: flex; flex-direction: column; gap: 8px; }
+.skel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--s);
+  border: 1px solid var(--b);
+  border-radius: var(--r2);
+  gap: 12px;
+}
+.skel-left { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+.skel-right { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.skel-line {
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--s2) 25%, var(--b) 50%, var(--s2) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+.skel-name  { height: 12px; width: 55%; }
+.skel-meta  { height: 9px;  width: 35%; }
+.skel-amt   { height: 13px; width: 64px; }
+.skel-sub   { height: 8px;  width: 48px; }
+
+.back-top-btn {
+  position: fixed;
+  bottom: 84px;
+  right: 20px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 599;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  transition: background 0.14s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.back-top-btn:hover { background: var(--blue); }
+
+.cmp-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: 99px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  z-index: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.toast-enter-active { transition: opacity 0.18s ease, transform 0.18s ease; }
+.toast-leave-active { transition: opacity 0.22s ease, transform 0.22s ease; }
+.toast-enter-from  { opacity: 0; transform: translateX(-50%) translateY(8px); }
+.toast-leave-to    { opacity: 0; transform: translateX(-50%) translateY(8px); }
 </style>
