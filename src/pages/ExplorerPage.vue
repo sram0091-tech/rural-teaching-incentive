@@ -50,7 +50,15 @@
                   <span v-else>—</span>
                 </td>
               </tr>
-              
+              <tr class="cmp-sec"><td :colspan="compareSchools.length + 1">Apply</td></tr>
+              <tr>
+                <td>Apply for position</td>
+                <td v-for="s in compareSchools" :key="s.id">
+                  <a :href="cmpApplyUrl(s)" target="_blank" rel="noopener noreferrer" class="cmp-apply-btn">
+                    Apply →
+                  </a>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -135,7 +143,7 @@
       <div class="exp-map-section">
         <div class="exp-map-header">
           <div class="exp-map-label">Schools with incentives — QLD &amp; NSW</div>
-          <div class="exp-map-hint">Hover a dot for details · click to search that suburb</div>
+          <div class="exp-map-hint">Hover for a preview · click any dot to see school details · use QLD/NSW to focus</div>
         </div>
         <div ref="mapEl" class="exp-map-container"></div>
         <div class="map-legend">
@@ -418,7 +426,7 @@ const {
   compareSchools, compareLoading, compareError,
   toggleCmp, clearCompare, isCmp,
   toggleRow, viewLifestyle,
-  heroTop, launchView, launchSort,
+  heroTop, launchView, launchSort, launchRem,
 } = useExplorer()
 
 const view        = ref('entry')
@@ -427,6 +435,8 @@ const searchQ     = ref('')
 const searchInput = ref(null)
 const mapEl       = ref(null)
 let mapInstance   = null
+let qldLayer      = null
+let nswLayer      = null
 
 const mapSchools = ref([])
 
@@ -463,6 +473,12 @@ const bestIncentiveIdx = computed(() => {
   const vals = compareSchools.value.map(s => s.annual_incentive || 0)
   return vals.indexOf(Math.max(...vals))
 })
+
+function cmpApplyUrl(school) {
+  return school?.state_id === '1'
+    ? 'https://smartjobs.qld.gov.au/jobtools/jncustomsearch.searchResults%3Fin_organid%3D14904%26in_jobDate%3DAll%26in_multi01_id%3D1108%26in_skills%3Dteacher'
+    : 'https://education.nsw.gov.au/teach-nsw/find-teaching-jobs/jobfeed#Rural0'
+}
 
 function onSelState(v)  { selState(v);  loadSearchLocations(searchQ.value) }
 function onSelEmp(v)    { selEmp(v);    loadSearchLocations(searchQ.value) }
@@ -524,11 +540,12 @@ function resetFilters() {
 watch(view, (v) => {
   if (v === 'search') {
     resetFilters()
-    if (launchSort.value) { setSort(launchSort.value); launchSort.value = null }
+    if (launchRem.value)  { toggleRem(launchRem.value);   launchRem.value  = null }
+    if (launchSort.value) { setSort(launchSort.value);    launchSort.value = null }
     nextTick(() => { searchInput.value?.focus(); loadSearchLocations(searchQ.value) })
   }
   if (v === 'entry')  nextTick(() => {
-    if (mapInstance) { mapInstance.remove(); mapInstance = null }
+    if (mapInstance) { mapInstance.remove(); mapInstance = null; qldLayer = null; nswLayer = null }
     initMap()
     plotMarkers()
   })
@@ -548,7 +565,8 @@ onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
 })
 onUnmounted(() => {
-  if (mapInstance) { mapInstance.remove(); mapInstance = null }
+  if (mapInstance) { mapInstance.remove(); mapInstance = null; qldLayer = null; nswLayer = null }
+  delete window.__mapSchoolSearch
   window.removeEventListener('scroll', onScroll)
 })
 
@@ -564,46 +582,108 @@ function lerpColor(h1, h2, t) {
 }
 function incentiveColor(inc, isQld) {
   const t = Math.max(0, Math.min(1, (inc - INC_MIN) / (INC_MAX - INC_MIN)))
-  return isQld ? lerpColor('#fde68a', '#b45309', t) : lerpColor('#bfdbfe', '#1e3a8a', t)
+  return isQld ? lerpColor('#fbbf24', '#92400e', t) : lerpColor('#4ade80', '#14532d', t)
 }
 
 function initMap() {
   if (!mapEl.value || mapInstance) return
   mapInstance = L.map(mapEl.value, { center: [-27, 145], zoom: 5, zoomControl: true, scrollWheelZoom: false })
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors', maxZoom: 18,
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors · © CARTO',
+    subdomains: 'abcd', maxZoom: 19,
   }).addTo(mapInstance)
+
+  qldLayer = L.layerGroup().addTo(mapInstance)
+  nswLayer = L.layerGroup().addTo(mapInstance)
+
+  // State filter control
+  const stateCtrl = L.control({ position: 'topright' })
+  stateCtrl.onAdd = () => {
+    const div = L.DomUtil.create('div', 'map-state-ctrl')
+    div.innerHTML = `
+      <button class="msc-btn msc-active" data-s="all">All</button>
+      <button class="msc-btn" data-s="qld">QLD</button>
+      <button class="msc-btn" data-s="nsw">NSW</button>
+    `
+    L.DomEvent.on(div, 'click', (e) => {
+      const btn = e.target.closest('[data-s]')
+      if (!btn) return
+      div.querySelectorAll('.msc-btn').forEach(b => b.classList.toggle('msc-active', b === btn))
+      const s = btn.dataset.s
+      if (s === 'all') { mapInstance.addLayer(qldLayer); mapInstance.addLayer(nswLayer) }
+      else if (s === 'qld') { mapInstance.addLayer(qldLayer); mapInstance.removeLayer(nswLayer) }
+      else { mapInstance.removeLayer(qldLayer); mapInstance.addLayer(nswLayer) }
+    })
+    L.DomEvent.disableClickPropagation(div)
+    return div
+  }
+  stateCtrl.addTo(mapInstance)
+
+  window.__mapSchoolSearch = (suburb) => {
+    view.value = 'search'
+    searchQ.value = suburb
+    loadSearchLocations(suburb)
+    mapInstance?.closePopup()
+  }
+
   plotMarkers()
 }
 
 function plotMarkers() {
-  if (!mapInstance) return
+  if (!mapInstance || !qldLayer || !nswLayer) return
+  qldLayer.clearLayers()
+  nswLayer.clearLayers()
+
   const schools = mapSchools.value.length ? mapSchools.value : heroTop.value
+
   schools.forEach((s, i) => {
     if (!s.lat || !s.lng) return
-    const isQld = s.state_id === '1'
-    const color = incentiveColor(s.annual_incentive || 0, isQld)
+    const isQld   = s.state_id === '1'
+    const color   = incentiveColor(s.annual_incentive || 0, isQld)
+    const radius  = 7
+    const layer   = isQld ? qldLayer : nswLayer
+    const inc     = Math.round(s.annual_incentive || 0).toLocaleString()
+    const escSub  = (s.suburb || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')
+
+    const tooltip = `
+      <div style="font-family:'DM Sans',sans-serif;min-width:160px">
+        <div style="font-weight:700;font-size:0.8rem;margin-bottom:2px">${s.name}</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:5px">${s.suburb} · ${isQld ? 'QLD' : 'NSW'} · ${s.remoteness}</div>
+        <div style="font-size:0.88rem;font-weight:800;color:${color}">+$${inc}/yr on top of base</div>
+      </div>`
+
+    const popupHtml = `
+      <div class="sp-wrap">
+        <div class="sp-tag ${isQld ? 'sp-qld' : 'sp-nsw'}">${isQld ? 'QLD' : 'NSW'} · ${s.remoteness || ''}</div>
+        <div class="sp-name">${s.name}</div>
+        <div class="sp-suburb">${s.suburb || ''}</div>
+        <div class="sp-inc"><span class="sp-inc-num">+$${inc}</span><span class="sp-inc-lbl">/yr on top of base</span></div>
+        <button class="sp-cta" onclick="window.__mapSchoolSearch('${escSub}')">Search ${s.suburb} schools →</button>
+      </div>`
+
     setTimeout(() => {
       const marker = L.circleMarker([s.lat, s.lng], {
-        radius: 7, fillColor: color, color: '#fff', weight: 2, opacity: 0, fillOpacity: 0,
-      }).addTo(mapInstance)
+        radius, fillColor: color, color: '#fff', weight: 1.5, opacity: 0, fillOpacity: 0,
+      }).addTo(layer)
+
       let op = 0
       const fade = setInterval(() => {
         op += 0.12
-        marker.setStyle({ opacity: Math.min(op,1), fillOpacity: Math.min(op*0.92,0.92) })
+        marker.setStyle({ opacity: Math.min(op, 1), fillOpacity: Math.min(op * 0.92, 0.92) })
         if (op >= 1) clearInterval(fade)
       }, 25)
-      marker.bindTooltip(`
-        <div style="font-family:'DM Sans',sans-serif;min-width:150px">
-          <div style="font-weight:700;font-size:0.8rem;margin-bottom:2px">${s.name}</div>
-          <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:4px">${s.suburb} · ${isQld ? 'QLD' : 'NSW'} · ${s.remoteness}</div>
-          <div style="font-size:0.8rem;font-weight:700;color:${color}">+$${Math.round(s.annual_incentive||0).toLocaleString()}/yr on top of base</div>
-        </div>
-      `, { permanent: false, direction: 'top', offset: [0,-8], opacity: 1, className: 'school-tooltip' })
-      marker.on('mouseover', function() { this.setRadius(10); this.setStyle({ weight: 3 }); this.openTooltip() })
-      marker.on('mouseout',  function() { this.setRadius(7);  this.setStyle({ weight: 2 }); this.closeTooltip() })
-      marker.on('click', () => { view.value = 'search'; searchQ.value = s.suburb })
-    }, i * 8)
+
+      marker.bindTooltip(tooltip, { permanent: false, direction: 'top', offset: [0, -10], opacity: 1, className: 'school-tooltip' })
+      marker.on('mouseover', function() { this.setRadius(10); this.setStyle({ weight: 3 }) })
+      marker.on('mouseout',  function() { this.setRadius(7);  this.setStyle({ weight: 2 }) })
+      marker.on('click', () => {
+        mapInstance.flyTo([s.lat, s.lng], 9, { duration: 0.7, easeLinearity: 0.4 })
+        L.popup({ className: 'school-popup', maxWidth: 260, closeButton: true, autoPan: true })
+          .setLatLng([s.lat, s.lng])
+          .setContent(popupHtml)
+          .openOn(mapInstance)
+      })
+    }, i * 6)
   })
 }
 
@@ -674,6 +754,37 @@ const q3opts = [
   { title: 'Nature & outdoors', svg: SVG_NATURE,  sub: 'Parks, reserves, wide open spaces' },
 ]
 </script>
+
+<!-- Global styles: Leaflet popups + map controls (must be unscoped) -->
+<style>
+/* popup wrapper */
+.school-popup .leaflet-popup-content-wrapper {
+  background: #0D1F3C !important; border: none !important;
+  border-radius: 14px !important; padding: 0 !important;
+  box-shadow: 0 16px 40px rgba(13,31,60,0.32) !important;
+  overflow: hidden !important;
+}
+.school-popup .leaflet-popup-tip-container .leaflet-popup-tip { background: #0D1F3C !important; }
+.school-popup .leaflet-popup-close-button { color: rgba(255,255,255,0.5) !important; top: 8px !important; right: 10px !important; font-size: 16px !important; }
+.school-popup .leaflet-popup-close-button:hover { color: #fff !important; }
+.school-popup .leaflet-popup-content { margin: 0 !important; }
+.sp-wrap { padding: 14px 16px 14px; font-family: 'DM Sans', sans-serif; }
+.sp-tag { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
+.sp-tag.sp-qld { color: #fbbf24; }
+.sp-tag.sp-nsw { color: #93c5fd; }
+.sp-name { font-weight: 700; font-size: 0.9rem; color: #fff; line-height: 1.25; margin-bottom: 2px; }
+.sp-suburb { font-size: 0.7rem; color: rgba(255,255,255,0.45); margin-bottom: 10px; }
+.sp-inc { margin-bottom: 13px; }
+.sp-inc-num { font-size: 1.4rem; font-weight: 900; color: #4ade80; line-height: 1; }
+.sp-inc-lbl { font-size: 0.67rem; color: rgba(255,255,255,0.45); margin-left: 4px; }
+.sp-cta { display: block; width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.16); border-radius: 8px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.74rem; font-weight: 600; cursor: pointer; transition: background 0.14s; text-align: center; }
+.sp-cta:hover { background: rgba(255,255,255,0.18); }
+/* state filter control */
+.map-state-ctrl { display: flex; gap: 4px; background: rgba(255,255,255,0.95); border-radius: 8px; padding: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.08); backdrop-filter: blur(6px); }
+.msc-btn { padding: 5px 12px; border: none; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600; cursor: pointer; background: transparent; color: #6b7280; transition: all 0.15s; }
+.msc-btn:hover { background: #f3f4f6; color: #1a1714; }
+.msc-btn.msc-active { background: #0D1F3C; color: #fff; }
+</style>
 
 <style scoped>
 .page.active {
@@ -995,19 +1106,20 @@ const q3opts = [
   font-size:0.72rem;
 }
 
-.exp-map-container { height:420px; width:100%; z-index:0; }
+.exp-map-container { height:460px; width:100%; z-index:0; }
 
 .map-legend {
   position:absolute;
   bottom:16px;
   right:16px;
-  background:rgba(255,255,255,0.97);
+  background:rgba(255,255,255,0.95);
   border:1px solid var(--b);
   border-radius:12px;
   padding:10px 14px;
   z-index:999;
   min-width:130px;
-  box-shadow: 0 8px 24px rgba(13,31,60,0.12);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  backdrop-filter: blur(6px);
 }
 
 .ml-title {
@@ -1021,8 +1133,8 @@ const q3opts = [
 
 .ml-gradient-row { display:flex; flex-direction:column; gap:2px; }
 .ml-gradient { height:10px; border-radius:4px; width:100%; }
-.qld-grad { background:linear-gradient(to right,#fde68a,#b45309); }
-.nsw-grad { background:linear-gradient(to right,#bfdbfe,#1e3a8a); }
+.qld-grad { background:linear-gradient(to right,#fbbf24,#92400e); }
+.nsw-grad { background:linear-gradient(to right,#4ade80,#14532d); }
 .ml-grad-labels { display:flex; justify-content:space-between; font-size:0.62rem; color:var(--ink3,#9ca3af); }
 .ml-grad-state { font-size:0.7rem; font-weight:700; color:var(--ink2,#374151); margin-top:1px; }
 
@@ -1462,6 +1574,21 @@ const q3opts = [
 .cmp-best {
   background: #f1fbf5;
 }
+
+.cmp-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.cmp-apply-btn:hover { background: var(--blue-d); }
 
 .cmp-lifestyle-row {
   display:flex;

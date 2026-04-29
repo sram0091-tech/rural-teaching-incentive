@@ -6,22 +6,6 @@
       <div class="page-sub">Official government data to help Australian teachers compare rural placements honestly.</div>
     </div>
 
-    <!-- MISSION STRIP -->
-    <section class="mission-strip">
-      <div class="mission-inner">
-        <div class="mission-text">
-          <h2>We show differences, not recommendations.</h2>
-          <p>Every number on this platform comes from an official government or statistical source. We don't tell you where to go. We give you the data to decide for yourself.</p>
-        </div>
-        <div class="mission-stats">
-          <div class="ms"><div class="ms-n">645</div><div class="ms-l">Schools</div></div>
-          <div class="ms"><div class="ms-n">2</div><div class="ms-l">States</div></div>
-          <div class="ms"><div class="ms-n">4</div><div class="ms-l">Data sources</div></div>
-          <div class="ms"><div class="ms-n">Free</div><div class="ms-l">Always</div></div>
-        </div>
-      </div>
-    </section>
-
     <!-- DATA SOURCES -->
     <section class="data-section">
       <div class="data-inner">
@@ -69,6 +53,38 @@
               <div class="data-card-title">NSW incentives</div>
               <div class="data-card-text">Rural Teacher Incentive tiered by transfer point value (4, 6, 8 points). Retention Benefit $5,000/yr up to 10 payments. Permanent employees only. Verify your transfer point value with your region.</div>
               <a href="https://education.nsw.gov.au" target="_blank" rel="noopener" class="data-card-link">Visit NSW Education</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- MEDIA & STORY CREDITS -->
+    <section class="credits-section">
+      <div class="credits-inner">
+        <div class="credits-heading">
+          <span class="section-eyebrow">Media &amp; story credits</span>
+        </div>
+        <div class="credits-list">
+
+          <div class="credit-item">
+            <div class="credit-thumb" style="background-image: url('https://teach.qld.gov.au/teachinstateschools/publishingimages/thumbnail_farnorthqueenslandregion.jpg')"></div>
+            <div class="credit-body">
+              <div class="credit-label">Hero image — Far North Queensland region</div>
+              <div class="credit-text">Photograph of a teacher in Far North Queensland, used as the homepage hero background.</div>
+              <a href="https://teach.qld.gov.au" target="_blank" rel="noopener" class="data-card-link">teach.qld.gov.au</a>
+            </div>
+          </div>
+
+          <div class="credit-item">
+            <div class="credit-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </div>
+            <div class="credit-body">
+              <div class="credit-label">Katie's story — Acting Head of Department in her 20s</div>
+              <div class="credit-text">Teacher success story shared publicly by the Queensland Department of Education. Katie taught at Cooktown, Far North Queensland, progressing to Acting Head of Department.</div>
+              <a href="https://www.facebook.com/TeachQLD/" target="_blank" rel="noopener" class="data-card-link">Teach QLD on Facebook</a>
             </div>
           </div>
 
@@ -159,15 +175,6 @@ defineEmits(['navigate'])
   color: rgba(255,255,255,0.82) !important;
 }
 
-/* MISSION */
-.mission-strip { background: var(--s); border-bottom: 1px solid var(--b); padding: 60px 0; }
-.mission-inner { padding: 0 80px; display: grid; grid-template-columns: 1fr auto; gap: 64px; align-items: center; }
-.mission-text h2 { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 14px; line-height: 1.2; }
-.mission-text p { font-size: 0.92rem; color: var(--ink2); line-height: 1.75; max-width: 560px; }
-.mission-stats { display: flex; gap: 44px; flex-shrink: 0; }
-.ms-n { font-family: 'Playfair Display', serif; font-size: 2.1rem; font-weight: 900; color: var(--ink); line-height: 1; margin-bottom: 5px; }
-.ms-l { font-size: 0.68rem; font-weight: 600; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.06em; }
-
 /* DATA SECTION */
 .data-section { background: var(--bg); padding: 88px 0; border-bottom: 1px solid var(--b); }
 .data-inner { padding: 0 80px; }
@@ -213,6 +220,44 @@ defineEmits(['navigate'])
 .data-card-text { font-size: 0.82rem; color: var(--ink2); line-height: 1.72; margin-bottom: 16px; }
 .data-card-link { font-size: 0.78rem; font-weight: 600; color: var(--blue); text-decoration: none; transition: color 0.12s; }
 .data-card-link:hover { color: var(--blue-d); text-decoration: underline; }
+
+/* CREDITS SECTION */
+.credits-section { background: var(--s); padding: 32px 0; border-bottom: 1px solid var(--b); }
+.credits-inner { padding: 0 80px; }
+.credits-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+
+.credit-item {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid var(--b);
+  border-radius: 8px;
+  background: var(--bg);
+}
+.credit-thumb {
+  width: 64px;
+  height: 44px;
+  border-radius: 5px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  filter: brightness(0.9);
+}
+.credit-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: var(--blue-s);
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.credit-icon svg { width: 16px; height: 16px; }
+.credit-label { font-size: 0.82rem; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.credit-text { font-size: 0.75rem; color: var(--ink3); line-height: 1.5; margin-bottom: 4px; }
 
 /* PRINCIPLES — warm off-white, professional, not dark */
 .principles-section {
@@ -262,9 +307,8 @@ defineEmits(['navigate'])
 @media (max-width: 900px) {
   .about-hero-content { padding: 48px 24px; }
   .about-hero-h1 { font-size: 2.6rem; }
-  .mission-inner { grid-template-columns: 1fr; padding: 0 24px; gap: 32px; }
-  .mission-stats { flex-wrap: wrap; gap: 28px; }
-  .data-inner, .principles-inner, .disclaimer-inner { padding: 0 24px; }
+  .data-inner, .principles-inner, .disclaimer-inner, .credits-inner { padding: 0 24px; }
+  .credit-thumb { width: 48px; height: 34px; }
   .data-section { padding: 52px 0; }
   .data-grid { grid-template-columns: 1fr; }
   .principles-section { padding: 52px 0; }
