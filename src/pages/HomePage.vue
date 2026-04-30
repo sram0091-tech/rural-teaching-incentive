@@ -13,7 +13,7 @@
 
         <div class="cin-slide cin-slide--active">
           <div class="cin-eyebrow">For Australian Teachers</div>
-          <h1 class="cin-hero-h1">Find where you<br><em>belong</em>,<br>not just a job.</h1>
+          <h1 class="cin-hero-h1">Rural teaching isn't a compromise.<br>It's an <em>opportunity</em>.</h1>
           <p class="cin-hero-sub">Real incentive data. Real lifestyle metrics. 645 schools across QLD and NSW so you can make an informed choice.</p>
           <div class="cin-hero-acts">
             <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Explore Schools</button>
@@ -53,7 +53,7 @@
             </div>
             <div class="why-label">Financial</div>
             <h3 class="why-title">A real pay difference</h3>
-            <div class="why-card-learn">See the breakdown ↗</div>
+            <div class="why-card-learn">See the breakdown →</div>
           </div>
 
           <div class="why-card why-cost" @click="openModal('cost')">
@@ -62,7 +62,7 @@
             </div>
             <div class="why-label">Cost of living</div>
             <h3 class="why-title">Your salary stretches further</h3>
-            <div class="why-card-learn">What the data shows ↗</div>
+            <div class="why-card-learn">What the data shows →</div>
           </div>
 
           <div class="why-card why-career" @click="openModal('career')">
@@ -71,7 +71,7 @@
             </div>
             <div class="why-label">Career pace</div>
             <h3 class="why-title">Smaller schools, broader role</h3>
-            <div class="why-card-learn">How careers progress ↗</div>
+            <div class="why-card-learn">How careers progress →</div>
           </div>
 
           <div class="why-card why-community" @click="openModal('community')">
@@ -80,7 +80,7 @@
             </div>
             <div class="why-label">Community</div>
             <h3 class="why-title">You are not anonymous</h3>
-            <div class="why-card-learn">What this means in practice ↗</div>
+            <div class="why-card-learn">What this means in practice →</div>
           </div>
 
         </div>
@@ -257,9 +257,6 @@
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               {{ modals[activeModal].source }}
             </div>
-            <button class="btn-hero-p hm-cta" @click="$emit('navigate', modals[activeModal].cta.nav); closeModal()">
-              {{ modals[activeModal].cta.label }} →
-            </button>
           </div>
         </div>
       </div>
@@ -391,7 +388,7 @@ const modals = {
       'Groceries do cost more remotely. Worth factoring in.',
     ],
     source: 'ABS Census 2021, SA2 household data',
-    cta: { label: 'Check rent data by school', nav: 'insights' },
+    cta: { label: 'Check rent data by school', nav: 'insights' }, hideCta: true,
   },
   career: {
     image: 'https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=900',
@@ -755,8 +752,8 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 43%, rgba(13,31,60,0.28) 0%, rgba(13,31,60,0.52) 44%, rgba(8,20,40,0.70) 100%),
-    linear-gradient(to bottom, rgba(8,20,40,0.52) 0%, rgba(8,20,40,0.34) 36%, rgba(8,20,40,0.78) 100%);
+    radial-gradient(circle at 50% 43%, rgba(13,31,60,0.06) 0%, rgba(13,31,60,0.18) 44%, rgba(8,20,40,0.36) 100%),
+    linear-gradient(to bottom, rgba(8,20,40,0.20) 0%, rgba(8,20,40,0.08) 36%, rgba(8,20,40,0.44) 100%);
 }
 
 .cin-content {
@@ -790,13 +787,14 @@ onUnmounted(() => {
 }
 .cin-hero-h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 4.7rem;
+  font-size: clamp(1.4rem, 3.6vw, 3.2rem);
   font-weight: 900;
-  line-height: 1.02;
+  line-height: 1.1;
   color: #fff;
   margin-bottom: 20px;
   letter-spacing: 0;
   text-shadow: 0 3px 28px rgba(0,0,0,0.52);
+  text-align: center;
 }
 .cin-hero-h1 em {
   color: #7DB4FF;
