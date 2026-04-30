@@ -5,18 +5,27 @@
     <div class="scroll-progress" :style="{ width: scrollPct + '%' }"></div>
 
     <!-- HERO -->
-    <section class="hero">
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <div class="hero-eyebrow">For Australian Teachers</div>
-        <h1 class="hero-h1">Find where you<br><em>belong</em>, not just a job.</h1>
-        <p class="hero-sub">Real incentive data. Real lifestyle metrics. 645 schools across QLD and NSW so you can make an informed choice.</p>
-        <div class="hero-acts">
-          <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Explore Schools</button>
-          <button class="btn-hero-s" @click="$emit('navigate', 'insights')">View Lifestyle Data</button>
+    <section class="cin-section">
+      <div class="cin-bg"></div>
+      <div class="cin-overlay"></div>
+
+      <div class="cin-content">
+
+        <div class="cin-slide cin-slide--active">
+          <div class="cin-eyebrow">For Australian Teachers</div>
+          <h1 class="cin-hero-h1">Find where you<br><em>belong</em>,<br>not just a job.</h1>
+          <p class="cin-hero-sub">Real incentive data. Real lifestyle metrics. 645 schools across QLD and NSW so you can make an informed choice.</p>
+          <div class="cin-hero-acts">
+            <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Explore Schools</button>
+            <button class="btn-hero-s" @click="$emit('navigate', 'insights')">View Lifestyle Data</button>
+          </div>
         </div>
+
       </div>
-      <div class="hero-stats-bar">
+
+      <div class="cin-photo-credit">Photo: <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a></div>
+
+      <div class="cin-stats-bar">
         <div class="hstat"><div class="hstat-n">645</div><div class="hstat-l">Schools with incentives</div></div>
         <div class="hstat-sep"></div>
         <div class="hstat"><div class="hstat-n">$30k+</div><div class="hstat-l">On top of base salary</div></div>
@@ -25,6 +34,7 @@
         <div class="hstat-sep"></div>
         <div class="hstat"><div class="hstat-n">Free</div><div class="hstat-l">No sign-up needed</div></div>
       </div>
+
     </section>
 
     <!-- WHY REGIONAL -->
@@ -32,67 +42,116 @@
       <div class="why-inner">
         <div class="section-header centered">
           <h2>What regional actually offers</h2>
-          <p>Four things that are genuinely true about teaching regionally. Not a pitch, a starting point for your own decision.</p>
+          <p>Four things that are genuinely true about teaching regionally. Not a pitch — a starting point for your own decision.</p>
         </div>
+
         <div class="why-grid">
 
-          <div class="why-card why-financial">
+          <div class="why-card why-financial" @click="openModal('financial')">
             <div class="why-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             </div>
             <div class="why-label">Financial</div>
             <h3 class="why-title">A real pay difference</h3>
-            <ul class="why-body">
-              <li>Up to $30,000/yr on top of base salary</li>
-              <li>Documented, verified, shown in Explorer</li>
-              <li>Paid each pay cycle, not deferred</li>
-            </ul>
-            <p class="why-caveat">Changes what your first few years look like financially.</p>
+            <div class="why-card-learn">See the breakdown ↗</div>
           </div>
 
-          <div class="why-card why-cost">
+          <div class="why-card why-cost" @click="openModal('cost')">
             <div class="why-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             </div>
             <div class="why-label">Cost of living</div>
             <h3 class="why-title">Your salary stretches further</h3>
-            <ul class="why-body">
-              <li>Median rent far lower than Sydney or Brisbane (ABS data)</li>
-              <li>City salaries feel tight; regionally they breathe</li>
-            </ul>
-            <p class="why-caveat">Some goods cost more, services are fewer. Housing is cheaper.</p>
+            <div class="why-card-learn">What the data shows ↗</div>
           </div>
 
-          <div class="why-card why-career">
+          <div class="why-card why-career" @click="openModal('career')">
             <div class="why-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 0 3-3h7z"/></svg>
             </div>
             <div class="why-label">Career pace</div>
             <h3 class="why-title">Smaller schools, broader role</h3>
-            <ul class="why-body">
-              <li>Leadership and mentoring responsibilities come earlier</li>
-              <li>Small school staffing makes this structural, not incidental</li>
-            </ul>
-            <p class="why-caveat">For some, the appeal. For others, the concern.</p>
+            <div class="why-card-learn">How careers progress ↗</div>
           </div>
 
-          <div class="why-card why-community">
+          <div class="why-card why-community" @click="openModal('community')">
             <div class="why-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </div>
             <div class="why-label">Community</div>
             <h3 class="why-title">You are not anonymous</h3>
-            <ul class="why-body">
-              <li>Families recognise you outside school</li>
-              <li>Tighter school-community bond than metro</li>
-              <li>Your presence is felt directly</li>
-            </ul>
-            <p class="why-caveat">That visibility suits some, not others. Worth knowing before you go.</p>
+            <div class="why-card-learn">What this means in practice ↗</div>
           </div>
 
         </div>
+
+        <div class="why-disclaimer">
+          All figures drawn from government sources: ABS Census 2021, NSW RTI Review 2020, QLD Directive 16/18. Verify eligibility with your state education department.
+        </div>
       </div>
     </section>
+
+    <!-- TEACHER STORY -->
+    <div class="story-cin-wrap">
+    <section class="cin-section story-cin-section fade-section">
+      <div class="cin-bg story-cin-bg" :style="{ backgroundImage: `url(${STORY_SLIDES[storySlide].img})`, backgroundPosition: STORY_SLIDES[storySlide].pos }"></div>
+      <div class="cin-overlay"></div>
+
+      <div class="cin-content story-cin-content">
+        <Transition name="sslide" mode="out-in">
+          <div :key="storySlide" class="story-content-pad">
+
+            <!-- Slide 0: Journey intro — Katie's photo, journey path only -->
+            <template v-if="storySlide === 0">
+              <div class="cin-tag-pill">Meet Katie</div>
+              <h2 class="cin-headline">City girl.<br>Remote teacher.</h2>
+              <p class="cin-sub story-intro-text">Who has found incredible joy and meaning in teaching in regional and remote Queensland state schools.</p>
+            </template>
+
+            <!-- Slide 1: Career quote — teacher at whiteboard background -->
+            <template v-else-if="storySlide === 1">
+              <div class="cin-tag-pill">On career</div>
+              <div class="story-quote-block">
+                <p class="story-qtext">“Going rural gave me career opportunities I don't imagine I would've got elsewhere, including a backfilling position as a <span class="story-qhilite">Head of Department</span>, which is pretty awesome for someone in their 20s.”</p>
+                <div class="story-qattr">— Katie, Cooktown QLD</div>
+              </div>
+            </template>
+
+            <!-- Slide 2: Life change + CTA — Queensland landscape background -->
+            <template v-else>
+              <div class="cin-tag-pill">On lifestyle</div>
+              <div class="story-quote-block">
+                <p class="story-qtext">“If you told me 6 years ago that I'd be working in Cape York in a remote community, I would've laughed in your face, but <span class="story-qhilite">now I can't imagine ever going back to the city.</span>”</p>
+                <div class="story-qattr">— Katie, Cooktown QLD</div>
+              </div>
+            </template>
+
+          </div>
+        </Transition>
+      </div>
+
+      <div class="cin-dots">
+        <button
+          v-for="i in STORY_SLIDE_COUNT"
+          :key="i"
+          class="cin-dot"
+          :class="{ 'cin-dot--active': storySlide === i - 1 }"
+          @click="goStorySlide(i - 1)"
+        ></button>
+        <button
+          class="cin-pause"
+          :class="{ paused: storyPaused }"
+          @click="toggleStoryPause"
+          :aria-label="storyPaused ? 'Resume story slideshow' : 'Pause story slideshow'"
+          :title="storyPaused ? 'Resume slideshow' : 'Pause slideshow'"
+        >
+          {{ storyPaused ? '▶' : 'Ⅱ' }}
+        </button>
+      </div>
+
+      <div class="cin-photo-credit">Photo: <a :href="STORY_SLIDES[storySlide].creditUrl" target="_blank" rel="noopener">{{ STORY_SLIDES[storySlide].credit }}</a></div>
+    </section>
+    </div>
 
     <!-- TOP INCENTIVE AREAS -->
     <!-- INCENTIVE SNAPSHOT -->
@@ -123,7 +182,7 @@
               </div>
               <div class="snap-amount amber">$7–11k<span>/yr</span></div>
             </div>
-            <button class="snap-btn" @click="$emit('navigate', 'explorer')">Explore Very Remote schools</button>
+            <button class="snap-btn" @click="goExploreByRemoteness('5')">Explore Very Remote schools</button>
           </div>
 
           <div class="snap-card snap-r">
@@ -144,7 +203,7 @@
               </div>
               <div class="snap-amount amber">$5–8k<span>/yr</span></div>
             </div>
-            <button class="snap-btn" @click="$emit('navigate', 'explorer')">Explore Remote schools</button>
+            <button class="snap-btn" @click="goExploreByRemoteness('4')">Explore Remote schools</button>
           </div>
 
           <div class="snap-card snap-or">
@@ -165,38 +224,11 @@
               </div>
               <div class="snap-amount amber">$2–5k<span>/yr</span></div>
             </div>
-            <button class="snap-btn" @click="$emit('navigate', 'explorer')">Explore Outer Regional schools</button>
+            <button class="snap-btn" @click="goExploreByRemoteness('3')">Explore Outer Regional schools</button>
           </div>
 
         </div>
         <div class="snap-note">All figures are indicative annual incentive payments on top of your base salary. Always verify eligibility with your state education department.</div>
-      </div>
-    </section>
-
-    <!-- SPLIT: teacher in classroom -->
-    <section class="split-section fade-section">
-      <div class="split-photo"></div>
-      <div class="split-text">
-        <div class="section-eyebrow">What is HardStaff Connect?</div>
-        <h2>Two questions. One platform.</h2>
-        <p class="split-lead">Most teachers considering a rural move ask two things:</p>
-        <div class="split-qs">
-          <div class="split-q">
-            <div class="split-q-num">01</div>
-            <div>
-              <div class="split-q-title">How much will I actually earn?</div>
-              <div class="split-q-text">The <strong>Explorer</strong> tab shows real incentive packages: base salary top-ups, locality allowances, and retention benefits by school, filtered by state and remoteness.</div>
-            </div>
-          </div>
-          <div class="split-q">
-            <div class="split-q-num">02</div>
-            <div>
-              <div class="split-q-title">What is life actually like there?</div>
-              <div class="split-q-text">The <strong>Lifestyle Insights</strong> tab shows healthcare access, housing costs, distance to the nearest city, crime rank, and nature access. Real ABS Census data.</div>
-            </div>
-          </div>
-        </div>
-        <button class="btn-ghost" @click="$emit('navigate', 'explorer')">Start in Explorer</button>
       </div>
     </section>
 
@@ -208,74 +240,39 @@
           <h2>Three steps to your decision</h2>
         </div>
         <div class="how-cards">
-          <div class="how-card">
+          <div class="how-card" @click="openModal('search')">
             <div class="how-card-img img-search"></div>
             <div class="how-card-body">
               <div class="how-card-num">01</div>
               <div class="how-card-title">Find by incentive</div>
-              <p class="how-card-text">Search 645 schools or answer 3 guided questions. Filter by state, remoteness, and role. Sort by highest package.</p>
-              <button class="btn-ghost" @click="$emit('navigate', 'explorer')">Open Explorer</button>
+              <p class="how-card-text">Search 645 schools. Filter by state, remoteness, and role. Sort by highest incentive package.</p>
+              <div class="how-card-learn">Learn how it works ↗</div>
             </div>
           </div>
           <div class="how-connector">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
-          <div class="how-card">
+          <div class="how-card" @click="openModal('rural')">
             <div class="how-card-img img-rural"></div>
             <div class="how-card-body">
               <div class="how-card-num">02</div>
               <div class="how-card-title">Explore the lifestyle</div>
-              <p class="how-card-text">Every school links to its Lifestyle Insights profile. Healthcare, rent, distance to the nearest city, and nature access.</p>
-              <button class="btn-ghost" @click="$emit('navigate', 'insights')">View Lifestyle Insights</button>
+              <p class="how-card-text">Every school links to its Lifestyle Insights profile: healthcare, rent, distance to city, and nature access.</p>
+              <div class="how-card-learn">See what's measured ↗</div>
             </div>
           </div>
           <div class="how-connector">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
-          <div class="how-card">
+          <div class="how-card" @click="openModal('compare')">
             <div class="how-card-img img-compare"></div>
             <div class="how-card-body">
               <div class="how-card-num">03</div>
               <div class="how-card-title">Compare side by side</div>
-              <p class="how-card-text">Add up to 4 schools to your compare tray. Incentives and lifestyle metrics in one table across both tabs.</p>
-              <button class="btn-ghost" @click="$emit('navigate', 'explorer')">Start comparing</button>
+              <p class="how-card-text">Add up to 4 schools to your compare tray. Incentives and lifestyle in one table.</p>
+              <div class="how-card-learn">How comparing works ↗</div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- STATE SECTION -->
-    <div class="state-section-header fade-section">
-      <div class="section-eyebrow">Incentive programs by state</div>
-      <h2>Choose your state</h2>
-      <p>Each state runs its own rural incentive program with different eligibility rules and payment structures.</p>
-    </div>
-    <section class="state-section">
-      <div class="state-card qld-card">
-        <div class="state-card-overlay"></div>
-        <div class="state-card-content">
-          <img src="../assets/flag-qld.png" alt="QLD" class="state-flag" />
-          <h3>Queensland</h3>
-          <p>Locality Allowance by posting centre tier under Directive 16/18. Applies to permanent and temporary government school employees across QLD.</p>
-          <div class="state-stats">
-            <div class="state-stat"><span>Full rate</span><strong>Up to $11,470/yr</strong></div>
-            <div class="state-stat"><span>Coverage</span><strong>All QLD gov schools</strong></div>
-          </div>
-          <button class="btn-state" @click="$emit('navigate', 'explorer')">Explore QLD Schools</button>
-        </div>
-      </div>
-      <div class="state-card nsw-card">
-        <div class="state-card-overlay"></div>
-        <div class="state-card-content">
-          <img src="../assets/flag-nsw.png" alt="NSW" class="state-flag" />
-          <h3>New South Wales</h3>
-          <p>Rural Teacher Incentive by transfer point value (4, 6, 8 pts) plus Retention Benefit of $5,000/yr up to 10 payments. Permanent employees only.</p>
-          <div class="state-stats">
-            <div class="state-stat"><span>Maximum RTI</span><strong>$30,000/yr</strong></div>
-            <div class="state-stat"><span>Retention</span><strong>$5k/yr up to 10 yrs</strong></div>
-          </div>
-          <button class="btn-state" @click="$emit('navigate', 'explorer')">Explore NSW Schools</button>
         </div>
       </div>
     </section>
@@ -322,15 +319,205 @@
       </div>
     </section>
 
+  <!-- HOW-IT-WORKS MODAL -->
+  <Teleport to="body">
+    <Transition name="hmodal">
+      <div v-if="activeModal" class="hm-backdrop" @click.self="closeModal">
+        <div class="hm-panel">
+          <button class="hm-close" @click="closeModal">✕</button>
+          <div class="hm-img" :style="{ backgroundImage: `url('${modals[activeModal].image}')` }"></div>
+          <div class="hm-body">
+            <div class="hm-tag">{{ modals[activeModal].tag }}</div>
+            <h3 class="hm-title">{{ modals[activeModal].title }}</h3>
+            <ul class="hm-list">
+              <li v-for="item in modals[activeModal].items" :key="item">{{ item }}</li>
+            </ul>
+            <div class="hm-source">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              {{ modals[activeModal].source }}
+            </div>
+            <button class="btn-hero-p hm-cta" @click="$emit('navigate', modals[activeModal].cta.nav); closeModal()">
+              {{ modals[activeModal].cta.label }} →
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useExplorer } from '../composables/useExplorer.js'
 
-defineEmits(['navigate', 'view-lifestyle'])
+const emit = defineEmits(['navigate', 'view-lifestyle'])
+
+const { launchView, launchRem } = useExplorer()
+
+function goExploreByRemoteness(remId) {
+  launchRem.value = remId
+  launchView.value = 'search'
+  emit('navigate', 'explorer')
+}
 
 const scrollPct = ref(0)
+
+// ── Teacher story slideshow ──
+const STORY_SLIDES = [
+  { img: 'https://teach.qld.gov.au/teachinstateschools/publishingimages/thumbnail_farnorthqueenslandregion.jpg', pos: '72% center', credit: 'Teach QLD', creditUrl: 'https://teach.qld.gov.au/' },
+  { img: 'https://pbs.twimg.com/media/EtRhym-XUAAwNWG?format=jpg&name=medium', pos: 'center 30%', credit: 'Teach QLD (@TeachQLD)', creditUrl: 'https://twitter.com/TeachQLD' },
+  { img: 'https://live-production.wcms.abc-cdn.net.au/728faaf9dcf36c033bb5111d3031eab1?impolicy=wcms_crop_resize&cropH=512&cropW=768&xPos=0&yPos=256&width=862&height=575', pos: 'center 40%', credit: 'ABC News', creditUrl: 'https://www.abc.net.au/' },
+]
+const STORY_SLIDE_COUNT = STORY_SLIDES.length
+const storySlide = ref(0)
+const storyPaused = ref(false)
+let storyTimer = null
+
+let storyVisible = false
+
+function scheduleStorySlide() {
+  if (storyTimer) clearTimeout(storyTimer)
+  if (storyPaused.value || !storyVisible) return
+  storyTimer = setTimeout(() => {
+    storySlide.value = (storySlide.value + 1) % STORY_SLIDE_COUNT
+    scheduleStorySlide()
+  }, 5000)
+}
+
+function goStorySlide(n) {
+  storySlide.value = n
+  scheduleStorySlide()
+}
+
+function toggleStoryPause() {
+  storyPaused.value = !storyPaused.value
+  scheduleStorySlide()
+}
+
+function startStoryIfVisible(el) {
+  const obs = new IntersectionObserver(([entry]) => {
+    storyVisible = entry.isIntersecting
+    if (storyVisible) {
+      storySlide.value = 0
+      scheduleStorySlide()
+    } else {
+      if (storyTimer) clearTimeout(storyTimer)
+    }
+  }, { threshold: 0.4 })
+  obs.observe(el)
+  return obs
+}
+
+// ── How-it-works modals ──
+const activeModal = ref(null)
+
+const modals = {
+  search: {
+    image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=900',
+    tag: 'Step 01 · Find Schools',
+    title: 'How incentive packages work',
+    items: [
+      'More remote = higher payment. Simple as that',
+      'NSW: up to $30k/yr. QLD: up to $11k/yr. Paid fortnightly',
+      'NSW stacks on $5k/yr retention on top. Runs for up to 10 years.',
+      '645 schools. All figures straight from government policy',
+    ],
+    source: 'QLD Directive 16/18 · NSW RTI Review 2020',
+    cta: { label: 'Open Explorer', nav: 'explorer' },
+  },
+  rural: {
+    image: 'https://images.pexels.com/photos/1687093/pexels-photo-1687093.jpeg?auto=compress&cs=tinysrgb&w=900',
+    tag: 'Step 02 · Lifestyle Insights',
+    title: 'What the lifestyle metrics measure',
+    items: [
+      'Healthcare nearby. Clinics and hospitals within your area.',
+      'Rent: what locals actually pay, not city averages',
+      'Distance to the nearest city. Know what you\'re signing up for.',
+      'Nature access: parks and reserves on your doorstep',
+    ],
+    source: 'ABS Census 2021 · ACARA My School 2025',
+    cta: { label: 'View Lifestyle Insights', nav: 'insights' },
+  },
+  compare: {
+    image: 'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=900',
+    tag: 'Step 03 · Compare',
+    title: 'Comparing schools side by side',
+    items: [
+      'Pin up to 4 schools. Hit Compare on any listing.',
+      'Pay + lifestyle side by side in one table',
+      'Mix QLD and NSW schools freely',
+      'No login, no account. Works right now.',
+    ],
+    source: 'ABS Census 2021 · QLD Directive 16/18 · NSW RTI Review 2020',
+    cta: { label: 'Start comparing', nav: 'explorer' },
+  },
+
+  // Why-section modals
+  financial: {
+    image: 'https://images.pexels.com/photos/4386366/pexels-photo-4386366.jpeg?auto=compress&cs=tinysrgb&w=900',
+    tag: 'Financial',
+    title: 'Up to $30k extra. Every year.',
+    items: [
+      'NSW pays $20k, $25k, or $30k/yr depending on how remote you go',
+      'QLD adds up to $11,470/yr on top. Locality allowance, paid fortnightly',
+      'NSW also stacks on $5k/yr retention for up to 10 years',
+      'It hits your account every pay cycle. Not a one-off at year end.',
+    ],
+    source: 'QLD Directive 16/18 · NSW RTI Review 2020',
+    cta: { label: 'See which schools pay most', nav: 'explorer' },
+  },
+  cost: {
+    image: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=900',
+    tag: 'Cost of Living',
+    title: 'Your money goes further out there.',
+    items: [
+      'Rent can be 60% cheaper than Sydney',
+      'Many postings offer subsidised government housing',
+      'No tolls, no $15 coffees, no $8 city parking',
+      'Groceries do cost more remotely. Worth factoring in.',
+    ],
+    source: 'ABS Census 2021, SA2 household data',
+    cta: { label: 'Check rent data by school', nav: 'insights' },
+  },
+  career: {
+    image: 'https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=900',
+    tag: 'Career',
+    title: 'Acting HoD in your 20s? Common.',
+    items: [
+      'Fewer staff = real leadership. Not a title you wait a decade for.',
+      'Teach across year levels and subjects. Builds skills fast.',
+      'Permanent placements fill quicker in regional areas',
+      'Experience that stands out when you return to the city',
+    ],
+    source: 'QLD Dept of Education case studies · AITSL Workforce Data',
+    cta: { label: 'Find your school', nav: 'explorer' },
+  },
+  community: {
+    image: 'https://www.healthworkforce.com.au/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBMTEyTGc9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--df26c928a3624325d84754867c7244d3b3b3d058/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCem9MWm05eWJXRjBTU0lJYW5CbkJqb0dSVlE2QzNKbGMybDZaVWtpRFRnd01IZzRNREE4QmpzR1ZBPT0iLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--9dd97854259a2667a77c23567cd4e48d29891f7c/Blog%20Images_V2.jpg',
+    tag: 'Community',
+    title: 'People know your name.',
+    items: [
+      'Families greet you at the shops. The relationship is real.',
+      'You might be the first uni grad some of your students ever meet',
+      'Watch the same kids grow up over years, not just one term',
+      'Small town, genuine belonging. Not just another face in a staffroom.',
+    ],
+    source: 'AITSL Workforce Data · ABS 2021 Remote Community profiles',
+    cta: { label: 'Explore regional schools', nav: 'explorer' },
+  },
+}
+
+function openModal(key) {
+  activeModal.value = key
+  document.body.style.overflow = 'hidden'
+}
+function closeModal() {
+  activeModal.value = null
+  document.body.style.overflow = ''
+}
+function onKeydown(e) { if (e.key === 'Escape') closeModal() }
 
 function onScroll() {
   const el = document.documentElement
@@ -339,20 +526,210 @@ function onScroll() {
   scrollPct.value = total > 0 ? (scrolled / total) * 100 : 0
 }
 
+let storyVisObs = null
+
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('keydown', onKeydown)
   const observer = new IntersectionObserver(
     (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); observer.unobserve(e.target) } }),
     { threshold: 0.1 }
   )
   document.querySelectorAll('.fade-section').forEach(el => observer.observe(el))
 
+  const cardObserver = new IntersectionObserver(
+    (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); cardObserver.unobserve(e.target) } }),
+    { threshold: 0.12 }
+  )
+  document.querySelectorAll('.why-card, .snap-card, .how-card').forEach(el => cardObserver.observe(el))
+
+  const storySectionEl = document.querySelector('.story-cin-section')
+  if (storySectionEl) storyVisObs = startStoryIfVisible(storySectionEl)
 })
 
-onUnmounted(() => window.removeEventListener('scroll', onScroll))
+onUnmounted(() => {
+  if (storyTimer) clearTimeout(storyTimer)
+  if (storyVisObs) storyVisObs.disconnect()
+  window.removeEventListener('scroll', onScroll)
+  window.removeEventListener('keydown', onKeydown)
+  document.body.style.overflow = ''
+})
 </script>
 
 <style scoped>
+
+/* STORY CINEMATIC SECTION — outer wrapper gives horizontal breathing room + top gap */
+.story-cin-wrap {
+  background: var(--bg);
+  padding: 52px 140px 0;
+}
+.story-cin-section {
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+/* Override overlay to gradient left→right so face on the right stays visible */
+.story-cin-section .cin-overlay {
+  background: linear-gradient(
+    to right,
+    rgba(8, 18, 40, 0.88) 0%,
+    rgba(8, 18, 40, 0.60) 45%,
+    rgba(8, 18, 40, 0.10) 100%
+  );
+}
+
+/* Push content to the left half */
+.story-cin-content {
+  align-items: flex-start !important;
+  padding-left: 6% !important;
+  padding-right: 50% !important;
+}
+
+/* Frosted glass content card — readable on any background photo */
+.story-content-pad {
+  max-width: 440px;
+  width: 100%;
+  padding: 28px 34px 32px;
+  margin: 0;
+  text-align: left;
+  background: rgba(8, 18, 40, 0.40);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 18px;
+  overflow: visible;
+}
+.story-cin-section .cin-headline {
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+  text-align: left;
+}
+.story-cin-section .cin-sub {
+  margin-bottom: 20px;
+  font-size: 0.93rem;
+  color: rgba(255, 255, 255, 0.72);
+  text-align: left;
+}
+.story-cin-section .cin-journey {
+  margin-top: 8px;
+  justify-content: flex-start;
+}
+.story-journey-label {
+  margin-top: 14px !important;
+  margin-bottom: 0 !important;
+  font-size: 0.75rem !important;
+  color: rgba(255, 255, 255, 0.48) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+.story-cin-section .cin-location {
+  margin-bottom: 8px;
+  text-align: left;
+}
+.story-cin-section .cin-tag-pill {
+  margin-bottom: 18px;
+  display: inline-block;
+  font-size: 0.84rem;
+  padding: 8px 18px;
+}
+.story-cin-section .cin-tag-pill:first-child {
+  background: rgba(31, 111, 235, 0.22);
+  border-color: rgba(125, 180, 255, 0.58);
+  color: #fff;
+  box-shadow: 0 0 24px rgba(31,111,235,0.20);
+}
+.story-intro-text {
+  max-width: 410px;
+  margin-top: 16px !important;
+  color: rgba(255,255,255,0.78) !important;
+  line-height: 1.65 !important;
+}
+.story-cin-section .cin-qmark {
+  text-align: left;
+  margin-bottom: 8px;
+}
+.story-cin-section .cin-qtext {
+  text-align: left;
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+}
+.story-cin-section .cin-qattr {
+  text-align: left;
+}
+.story-cta-btn {
+  margin-top: 22px;
+  font-size: 0.88rem;
+  padding: 12px 24px;
+}
+
+/* Quote block — compact editorial card */
+.story-quote-block {
+  position: relative;
+  margin-top: 0;
+  max-width: 500px;
+}
+.story-qtext {
+  position: relative;
+  z-index: 1;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(0.94rem, 1.08vw, 1.08rem);
+  font-weight: 650;
+  color: #fff;
+  line-height: 1.64;
+  margin: 0 0 16px;
+  letter-spacing: 0;
+  max-width: 420px;
+}
+.story-qhilite {
+  color: #7DB4FF;
+  font-weight: 900;
+}
+.story-qattr {
+  position: relative;
+  z-index: 1;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.62);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  max-width: 420px;
+}
+
+/* Slide transition */
+.sslide-enter-active { transition: opacity 0.5s ease, transform 0.5s ease; }
+.sslide-leave-active { transition: opacity 0.3s ease, transform 0.3s ease; }
+.sslide-enter-from   { opacity: 0; transform: translateY(18px); }
+.sslide-leave-to     { opacity: 0; transform: translateY(-12px); }
+
+@media (max-width: 768px) {
+  .story-cin-wrap { padding: 32px 24px 0; }
+  .story-cin-section { border-radius: 16px; }
+  .story-cin-content {
+    align-items: center !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+  .story-content-pad {
+    padding: 18px 18px 24px;
+    text-align: center;
+    margin: 0 auto;
+  }
+  .story-cin-section .cin-headline { font-size: 1.72rem; text-align: center; }
+  .story-cin-section .cin-sub { text-align: center; }
+  .story-intro-text { max-width: 320px; margin-left: auto !important; margin-right: auto !important; }
+  .story-cin-section .cin-location { text-align: center; }
+  .story-cin-section .cin-qtext { text-align: center; font-size: 1.05rem; }
+  .story-cin-section .cin-qattr { text-align: center; }
+  .story-cin-section .cin-qmark { text-align: center; }
+  .story-cin-section .cin-journey { justify-content: center; }
+  .story-journey-label { margin-top: 10px !important; }
+  .story-cin-section .cin-overlay {
+    background: rgba(8, 18, 40, 0.65);
+  }
+}
 
 /* SCROLL PROGRESS */
 .scroll-progress {
@@ -374,76 +751,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .fade-section { opacity: 0; transform: translateY(28px); }
 .fade-section.in-view { animation: fadeUp 0.55s ease forwards; }
 
-/* ── HERO
-   Using a CSS gradient + subtle pattern instead of an unreliable external image.
-   Feels like a professional govt/edu tool — dark navy, clean, no broken images. ── */
-.hero {
-  position: relative;
-  min-height: 92vh;
-  background:
-    linear-gradient(135deg, #0D1F3C 0%, #1A3557 40%, #0F2D4A 70%, #081828 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-}
-
-/* Subtle topographic-style pattern overlay — evokes maps/geography, relevant to location-based tool */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 20% 50%, rgba(31,111,235,0.12) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(30,158,86,0.08) 0%, transparent 40%),
-    radial-gradient(circle at 60% 80%, rgba(31,111,235,0.06) 0%, transparent 35%);
-  pointer-events: none;
-}
-
-.hero-overlay { display: none; }
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  padding: 0 80px;
-  max-width: 820px;
-  margin-top: -40px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-}
-
-.hero-eyebrow {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 20px;
-}
-
-.hero-h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 4.4rem;
-  font-weight: 900;
-  line-height: 1.06;
-  color: #fff;
-  margin-bottom: 22px;
-  letter-spacing: -0.02em;
-}
-
-.hero-h1 em { color: #60A5FA; font-style: italic; }
-
-.hero-sub {
-  font-size: 1.12rem;
-  color: rgba(255,255,255,0.72);
-  line-height: 1.72;
-  margin-bottom: 34px;
-  max-width: 540px;
-}
-
-.hero-acts { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-
 .btn-hero-p {
   padding: 16px 32px;
   background: #1F6FEB;
@@ -454,9 +761,10 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.18s;
+  box-shadow: 0 4px 20px rgba(31,111,235,0.35);
 }
-.btn-hero-p:hover { background: #1558C4; transform: translateY(-2px); }
+.btn-hero-p:hover { background: #1558C4; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(31,111,235,0.45); }
 
 .btn-hero-s {
   padding: 16px 32px;
@@ -472,53 +780,386 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 .btn-hero-s:hover { background: rgba(255,255,255,0.18); }
 
-.hero-stats-bar {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  padding: 28px 80px;
-  background: rgba(0,0,0,0.35);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  margin-top: auto;
-}
-
 .hstat { flex: 1; text-align: center; }
 .hstat-n { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 5px; }
 .hstat-l { font-size: 0.74rem; font-weight: 600; color: rgba(255,255,255,0.45); letter-spacing: 0.06em; text-transform: uppercase; }
 .hstat-sep { width: 1px; height: 40px; background: rgba(255,255,255,0.12); }
 
 /* WHY REGIONAL */
-.why-section { background: var(--s); padding: 32px 24px; border-bottom: 1px solid var(--b); }
+.why-section {
+  background: linear-gradient(135deg, #0D1F3C 0%, #152B4A 50%, #0D1F3C 100%);
+  padding: 80px 24px;
+  border-bottom: none;
+}
 .why-inner { max-width: 1200px; margin: 0 auto; }
-.why-inner h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1.12; margin-bottom: 6px; }
-.why-inner > .section-header { margin-bottom: 16px; }
-.why-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+.why-inner h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1.12; margin-bottom: 6px; color: #fff; }
+.why-inner .section-header p { color: rgba(255,255,255,0.6); }
+.why-inner > .section-header { margin-bottom: 40px; }
 
-.why-card { background: var(--bg); border: 1px solid var(--b); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 5px; transition: box-shadow 0.18s; }
-.why-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.07); }
+.why-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 8px; }
 
-.why-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 2px; flex-shrink: 0; }
-.why-financial .why-icon { background: #D1FAE5; color: #065F46; }
-.why-cost .why-icon { background: #DBEAFE; color: #1E40AF; }
-.why-career .why-icon { background: #FEF3C7; color: #92400E; }
-.why-community .why-icon { background: #EDE9FE; color: #5B21B6; }
+.why-disclaimer {
+  margin-top: 24px;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.25);
+  text-align: center;
+  line-height: 1.6;
+  padding: 0 16px;
+}
 
-.why-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
-.why-financial .why-label { color: #065F46; }
-.why-cost .why-label { color: #1E40AF; }
-.why-career .why-label { color: #92400E; }
-.why-community .why-label { color: #5B21B6; }
+/* ── CINEMATIC SECTION ── */
+@keyframes kenBurns {
+  0%   { transform: scale(1)    translate(0%,    0%); }
+  50%  { transform: scale(1.10) translate(-1.5%, 1%); }
+  100% { transform: scale(1)    translate(0%,    0%); }
+}
 
-.why-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 900; color: var(--ink); line-height: 1.2; margin-bottom: 2px; }
-.why-body { font-size: 0.83rem; color: var(--ink2); line-height: 1.68; }
+
+.cin-section {
+  position: relative;
+  height: 88vh;
+  max-height: 840px;
+  min-height: 520px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cin-bg {
+  position: absolute;
+  inset: -5%;
+  background-image: url('https://images.pexels.com/photos/440731/pexels-photo-440731.jpeg?auto=compress&cs=tinysrgb&w=2200');
+  background-size: cover;
+  background-position: center 48%;
+  animation: kenBurns 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+.story-cin-section .cin-bg {
+  transition: opacity 0.4s ease;
+}
+
+.cin-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 43%, rgba(13,31,60,0.28) 0%, rgba(13,31,60,0.52) 44%, rgba(8,20,40,0.70) 100%),
+    linear-gradient(to bottom, rgba(8,20,40,0.52) 0%, rgba(8,20,40,0.34) 36%, rgba(8,20,40,0.78) 100%);
+}
+
+.cin-content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+/* Slide 1: hero content */
+.cin-eyebrow {
+  width: fit-content;
+  margin: 0 auto 18px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(232,241,253,0.14);
+  border: 1px solid rgba(147,197,253,0.42);
+  box-shadow: 0 8px 30px rgba(13,31,60,0.24);
+  backdrop-filter: blur(10px);
+  font-size: 1.03rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #F8FBFF;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+}
+.cin-hero-h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 4.7rem;
+  font-weight: 900;
+  line-height: 1.02;
+  color: #fff;
+  margin-bottom: 20px;
+  letter-spacing: 0;
+  text-shadow: 0 3px 28px rgba(0,0,0,0.52);
+}
+.cin-hero-h1 em {
+  color: #7DB4FF;
+  font-style: italic;
+  text-shadow: 0 0 28px rgba(31,111,235,0.52), 0 3px 20px rgba(0,0,0,0.44);
+}
+.cin-hero-sub {
+  font-size: 1.12rem;
+  font-weight: 650;
+  color: rgba(255,255,255,0.86);
+  line-height: 1.72;
+  margin-bottom: 32px;
+  max-width: 650px;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.42);
+}
+.cin-hero-acts { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+/* Stats bar at bottom of cinematic hero */
+.cin-stats-bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  padding: 22px 80px;
+  background: rgba(0,0,0,0.45);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.cin-slide {
+  position: absolute;
+  width: 100%;
+  max-width: 760px;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  z-index: 0;
+}
+.cin-slide--active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  z-index: 1;
+}
+
+/* Photo credit watermark */
+.cin-photo-credit {
+  position: absolute;
+  bottom: 72px;
+  right: 16px;
+  z-index: 3;
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.03em;
+}
+.cin-photo-credit a { color: rgba(255,255,255,0.45); text-decoration: none; }
+.cin-photo-credit a:hover { color: rgba(255,255,255,0.7); text-decoration: underline; }
+
+/* Why card stagger animations */
+.why-card { opacity: 0; transform: translateY(20px); }
+.why-card.in-view { animation: fadeUp 0.55s ease forwards; }
+.why-grid .why-card:nth-child(1).in-view { animation-delay: 0.05s; }
+.why-grid .why-card:nth-child(2).in-view { animation-delay: 0.15s; }
+.why-grid .why-card:nth-child(3).in-view { animation-delay: 0.25s; }
+.why-grid .why-card:nth-child(4).in-view { animation-delay: 0.35s; }
+
+.why-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+.why-card:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  transform: translateY(-3px);
+}
+
+.why-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; flex-shrink: 0; }
+.why-financial .why-icon { background: rgba(209,250,229,0.15); color: #6EE7B7; }
+.why-cost .why-icon { background: rgba(219,234,254,0.15); color: #93C5FD; }
+.why-career .why-icon { background: rgba(254,243,199,0.15); color: #FCD34D; }
+.why-community .why-icon { background: rgba(237,233,254,0.15); color: #C4B5FD; }
+
+.why-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.why-financial .why-label { color: #6EE7B7; }
+.why-cost .why-label { color: #93C5FD; }
+.why-career .why-label { color: #FCD34D; }
+.why-community .why-label { color: #C4B5FD; }
+
+.why-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 4px; }
+.why-body { font-size: 0.85rem; color: rgba(255,255,255,0.65); line-height: 1.7; }
 .why-body li { padding-left: 0.25rem; margin-bottom: 4px; }
-.why-body { padding-left: 1.1rem; margin: 0 0 8px 0; }
-.why-caveat { font-size: 0.76rem; color: var(--ink3); line-height: 1.5; font-style: italic; border-top: 1px solid var(--b); padding-top: 6px; margin-top: 2px; }
+.why-body { padding-left: 1.1rem; margin: 4px 0 0; }
+.why-card-learn { font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.45); margin-top: 10px; transition: color 0.15s; }
+.why-card:hover .why-card-learn { color: rgba(255,255,255,0.8); }
+
+/* TEACHER STORY */
+.story-cin-section {
+  height: 78vh;
+  min-height: 560px;
+  max-height: 760px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  opacity: 0;
+  transform: translateY(20px);
+}
+.story-cin-section.in-view {
+  animation: fadeUp 0.55s ease forwards;
+}
+.cin-tag-pill {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.18);
+  padding: 5px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.cin-location {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  margin-bottom: 16px;
+}
+.cin-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 4.2rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.08;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.4);
+}
+.cin-sub {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.04em;
+  margin-bottom: 20px;
+}
+.cin-journey {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cj-stop {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+}
+.cj-stop--dest {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(96,165,250,0.6);
+}
+.cj-arr {
+  color: rgba(255,255,255,0.4);
+  font-size: 1.4rem;
+  font-weight: 300;
+  line-height: 1;
+}
+.cin-qmark {
+  font-family: 'Playfair Display', serif;
+  font-size: 6rem;
+  color: #60A5FA;
+  line-height: 0.7;
+  margin-bottom: 12px;
+}
+.cin-qtext {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.55;
+  max-width: 640px;
+  margin: 0 auto 14px;
+  font-style: italic;
+}
+.cin-qattr {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.06em;
+}
+.cin-dots {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  padding: 14px 0;
+}
+.cin-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.45);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.25s ease;
+}
+.cin-dot--active {
+  width: 24px;
+  border-radius: 4px;
+  background: #fff;
+  border-color: #fff;
+}
+.cin-pause {
+  width: 26px;
+  height: 26px;
+  margin-left: 6px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,0.38);
+  background: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.86);
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.cin-pause:hover,
+.cin-pause.paused {
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.7);
+  color: #fff;
+}
+/* Snap card stagger animations */
+.snap-card { opacity: 0; transform: translateY(20px); }
+.snap-card.in-view { animation: fadeUp 0.55s ease forwards; }
+.snap-grid .snap-card:nth-child(1).in-view { animation-delay: 0.05s; }
+.snap-grid .snap-card:nth-child(2).in-view { animation-delay: 0.17s; }
+.snap-grid .snap-card:nth-child(3).in-view { animation-delay: 0.29s; }
 
 /* TOP AREAS */
 /* SNAPSHOT */
-.snapshot { background: var(--bg); padding: 88px 24px; border-bottom: 1px solid var(--b); }
+.snapshot {
+  background: var(--bg);
+  padding: 88px 24px;
+  border-bottom: 1px solid var(--b);
+  position: relative;
+  overflow: hidden;
+}
+.snapshot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 10% 50%, rgba(31,111,235,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 90% 20%, rgba(30,158,86,0.05) 0%, transparent 40%);
+  pointer-events: none;
+}
+.snapshot-inner { position: relative; z-index: 1; }
 .snapshot-inner { padding: 0 24px; max-width: 1200px; margin: 0 auto; }
 .section-header { margin-bottom: 40px; text-align: center;}
 .section-header.centered { text-align: center; }
@@ -553,25 +1194,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 
 .snap-note { font-size: 0.72rem; color: var(--ink3); text-align: center; font-style: italic; }
 
-/* SPLIT: What is HardStaff Connect */
-.split-section { display: grid; grid-template-columns: 1fr 1fr; min-height: 480px; border-top: 1px solid var(--b); border-bottom: 1px solid var(--b); }
-.split-photo {
-  background-image: url('https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=900');
-  background-size: cover;
-  background-position: center;
-  filter: grayscale(30%) brightness(0.88);
-}
-.split-text { padding: 56px 64px; background: var(--s); display: flex; flex-direction: column; justify-content: center; }
-.split-text .section-eyebrow { margin-bottom: 10px; }
-.split-text h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1.15; margin-bottom: 10px; }
-.split-lead { font-size: 0.9rem; color: var(--ink2); margin-bottom: 20px; line-height: 1.7; }
-.split-qs { margin-bottom: 28px; }
-.split-q { display: flex; gap: 16px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--b); }
-.split-q:last-child { border-bottom: none; }
-.split-q-num { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: var(--b); flex-shrink: 0; width: 32px; line-height: 1; }
-.split-q-title { font-size: 0.92rem; font-weight: 700; margin-bottom: 5px; }
-.split-q-text { font-size: 0.82rem; color: var(--ink2); line-height: 1.68; }
-
 /* HOW STEPS */
 .how-section { background: var(--bg); padding: 64px 24px; border-top: 1px solid var(--b); border-bottom: 1px solid var(--b); }
 .how-inner { max-width: 1200px; margin: 0 auto; }
@@ -582,6 +1204,12 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 
 .how-card { flex: 1; background: var(--s); border: 1px solid var(--b); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.18s; }
 .how-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.08); }
+
+.how-card { opacity: 0; transform: translateY(20px); }
+.how-card.in-view { animation: fadeUp 0.55s ease forwards; }
+.how-cards .how-card:nth-child(1).in-view { animation-delay: 0.05s; }
+.how-cards .how-card:nth-child(3).in-view { animation-delay: 0.18s; }
+.how-cards .how-card:nth-child(5).in-view { animation-delay: 0.31s; }
 
 .how-card-img { height: 160px; background-size: cover; background-position: center; }
 .img-search {
@@ -597,49 +1225,130 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   filter: grayscale(30%) brightness(0.88);
 }
 
+.how-card { cursor: pointer; }
+.how-card:hover { box-shadow: 0 12px 36px rgba(0,0,0,0.12); transform: translateY(-3px); }
+.how-card:hover .how-card-img { filter: brightness(1) !important; }
 .how-card-body { padding: 24px 28px; display: flex; flex-direction: column; flex: 1; }
 .how-card-num { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; color: var(--b); line-height: 1; margin-bottom: 6px; }
 .how-card-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 900; margin-bottom: 8px; }
-.how-card-text { font-size: 0.84rem; color: var(--ink2); line-height: 1.68; margin-bottom: 20px; flex: 1; }
+.how-card-text { font-size: 0.84rem; color: var(--ink2); line-height: 1.68; margin-bottom: 16px; flex: 1; }
+.how-card-learn { font-size: 0.8rem; font-weight: 700; color: var(--blue); align-self: flex-start; }
 .btn-ghost { padding: 9px 20px; background: transparent; color: var(--blue); border: 1.5px solid var(--blue); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.14s; align-self: flex-start; }
 .btn-ghost:hover { background: var(--blue-s); }
 
-.state-section-header {
-  padding: 40px 80px 20px;
-  background: var(--bg);
-  text-align: center;
+/* ── HOW-IT-WORKS MODAL ── */
+.hm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8,16,32,0.72);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(4px);
+}
+.hm-panel {
+  background: var(--s);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 840px;
+  max-height: 88vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.4);
+}
+.hm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  background: rgba(0,0,0,0.45);
+  border: none;
+  border-radius: 99px;
+  width: 32px;
+  height: 32px;
+  color: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.hm-close:hover { background: rgba(0,0,0,0.7); }
+.hm-img {
+  background-size: cover;
+  background-position: center;
+  min-height: 320px;
+}
+.hm-body {
+  padding: 36px 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.hm-tag {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 10px;
+}
+.hm-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+.hm-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hm-list li {
+  font-size: 0.86rem;
+  color: var(--ink2);
+  line-height: 1.65;
+  padding-left: 18px;
+  position: relative;
+}
+.hm-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--blue);
+  font-size: 0.78rem;
+  top: 2px;
+}
+.hm-source {
+  font-size: 0.72rem;
+  color: var(--ink3);
+  line-height: 1.5;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin-top: auto;
+  padding-top: 16px;
   border-top: 1px solid var(--b);
 }
-.state-section-header .section-eyebrow { margin-bottom: 8px; }
-.state-section-header h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; margin-bottom: 8px; }
-.state-section-header p { font-size: 0.9rem; color: var(--ink2); margin-bottom: 20px; }
+.hm-source svg { flex-shrink: 0; margin-top: 1px; }
+.hm-cta { align-self: flex-start; }
 
-/* STATE SECTION */
-.state-section { display: grid; grid-template-columns: 1fr 1fr; min-height: 320px; }
-.state-card { position: relative; background-size: cover; background-position: center; display: flex; align-items: flex-end; overflow: hidden; }
-
-/* QLD: warm dry Australian outback — Pexels */
-.qld-card {
-  background-image: url('https://images.pexels.com/photos/1658967/pexels-photo-1658967.jpeg?auto=compress&cs=tinysrgb&w=900');
-  filter: grayscale(20%) brightness(0.80);
-}
-
-/* NSW: green rural Australian paddocks — Pexels */
-.nsw-card {
-  background-image: url('https://images.pexels.com/photos/440731/pexels-photo-440731.jpeg?auto=compress&cs=tinysrgb&w=900');
-  filter: grayscale(25%) brightness(0.80);
-}
-
-.state-card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,16,32,0.95) 0%, rgba(8,16,32,0.45) 50%, rgba(8,16,32,0.1) 100%); }
-.state-card-content { position: relative; z-index: 1; padding: 30px 40px; color: #fff; }
-.state-flag { height: 22px; width: auto; border-radius: 3px; margin-bottom: 10px; display: block; }
-.state-card-content h3 { font-family: 'Playfair Display', serif; font-size: 1.55rem; font-weight: 900; margin-bottom: 8px; line-height: 1.2; }
-.state-card-content p { font-size: 0.84rem; color: rgba(255,255,255,0.72); line-height: 1.65; margin-bottom: 12px; max-width: 360px; }
-.state-stats { display: flex; gap: 24px; margin-bottom: 16px; }
-.state-stat span { display: block; font-size: 0.63rem; color: rgba(255,255,255,0.48); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 2px; }
-.state-stat strong { font-size: 0.87rem; color: #fff; font-weight: 700; }
-.btn-state { padding: 9px 20px; background: rgba(255,255,255,0.14); color: #fff; border: 1.5px solid rgba(255,255,255,0.36); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
-.btn-state:hover { background: rgba(255,255,255,0.28); }
+/* Modal transition */
+.hmodal-enter-active { transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22,1,0.36,1); }
+.hmodal-leave-active { transition: opacity 0.18s ease, transform 0.2s ease; }
+.hmodal-enter-from  { opacity: 0; transform: scale(0.95); }
+.hmodal-leave-to    { opacity: 0; transform: scale(0.95); }
 
 /* TRUST STRIP */
 .trust-strip { background: var(--s); border-top: 1px solid var(--b); padding: 32px 0; }
@@ -677,30 +1386,70 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 
 /* MOBILE */
 @media (max-width: 900px) {
-  .hero-content { padding: 60px 20px 0; width: 100%; box-sizing: border-box; margin-top: 0; }
-  .hero-eyebrow { letter-spacing: 0.04em; font-size: 0.7rem; text-transform: none; }
-  .hero-h1 { font-size: 2.8rem; }
-  .hero-sub { font-size: 1rem; }
-  .hero-stats-bar { padding: 22px 24px; flex-wrap: wrap; gap: 16px; }
-  .hstat { min-width: 100px; }
+  .cin-section { height: 85vh; max-height: none; min-height: 420px; }
+  .cin-hero-h1 { font-size: 2.6rem; }
+  .cin-eyebrow { font-size: 0.78rem; letter-spacing: 0.1em; padding: 7px 12px; }
+  .cin-hero-sub { font-size: 0.95rem; }
+  .cin-stats-bar { padding: 16px 20px; flex-wrap: wrap; gap: 12px; }
+  .hstat { min-width: 90px; }
   .hstat-sep { display: none; }
-  .why-section { padding: 28px 16px; }
-  .why-grid { grid-template-columns: 1fr; gap: 16px; }
+  .why-section { padding: 48px 16px; }
+  .why-grid { grid-template-columns: 1fr; gap: 12px; }
+  .story-cin-section { height: 78vh; min-height: 520px; }
+  .cin-headline { font-size: 2.6rem; }
+  .cin-qtext { font-size: 1.15rem; }
+  /* ── Snap-grid: horizontal swipe ── */
   .snapshot { padding: 52px 0; }
-  .snapshot-inner { padding: 0 24px; }
-  .snap-grid { grid-template-columns: 1fr; gap: 14px; }
-  .connect-section { padding: 48px 24px; }
-  .connect-qs { grid-template-columns: 1fr; }
-  .connect-q-div { width: auto; height: 1px; margin: 24px 0; }
-  .connect-q-num { font-size: 1.6rem; }
-  .how-section { padding: 48px 24px; }
-  .how-cards { flex-direction: column; }
-  .how-connector { transform: rotate(90deg); margin: 0; padding: 4px 0; }
+  .snapshot-inner { padding: 0; }
+  .snap-grid {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 14px;
+    padding: 4px 24px 20px;
+  }
+  .snap-grid::-webkit-scrollbar { display: none; }
+  .snap-card {
+    flex: 0 0 82vw;
+    max-width: 320px;
+    scroll-snap-align: start;
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .snap-grid::after { content: ''; flex: 0 0 10px; }
+
+  /* ── How-cards: horizontal swipe ── */
+  .how-section { padding: 48px 0; }
+  .how-section .section-header { padding: 0 24px; }
+  .how-cards {
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0;
+    padding: 4px 24px 20px;
+    align-items: stretch;
+  }
+  .how-cards::-webkit-scrollbar { display: none; }
+  .how-card {
+    flex: 0 0 78vw;
+    max-width: 300px;
+    scroll-snap-align: start;
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .how-connector { flex-shrink: 0; transform: none; margin: auto 0; padding: 0 6px; }
+  .how-cards::after { content: ''; flex: 0 0 10px; }
   .how-card-img { height: 140px; }
-  .state-section-header { padding: 24px 24px 0; }
-  .state-section { grid-template-columns: 1fr; }
-  .state-card { min-height: 220px; }
-  .state-card-content { padding: 20px 24px; }
+  .hm-panel { grid-template-columns: 1fr; max-height: 92vh; }
+  .hm-img { min-height: 200px; }
+  .hm-body { padding: 24px 20px; }
   .trust-strip { padding: 20px 0; }
   .trust-inner { flex-wrap: wrap; padding: 0 24px; }
   .trust-item { min-width: 160px; padding: 16px; }
@@ -712,9 +1461,25 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 
 @media (max-width: 540px) {
-  .hero-h1 { font-size: 2.1rem; }
+  .cin-hero-h1 { font-size: 2.1rem; }
   .btn-hero-p, .btn-hero-s { width: 100%; display: block; text-align: center; }
-  .areas-grid { grid-template-columns: 1fr; }
+  .cin-hero-acts { flex-direction: column; }
+  .story-cin-wrap { padding: 24px 16px 0; }
+  .story-cin-section { height: 74vh; min-height: 520px; }
+  .story-cin-section .cin-content { padding: 28px 14px 2px; }
+  .story-content-pad { max-height: calc(100% - 34px); padding: 16px 16px 18px; }
+  .story-cin-section .cin-tag-pill { margin-bottom: 12px; font-size: 0.78rem; padding: 7px 15px; }
+  .story-cin-section .cin-location { font-size: 0.72rem; line-height: 1.55; margin-bottom: 8px; }
+  .story-cin-section .cin-headline { font-size: 1.55rem; line-height: 1.08; margin-bottom: 8px; }
+  .story-intro-text { font-size: 0.78rem !important; line-height: 1.55 !important; }
+  .story-journey-label { font-size: 0.62rem !important; margin-top: 8px !important; }
+  .cin-journey { flex-direction: column; }
+  .story-cin-section .cin-journey { gap: 6px; margin-top: 4px; }
+  .cj-stop { font-size: 1rem; }
+  .cj-stop--dest { font-size: 1.22rem; }
+  .cj-arr { transform: rotate(90deg); }
+  .cin-dots { padding: 6px 0 10px; }
+  .cin-photo-credit { bottom: 42px; }
   .how-step-body { padding: 28px 20px; }
 }
 </style>

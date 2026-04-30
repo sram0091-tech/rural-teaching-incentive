@@ -270,7 +270,7 @@ main {
 .page-sub { font-size:0.71rem; color:var(--ink2); margin-top:1px; }
 
 /* ── GRADE BADGES ── */
-.gbadge { display:inline-flex; align-items:center; font-size:0.62rem; font-weight:700; padding:1px 5px; border-radius:4px; }
+.gbadge { display:inline-flex; align-items:center; font-size:0.74rem; font-weight:700; padding:2px 7px; border-radius:4px; }
 .gap2 { background:#D1FAE5; color:#065F46; }
 .ga { background:#D1FAE5; color:#065F46; }
 .gb { background:#DBEAFE; color:#1E40AF; }
@@ -517,8 +517,8 @@ main {
 .lc-title { font-size:0.68rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink2); margin-bottom:10px; }
 .lr { display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:4px 0; border-bottom:1px solid var(--b); }
 .lr:last-child { border-bottom:none; }
-.lrk { font-size:0.69rem; color:var(--ink3); }
-.lrv { font-size:0.76rem; font-weight:500; }
+.lrk { font-size:0.82rem; color:var(--ink3); }
+.lrv { font-size:0.88rem; font-weight:500; }
 .lrv.good { color:var(--green-d); }
 .lrv.warn { color:var(--orange-d); }
 .lrv.bad { color:var(--red); }

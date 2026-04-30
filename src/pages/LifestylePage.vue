@@ -185,6 +185,9 @@
             <button class="btn btn-sm" :class="isCmp(insSchool.id) ? 'btn-g' : 'btn-gh'" @click="toggleCmp(insSchool.id)">
               {{ isCmp(insSchool.id) ? '✓ In Compare' : '+ Compare' }}
             </button>
+            <a :href="applyUrl(insSchool)" target="_blank" rel="noopener noreferrer" class="ls-apply-btn">
+              Apply for this position →
+            </a>
           </div>
         </div>
 
@@ -286,6 +289,15 @@
               <tr>
                 <td>Nature reserves</td>
                 <td v-for="(s, i) in cmpSchools" :key="s.id" :class="bestIdx(cmpSchools.map(x => n(metricVal(x, 'nature_reserves_count'))), true) === i ? 'sbs-best' : 'sbs-lo'">{{ n(metricVal(s, 'nature_reserves_count')) }} reserves</td>
+              </tr>
+              <tr class="sbs-sec"><td :colspan="cmpSchools.length + 1">Apply</td></tr>
+              <tr>
+                <td>Apply for position</td>
+                <td v-for="s in cmpSchools" :key="s.id">
+                  <a :href="applyUrl(s)" target="_blank" rel="noopener noreferrer" class="ls-apply-btn ls-apply-btn--sm">
+                    Apply →
+                  </a>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -421,6 +433,12 @@ function bestIdx(vals, hi) {
   const best = hi ? Math.max(...ns) : Math.min(...ns.filter(n => n > 0).concat([0]))
   return ns.indexOf(best)
 }
+
+function applyUrl(school) {
+  return school?.state_id === '1'
+    ? 'https://smartjobs.qld.gov.au/jobtools/jncustomsearch.searchResults%3Fin_organid%3D14904%26in_jobDate%3DAll%26in_multi01_id%3D1108%26in_skills%3Dteacher'
+    : 'https://education.nsw.gov.au/teach-nsw/find-teaching-jobs/jobfeed#Rural0'
+}
 </script>
 
 <style scoped>
@@ -487,7 +505,7 @@ function bestIdx(vals, hi) {
   padding: 6px 14px;
   border-radius: var(--r2);
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.74rem;
+  font-size: 0.84rem;
   font-weight: 700;
   cursor: pointer;
   border: 1.5px solid var(--blue);
@@ -534,14 +552,14 @@ function bestIdx(vals, hi) {
 }
 .ies-h {
   font-family: 'Playfair Display', serif;
-  font-size: 2rem;
+  font-size: 2.3rem;
   font-weight: 900;
   color: var(--ink);
   line-height: 1.15;
   margin-bottom: 10px;
 }
 .ies-sub {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   color: var(--ink2);
   margin-bottom: 20px;
 }
@@ -558,7 +576,7 @@ function bestIdx(vals, hi) {
   border: none;
   border-radius: 99px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.84rem;
+  font-size: 0.94rem;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.14s;
@@ -571,7 +589,7 @@ function bestIdx(vals, hi) {
   border: 1.5px solid var(--b2);
   border-radius: 99px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.84rem;
+  font-size: 0.94rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.14s;
@@ -609,8 +627,8 @@ function bestIdx(vals, hi) {
   color: var(--blue);
   margin: 0 auto 10px;
 }
-.ies-goal-label { font-size: 0.84rem; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
-.ies-goal-sub { font-size: 0.71rem; color: var(--ink3); line-height: 1.4; }
+.ies-goal-label { font-size: 0.94rem; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.ies-goal-sub { font-size: 0.82rem; color: var(--ink3); line-height: 1.4; }
 
 /* How it works */
 .ies-how {
@@ -620,7 +638,7 @@ function bestIdx(vals, hi) {
   padding: 22px 24px;
 }
 .ies-how-title {
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -650,7 +668,7 @@ function bestIdx(vals, hi) {
   flex-shrink: 0;
 }
 .ies-step-text {
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: var(--ink2);
   line-height: 1.5;
   padding-top: 3px;
@@ -668,7 +686,7 @@ function bestIdx(vals, hi) {
   gap: 12px;
 }
 .ies-preview-label {
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -690,7 +708,7 @@ function bestIdx(vals, hi) {
   opacity: 0.7;
 }
 .ies-pc-title {
-  font-size: 0.76rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: var(--ink);
   margin-bottom: 2px;
@@ -705,11 +723,11 @@ function bestIdx(vals, hi) {
   gap: 8px;
 }
 .ies-pc-k {
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   color: var(--ink3);
 }
 .ies-pc-v {
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--ink);
 }
@@ -724,7 +742,7 @@ function bestIdx(vals, hi) {
 .ies-skel--md { width: 80px; }
 .ies-preview-cta {
   text-align: center;
-  font-size: 0.74rem;
+  font-size: 0.84rem;
   color: var(--ink3);
   font-style: italic;
 }
@@ -734,7 +752,7 @@ function bestIdx(vals, hi) {
   .ies-preview-cards { grid-template-columns: 1fr; }
   .ies-steps { flex-direction: column; }
   .ies-step-arrow { transform: rotate(90deg); }
-  .ies-h { font-size: 1.5rem; }
+  .ies-h { font-size: 1.75rem; }
 }
 
 .grade-legend {
@@ -749,7 +767,7 @@ function bestIdx(vals, hi) {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.64rem;
+  font-size: 0.74rem;
   color: var(--ink3);
 }
 
@@ -772,7 +790,7 @@ function bestIdx(vals, hi) {
   min-width: 200px;
 }
 .sbs-legend-title {
-  font-size: 0.63rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: var(--ink2);
   width: 100%;
@@ -782,8 +800,44 @@ function bestIdx(vals, hi) {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.63rem;
+  font-size: 0.74rem;
   color: var(--ink3);
+}
+
+.ins-school-hdr {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 0 0 16px;
+}
+
+.ish-acts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.ls-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 18px;
+  border-radius: 8px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.ls-apply-btn:hover { background: var(--blue-d); }
+.ls-apply-btn--sm {
+  padding: 6px 14px;
+  font-size: 0.78rem;
 }
 
 </style>
