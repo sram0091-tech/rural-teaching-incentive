@@ -82,3 +82,39 @@ export async function fetchExplorerHeroTop() {
   const json = await r.json()
   return normalizeHeroPayload(json)
 }
+
+export async function fetchIncentiveBreakdown(schoolId) {
+  const u = apiUrlObject('/api/incentives/breakdown')
+  u.searchParams.set('school_id', String(schoolId))
+  const r = await fetch(u.toString())
+  if (!r.ok) throw new Error(`incentive breakdown ${r.status}`)
+  return r.json()
+}
+
+export async function checkEligibility(payload) {
+  const r = await fetch(`${API_BASE}/api/eligibility/check`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!r.ok) throw new Error(`eligibility ${r.status}`)
+  return r.json()
+}
+
+export async function fetchIncentiveEstimate(payload) {
+  const r = await fetch(`${API_BASE}/api/incentives/estimate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!r.ok) throw new Error(`incentive estimate ${r.status}`)
+  return r.json()
+}
+
+export async function fetchVerifyIncentiveLink(schoolId) {
+  const u = apiUrlObject('/api/incentives/verify-link')
+  u.searchParams.set('school_id', String(schoolId))
+  const r = await fetch(u.toString())
+  if (!r.ok) throw new Error(`verify incentive link ${r.status}`)
+  return r.json()
+}

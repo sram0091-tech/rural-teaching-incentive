@@ -48,34 +48,7 @@
     <!-- Desktop inline detail -->
     <Transition name="detail">
       <div v-if="isOpen && !isMobile" class="srow-detail">
-        <div class="inc-box">
-          <div class="inc-box-title">💰 Incentive Package</div>
-          <template v-if="numInc(school) > 0">
-            <div class="inc-big">${{ Math.round(numInc(school)).toLocaleString() }}</div>
-            <div class="inc-sublbl">{{ school.inc_label || 'Incentive package' }} · per year on top of base salary</div>
-            <div class="inc-rows">
-              <div class="inc-r">
-                <span class="inc-rk">Eligibility</span>
-                <span class="inc-rv" :class="empType === 'perm' ? 'good' : 'warn'">
-                  {{ empType === 'perm' ? 'Permanent — fully eligible' : 'Temporary — check eligibility' }}
-                </span>
-              </div>
-              <div class="inc-r">
-                <span class="inc-rk">System</span>
-                <span class="inc-rv">{{ school.state_id === '1' ? 'QLD Directive 16/18' : 'NSW RTI Review 2020' }}</span>
-              </div>
-              <div class="inc-r">
-                <span class="inc-rk">Remoteness</span>
-                <span class="inc-rv">{{ school.remoteness || '—' }}</span>
-              </div>
-            </div>
-            <div class="inc-src">Verify directly with {{ school.state_id === '1' ? 'Teach.QLD' : 'Teach.NSW' }} before deciding.</div>
-          </template>
-          <div v-else class="no-inc">No incentive data linked to this school.</div>
-          <div class="life-lnk" @click="$emit('view-lifestyle', school.id)">
-            🌿 View lifestyle for {{ school.suburb }} →
-          </div>
-        </div>
+        <IncentivePanel :school="school" @view-lifestyle="$emit('view-lifestyle', school.id)" />
       </div>
     </Transition>
 
@@ -97,34 +70,7 @@
               <button class="sheet-close" @click="$emit('toggle', school.id)">✕</button>
             </div>
             <div class="sheet-body">
-              <div class="inc-box">
-                <div class="inc-box-title">💰 Incentive Package</div>
-                <template v-if="numInc(school) > 0">
-                  <div class="inc-big">${{ Math.round(numInc(school)).toLocaleString() }}</div>
-                  <div class="inc-sublbl">{{ school.inc_label || 'Incentive package' }} · per year on top of base salary</div>
-                  <div class="inc-rows">
-                    <div class="inc-r">
-                      <span class="inc-rk">Eligibility</span>
-                      <span class="inc-rv" :class="empType === 'perm' ? 'good' : 'warn'">
-                        {{ empType === 'perm' ? 'Permanent — fully eligible' : 'Temporary — check eligibility' }}
-                      </span>
-                    </div>
-                    <div class="inc-r">
-                      <span class="inc-rk">System</span>
-                      <span class="inc-rv">{{ school.state_id === '1' ? 'QLD Directive 16/18' : 'NSW RTI Review 2020' }}</span>
-                    </div>
-                    <div class="inc-r">
-                      <span class="inc-rk">Remoteness</span>
-                      <span class="inc-rv">{{ school.remoteness || '—' }}</span>
-                    </div>
-                  </div>
-                  <div class="inc-src">Verify directly with {{ school.state_id === '1' ? 'Teach.QLD' : 'Teach.NSW' }} before deciding.</div>
-                </template>
-                <div v-else class="no-inc">No incentive data linked to this school.</div>
-                <div class="life-lnk" @click="$emit('view-lifestyle', school.id)">
-                  🌿 View lifestyle for {{ school.suburb }} →
-                </div>
-              </div>
+              <IncentivePanel :school="school" @view-lifestyle="$emit('view-lifestyle', school.id)" />
             </div>
           </div>
         </div>
@@ -137,6 +83,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RC } from '../data/db.js'
 import { toNum } from '../utils/locationFields.js'
+import IncentivePanel from './incentives/IncentivePanel.vue'
 
 defineProps({
   school: Object,

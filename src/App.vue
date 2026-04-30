@@ -417,7 +417,7 @@ main {
 .school-list { border:1px solid var(--b); border-radius:var(--r); overflow:hidden; background:var(--s); }
 .srow { border-bottom:1px solid var(--b); }
 .srow:last-child { border-bottom:none; }
-.srow-main { display:flex; align-items:center; gap:10px; padding:11px 14px; cursor:pointer; transition:background 0.11s; }
+.srow-main { display:flex; align-items:center; gap:10px; padding:10px 10px; cursor:pointer; transition:background 0.11s; }
 .srow-main:hover,.srow.open .srow-main { background:var(--s2); }
 .srow-left { flex:1; min-width:0; }
 .srow-name { font-size:0.85rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -433,7 +433,7 @@ main {
 .btn-cmp.added { background:var(--green-s); color:var(--green-d); border-color:var(--green-d); }
 .btn-exp { font-size:0.67rem; padding:4px 8px; border-radius:var(--r2); border:1px solid var(--blue-s); background:var(--blue-s); color:var(--blue); cursor:pointer; white-space:nowrap; transition:all 0.11s; }
 .btn-exp:hover { background:var(--blue); color:#fff; }
-.srow-detail { background:var(--s2); border-top:1px solid var(--b); padding:13px 14px; }
+.srow-detail { background:var(--s2); border-top:1px solid var(--b); padding:10px; }
 .detail-enter-active { animation:fadeIn 0.16s ease; }
 
 .inc-box { background:var(--s); border:1px solid var(--b); border-left:3px solid var(--green); border-radius:0 var(--r2) var(--r2) 0; padding:13px 14px; }

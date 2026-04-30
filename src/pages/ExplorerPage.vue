@@ -246,7 +246,7 @@
           </div>
           <div class="school-list">
             <SchoolRow
-              v-for="s in searchListItems"
+              v-for="s in visibleSearchListItems"
               :key="s.id"
               :school="s"
               :is-open="openRow === String(s.id)"
@@ -258,7 +258,7 @@
               @view-lifestyle="handleViewLifestyle"
             />
           </div>
-          <AppPagination :total="searchTotal" :page="currentPage" @change="goPage" />
+          <AppPagination v-if="!openRow" :total="searchTotal" :page="currentPage" @change="goPage" />
         </template>
         <div v-else class="search-empty-state">
           <div class="ses-title">{{ searchQ || remSize > 0 || fState !== 'both' ? 'No schools match' : 'Search for a school' }}</div>
@@ -358,7 +358,7 @@
                 <div class="r-meta" style="margin-top:4px">sorted by {{ sortLabel }}</div>
                 <div class="school-list">
                   <SchoolRow
-                    v-for="s in guideListItems"
+                    v-for="s in visibleGuideListItems"
                     :key="s.id"
                     :school="s"
                     :is-open="openRow === String(s.id)"
@@ -370,7 +370,7 @@
                     @view-lifestyle="handleViewLifestyle"
                   />
                 </div>
-                <AppPagination :total="guideTotal" :page="guidePage" @change="goGuidePage" />
+                <AppPagination v-if="!openRow" :total="guideTotal" :page="guidePage" @change="goGuidePage" />
               </template>
               <div v-else class="search-empty-state">
                 <div class="ses-title">No schools match</div>
@@ -479,6 +479,16 @@ function cmpApplyUrl(school) {
     ? 'https://smartjobs.qld.gov.au/jobtools/jncustomsearch.searchResults%3Fin_organid%3D14904%26in_jobDate%3DAll%26in_multi01_id%3D1108%26in_skills%3Dteacher'
     : 'https://education.nsw.gov.au/teach-nsw/find-teaching-jobs/jobfeed#Rural0'
 }
+
+const visibleSearchListItems = computed(() => {
+  if (!openRow.value) return searchListItems.value
+  return searchListItems.value.filter(s => String(s.id) === openRow.value)
+})
+
+const visibleGuideListItems = computed(() => {
+  if (!openRow.value) return guideListItems.value
+  return guideListItems.value.filter(s => String(s.id) === openRow.value)
+})
 
 function onSelState(v)  { selState(v);  loadSearchLocations(searchQ.value) }
 function onSelEmp(v)    { selEmp(v);    loadSearchLocations(searchQ.value) }
