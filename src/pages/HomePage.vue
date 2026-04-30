@@ -153,85 +153,6 @@
     </section>
     </div>
 
-    <!-- TOP INCENTIVE AREAS -->
-    <!-- INCENTIVE SNAPSHOT -->
-    <section class="snapshot fade-section">
-      <div class="snapshot-inner">
-        <div class="section-header">
-          <div class="section-eyebrow">What could you earn?</div>
-          <h2>The further you go, the more you earn on top</h2>
-          <p>Remoteness tiers determine your incentive — more remote means a higher payment on top of your base salary. Here is what teachers are currently receiving across QLD and NSW.</p>
-        </div>
-        <div class="snap-grid">
-
-          <div class="snap-card snap-vr">
-            <div class="snap-tier-label">Very Remote</div>
-            <div class="snap-row">
-              <img src="../assets/flag-nsw.png" alt="NSW" class="snap-flag" />
-              <div class="snap-info">
-                <div class="snap-suburb">Wilcannia, Bourke, Tibooburra</div>
-                <div class="snap-desc">8-point RTI + Retention Benefit</div>
-              </div>
-              <div class="snap-amount green">$30k<span>/yr</span></div>
-            </div>
-            <div class="snap-row">
-              <img src="../assets/flag-qld.png" alt="QLD" class="snap-flag" />
-              <div class="snap-info">
-                <div class="snap-suburb">Birdsville, Jundah, Eromanga</div>
-                <div class="snap-desc">Locality Allowance — Full Rate</div>
-              </div>
-              <div class="snap-amount amber">$7–11k<span>/yr</span></div>
-            </div>
-            <button class="snap-btn" @click="goExploreByRemoteness('5')">Explore Very Remote schools</button>
-          </div>
-
-          <div class="snap-card snap-r">
-            <div class="snap-tier-label">Remote</div>
-            <div class="snap-row">
-              <img src="../assets/flag-nsw.png" alt="NSW" class="snap-flag" />
-              <div class="snap-info">
-                <div class="snap-suburb">Walgett, Cobar, Collarenebri</div>
-                <div class="snap-desc">6 or 8-point RTI + Retention Benefit</div>
-              </div>
-              <div class="snap-amount green">$25–30k<span>/yr</span></div>
-            </div>
-            <div class="snap-row">
-              <img src="../assets/flag-qld.png" alt="QLD" class="snap-flag" />
-              <div class="snap-info">
-                <div class="snap-suburb">Cooktown, Hope Vale, Mount Isa</div>
-                <div class="snap-desc">Locality Allowance — Full Rate</div>
-              </div>
-              <div class="snap-amount amber">$5–8k<span>/yr</span></div>
-            </div>
-            <button class="snap-btn" @click="goExploreByRemoteness('4')">Explore Remote schools</button>
-          </div>
-
-          <div class="snap-card snap-or">
-            <div class="snap-tier-label">Outer Regional</div>
-            <div class="snap-row">
-              <img src="../assets/flag-nsw.png" alt="NSW" class="snap-flag" />
-              <div class="snap-info">
-                <div class="snap-suburb">Broken Hill, Dareton, Coomealla</div>
-                <div class="snap-desc">4 or 6-point RTI</div>
-              </div>
-              <div class="snap-amount green">$20–25k<span>/yr</span></div>
-            </div>
-            <div class="snap-row">
-              <img src="../assets/flag-qld.png" alt="QLD" class="snap-flag" />
-              <div class="snap-info">
-                <div class="snap-suburb">Townsville region, Eaton College</div>
-                <div class="snap-desc">Locality Allowance applies</div>
-              </div>
-              <div class="snap-amount amber">$2–5k<span>/yr</span></div>
-            </div>
-            <button class="snap-btn" @click="goExploreByRemoteness('3')">Explore Outer Regional schools</button>
-          </div>
-
-        </div>
-        <div class="snap-note">All figures are indicative annual incentive payments on top of your base salary. Always verify eligibility with your state education department.</div>
-      </div>
-    </section>
-
     <!-- HOW IT WORKS -->
     <section class="how-section fade-section">
       <div class="how-inner">
@@ -350,17 +271,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useExplorer } from '../composables/useExplorer.js'
 
 const emit = defineEmits(['navigate', 'view-lifestyle'])
-
-const { launchView, launchRem } = useExplorer()
-
-function goExploreByRemoteness(remId) {
-  launchRem.value = remId
-  launchView.value = 'search'
-  emit('navigate', 'explorer')
-}
 
 const scrollPct = ref(0)
 
@@ -541,7 +453,7 @@ onMounted(() => {
     (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); cardObserver.unobserve(e.target) } }),
     { threshold: 0.12 }
   )
-  document.querySelectorAll('.why-card, .snap-card, .how-card').forEach(el => cardObserver.observe(el))
+  document.querySelectorAll('.why-card, .how-card').forEach(el => cardObserver.observe(el))
 
   const storySectionEl = document.querySelector('.story-cin-section')
   if (storySectionEl) storyVisObs = startStoryIfVisible(storySectionEl)
@@ -1134,65 +1046,11 @@ onUnmounted(() => {
   border-color: rgba(255,255,255,0.7);
   color: #fff;
 }
-/* Snap card stagger animations */
-.snap-card { opacity: 0; transform: translateY(20px); }
-.snap-card.in-view { animation: fadeUp 0.55s ease forwards; }
-.snap-grid .snap-card:nth-child(1).in-view { animation-delay: 0.05s; }
-.snap-grid .snap-card:nth-child(2).in-view { animation-delay: 0.17s; }
-.snap-grid .snap-card:nth-child(3).in-view { animation-delay: 0.29s; }
-
-/* TOP AREAS */
-/* SNAPSHOT */
-.snapshot {
-  background: var(--bg);
-  padding: 88px 24px;
-  border-bottom: 1px solid var(--b);
-  position: relative;
-  overflow: hidden;
-}
-.snapshot::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 10% 50%, rgba(31,111,235,0.06) 0%, transparent 50%),
-    radial-gradient(circle at 90% 20%, rgba(30,158,86,0.05) 0%, transparent 40%);
-  pointer-events: none;
-}
-.snapshot-inner { position: relative; z-index: 1; }
-.snapshot-inner { padding: 0 24px; max-width: 1200px; margin: 0 auto; }
 .section-header { margin-bottom: 40px; text-align: center;}
 .section-header.centered { text-align: center; }
 .section-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; display: inline-block; }
 .section-header h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1.12; margin-bottom: 10px; }
 .section-header p { font-size: 0.96rem; color: var(--ink2); }
-.snapshot .section-header { text-align: center; }
-
-.snap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; width: 100%; }
-
-.snap-card { background: var(--s); border: 1px solid var(--b); border-radius: 14px; padding: 24px; transition: box-shadow 0.18s; }
-.snap-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.07); }
-
-.snap-tier-label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--b); }
-.snap-vr .snap-tier-label { color: #991B1B; }
-.snap-r .snap-tier-label { color: #A05A00; }
-.snap-or .snap-tier-label { color: #1558C4; }
-
-.snap-row { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--b); }
-.snap-row:last-of-type { border-bottom: none; margin-bottom: 16px; }
-.snap-flag { height: 18px; width: auto; border-radius: 2px; flex-shrink: 0; }
-.snap-info { flex: 1; }
-.snap-suburb { font-size: 0.88rem; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
-.snap-desc { font-size: 0.78rem; color: var(--ink3); }
-.snap-amount { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; flex-shrink: 0; text-align: right; }
-.snap-amount span { font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600; opacity: 0.7; }
-.snap-amount.green { color: var(--green-d); }
-.snap-amount.amber { color: var(--orange-d); }
-
-.snap-btn { width: 100%; padding: 9px 0; background: transparent; color: var(--blue); border: 1.5px solid var(--blue); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: background 0.14s; }
-.snap-btn:hover { background: var(--blue-s); }
-
-.snap-note { font-size: 0.72rem; color: var(--ink3); text-align: center; font-style: italic; }
 
 /* HOW STEPS */
 .how-section { background: var(--bg); padding: 64px 24px; border-top: 1px solid var(--b); border-bottom: 1px solid var(--b); }
@@ -1398,30 +1256,6 @@ onUnmounted(() => {
   .story-cin-section { height: 78vh; min-height: 520px; }
   .cin-headline { font-size: 2.6rem; }
   .cin-qtext { font-size: 1.15rem; }
-  /* ── Snap-grid: horizontal swipe ── */
-  .snapshot { padding: 52px 0; }
-  .snapshot-inner { padding: 0; }
-  .snap-grid {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    gap: 14px;
-    padding: 4px 24px 20px;
-  }
-  .snap-grid::-webkit-scrollbar { display: none; }
-  .snap-card {
-    flex: 0 0 82vw;
-    max-width: 320px;
-    scroll-snap-align: start;
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
-  }
-  .snap-grid::after { content: ''; flex: 0 0 10px; }
-
   /* ── How-cards: horizontal swipe ── */
   .how-section { padding: 48px 0; }
   .how-section .section-header { padding: 0 24px; }
