@@ -69,11 +69,44 @@
       </div>
     </div>
 
+    <section v-if="!showCmp" class="explorer-profile-card" :class="{ collapsed: !isProfileExpanded }">
+      <div class="explorer-profile-inner">
+        <template v-if="isProfileExpanded">
+          <button v-if="preferencesApplied" class="profile-collapse-btn" type="button" @click="profileCardOpen = false">
+            Collapse preferences
+          </button>
+          <EligibilityChecker
+            compact
+            :initial-profile="incentiveProfile"
+            :show-result="false"
+            title="See incentives that apply to you"
+            subtitle="Tell us your role and experience so schools, map pins, and each incentive package reflect what you may actually be eligible for."
+            action-label="Update my matches"
+            ready-label="Ready"
+            @profile-change="handleProfileChange"
+            @profile-submit="applyProfilePreferences"
+          />
+          <div v-if="preferencesApplied" class="profile-applied">Your matches, map, and school incentive packages are now personalised.</div>
+        </template>
+        <button v-else class="profile-summary-bar" type="button" @click="profileCardOpen = true">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--blue);flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          <span class="profile-summary-title">Incentive preferences</span>
+          <span class="profile-summary-divider">·</span>
+          <span class="profile-summary-copy">{{ profileSummary }}</span>
+          <span class="profile-summary-edit">Edit</span>
+        </button>
+      </div>
+    </section>
+
     <!-- ── Entry ── -->
-    <div v-else-if="view === 'entry'" class="exp-entry anim-fadeup">
+    <div v-if="!showCmp && view === 'entry'" class="exp-entry anim-fadeup">
       <div class="exp-entry-h">
         <h2>How would you like to find a school?</h2>
         <p>Choose the path that suits you — both lead to the same results</p>
+        <div v-if="preferencesApplied" class="entry-personalised-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Results and incentive estimates are personalised to your profile
+        </div>
       </div>
 
       <div class="two-paths">
@@ -123,26 +156,12 @@
         </div>
       </div>
 
-      <div class="exp-stats-bar">
-        <div class="exp-stat">
-          <span class="es-num">645</span>
-          <span class="es-lbl">schools with incentives</span>
-        </div>
-        <div class="exp-stat-div"></div>
-        <div class="exp-stat">
-          <span class="es-num">2</span>
-          <span class="es-lbl">states covered</span>
-        </div>
-        <div class="exp-stat-div"></div>
-        <div class="exp-stat">
-          <span class="es-num">$45k+</span>
-          <span class="es-lbl">top annual package</span>
-        </div>
-      </div>
-
       <div class="exp-map-section">
         <div class="exp-map-header">
-          <div class="exp-map-label">Schools with incentives — QLD &amp; NSW</div>
+          <div class="exp-map-label">
+            Schools with incentives — QLD &amp; NSW
+            <span v-if="preferencesApplied" class="map-personalised-chip">Filtered by your profile</span>
+          </div>
           <div class="exp-map-hint">Hover for a preview · click any dot to see school details · use QLD/NSW to focus</div>
         </div>
         <div ref="mapEl" class="exp-map-container"></div>
@@ -163,10 +182,10 @@
     </div>
 
     <!-- ── Search Path ── -->
-    <div v-else-if="view === 'search'" class="search-path anim-fadeup">
+    <div v-else-if="!showCmp && view === 'search'" class="search-path anim-fadeup">
       <div class="back-row" @click="view = 'entry'">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
-        Back
+        Back to overview
       </div>
       <div class="srch-row">
         <div class="srch-wrap">
@@ -253,6 +272,7 @@
               :in-cmp="isCmp(s.id)"
               :sort="fSort"
               :emp-type="fEmp"
+              :incentive-profile="incentiveProfile"
               @toggle="handleToggleRow"
               @toggle-cmp="handleToggleCmp"
               @view-lifestyle="handleViewLifestyle"
@@ -268,11 +288,11 @@
     </div>
 
     <!-- ── Guided Path ── -->
-    <div v-else-if="view === 'guide'" class="guide-path anim-fadeup">
+    <div v-else-if="!showCmp && view === 'guide'" class="guide-path anim-fadeup">
       <div class="guide-inner">
         <div class="back-row" @click="view = 'entry'">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
-          Back
+          Back to overview
         </div>
 
         <div class="guide-progress">
@@ -355,7 +375,9 @@
               </div>
               <div v-else-if="guideError" class="error-state">{{ guideError }}</div>
               <template v-else-if="guideListItems.length">
-                <div class="r-meta" style="margin-top:4px">sorted by {{ sortLabel }}</div>
+                <div class="r-meta" style="margin-top:4px">
+                  <strong>{{ guideTotal }}</strong> school{{ guideTotal !== 1 ? 's' : '' }} matched · sorted by {{ sortLabel }}
+                </div>
                 <div class="school-list">
                   <SchoolRow
                     v-for="s in visibleGuideListItems"
@@ -365,6 +387,7 @@
                     :in-cmp="isCmp(s.id)"
                     :sort="fSort"
                     :emp-type="fEmp"
+                    :incentive-profile="incentiveProfile"
                     @toggle="handleToggleRow"
                     @toggle-cmp="handleToggleCmp"
                     @view-lifestyle="handleViewLifestyle"
@@ -407,6 +430,7 @@ import { normalizeLocationList } from '../utils/locationFields.js'
 import SchoolRow from '../components/SchoolRow.vue'
 import AppPagination from '../components/AppPagination.vue'
 import CompareTray from '../components/CompareTray.vue'
+import EligibilityChecker from '../components/incentives/EligibilityChecker.vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -439,22 +463,79 @@ let qldLayer      = null
 let nswLayer      = null
 
 const mapSchools = ref([])
+const incentiveProfile = ref({
+  employmentType: '',
+  yearsExperience: '',
+  hasDependants: false,
+  ready: false,
+})
+const preferencesApplied = ref(false)
+const profileCardOpen = ref(true)
+const isProfileExpanded = computed(() => profileCardOpen.value && (!preferencesApplied.value || view.value === 'entry' || view.value === 'search' || view.value === 'guide'))
+const profileSummary = computed(() => {
+  if (!incentiveProfile.value.ready) return 'Add your role and experience to personalise results.'
+  return `${employmentLabel(incentiveProfile.value.employmentType)} · ${incentiveProfile.value.yearsExperience} year${Number(incentiveProfile.value.yearsExperience) === 1 ? '' : 's'} experience`
+})
+
+function profileEmployeeTypeForApi() {
+  return {
+    permanent: 'perm',
+    temporary: 'temp',
+    public_service_officer: 'public_service_officer',
+  }[incentiveProfile.value.employmentType] || ''
+}
 
 async function loadMapSchools() {
   try {
-    const [qld, nsw] = await Promise.all([
-      fetchExplorerLocations({ page: 1, page_size: 200, state: 'qld', sort: 'inc' }),
-      fetchExplorerLocations({ page: 1, page_size: 200, state: 'nsw', sort: 'inc' }),
-    ])
-    const all = [
-      ...normalizeLocationList(qld.items),
-      ...normalizeLocationList(nsw.items),
-    ].filter(s => s.annual_incentive > 0)
+    const stateList = fState.value === 'both' ? ['qld', 'nsw'] : [fState.value]
+    const remoteness_ids = [...fRem].sort().join(',')
+    const employee_type = profileEmployeeTypeForApi() || (fEmp.value !== 'both' ? fEmp.value : '')
+    const responses = await Promise.all(stateList.map((state) => fetchExplorerLocations({
+      page: 1,
+      page_size: 200,
+      state,
+      sort: 'inc',
+      employee_type,
+      remoteness_ids,
+      years_experience: incentiveProfile.value.ready ? incentiveProfile.value.yearsExperience : '',
+      has_dependants: incentiveProfile.value.ready ? incentiveProfile.value.hasDependants : '',
+    })))
+    const all = responses.flatMap((r) => normalizeLocationList(r.items)).filter(s => s.annual_incentive > 0)
     mapSchools.value = all
   } catch (e) {
     console.warn('loadMapSchools failed:', e)
     mapSchools.value = heroTop.value.filter(s => s.annual_incentive > 0)
   }
+}
+
+function handleProfileChange(profile) {
+  const unchanged =
+    incentiveProfile.value.employmentType === profile.employmentType &&
+    String(incentiveProfile.value.yearsExperience) === String(profile.yearsExperience) &&
+    Boolean(incentiveProfile.value.hasDependants) === Boolean(profile.hasDependants) &&
+    Boolean(incentiveProfile.value.ready) === Boolean(profile.ready)
+  incentiveProfile.value = { ...profile }
+  if (!unchanged) preferencesApplied.value = false
+}
+
+function applyProfilePreferences(profile) {
+  incentiveProfile.value = { ...profile }
+  const empFilter = profileEmployeeTypeForApi()
+  selEmp(empFilter || 'both')
+  openRow.value = null
+  preferencesApplied.value = true
+  profileCardOpen.value = true
+  if (view.value === 'search') loadSearchLocations(searchQ.value)
+  if (view.value === 'guide' && guideStep.value === 3) loadGuideLocations()
+  loadMapSchools()
+}
+
+function employmentLabel(value) {
+  return {
+    permanent: 'Permanent',
+    temporary: 'Temporary',
+    public_service_officer: 'Public Service Officer',
+  }[value] || 'Role not set'
 }
 
 const topIncentive = computed(() => {
@@ -548,6 +629,7 @@ function resetFilters() {
 }
 
 watch(view, (v) => {
+  if (!preferencesApplied.value) profileCardOpen.value = v === 'entry'
   if (v === 'search') {
     resetFilters()
     if (launchRem.value)  { toggleRem(launchRem.value);   launchRem.value  = null }
@@ -562,7 +644,12 @@ watch(view, (v) => {
 })
 
 const showBackTop = ref(false)
-function onScroll() { showBackTop.value = window.scrollY > 400 }
+function onScroll() {
+  showBackTop.value = window.scrollY > 400
+  if (preferencesApplied.value && profileCardOpen.value && window.scrollY > 260) {
+    profileCardOpen.value = false
+  }
+}
 
 onMounted(() => {
   if (launchView.value) {
@@ -907,6 +994,168 @@ const q3opts = [
 }
 
 .back-row:hover { color: var(--blue-d); }
+
+.explorer-profile-card {
+  width: 100%;
+  margin: 0 0 22px;
+  padding: 14px 20px 10px;
+  background: transparent;
+  border-bottom: 0;
+  box-shadow: none;
+}
+
+.explorer-profile-card.collapsed {
+  width: fit-content;
+  margin: 0 auto 22px;
+  padding: 8px 20px;
+  background: transparent;
+  border-bottom: 0;
+  box-shadow: none;
+}
+
+.explorer-profile-inner {
+  position:relative;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 28px;
+  background: var(--s);
+  border: 1px solid var(--b);
+  border-radius: var(--r);
+  box-shadow: 0 4px 20px rgba(13,31,60,0.07);
+}
+
+.collapsed .explorer-profile-inner {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.profile-collapse-btn {
+  position:absolute;
+  top:12px;
+  right:14px;
+  border:0;
+  border-radius:6px;
+  background:#fff;
+  color:var(--blue);
+  padding:6px 10px;
+  font:inherit;
+  font-size:0.72rem;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(13,31,60,0.08);
+}
+
+.profile-collapse-btn:hover {
+  background:var(--blue-s);
+}
+
+.profile-applied {
+  display:inline-flex;
+  align-items:center;
+  margin-top: 12px;
+  padding:7px 10px;
+  border-radius:6px;
+  background:var(--green-s);
+  color: var(--green-d);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.profile-summary-bar {
+  width:auto;
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  border:1px solid var(--b);
+  border-radius:8px;
+  background:var(--s);
+  padding:8px 14px;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(13,31,60,0.06);
+}
+
+.profile-summary-title {
+  font-size:0.76rem;
+  font-weight:900;
+  color:var(--ink);
+  white-space:nowrap;
+}
+
+.profile-summary-divider {
+  color:var(--ink3);
+  font-size:0.76rem;
+}
+
+.profile-summary-copy {
+  flex:1 1 auto;
+  color:var(--ink3);
+  font-size:0.76rem;
+  font-weight:600;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.profile-summary-edit {
+  flex-shrink:0;
+  font-size:0.72rem;
+  font-weight:800;
+  color:var(--blue);
+  border:1px solid var(--blue);
+  border-radius:5px;
+  padding:2px 8px;
+  margin-left:4px;
+}
+
+/* ── Entry personalised note ── */
+.entry-personalised-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 5px 12px;
+  background: var(--green-s);
+  color: var(--green-d);
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ── Map personalised chip ── */
+.map-personalised-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: var(--green-s);
+  color: var(--green-d);
+  border-radius: 99px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+/* ── Results personalised chip ── */
+.r-personalised-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: var(--green-s);
+  color: var(--green-d);
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  vertical-align: middle;
+}
 
 .exp-entry {
   padding:16px 140px 0;
@@ -1627,6 +1876,11 @@ const q3opts = [
   .search-path,
   .guide-path,
   .page-topbar {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .explorer-profile-card {
     padding-left: 20px;
     padding-right: 20px;
   }
