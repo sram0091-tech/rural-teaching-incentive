@@ -6,7 +6,7 @@
 
     <!-- HERO -->
     <section class="cin-section">
-      <video class="cin-video-bg" autoplay muted loop playsinline>
+      <video class="cin-video-bg" autoplay muted loop playsinline :style="heroVideoStyle">
         <source :src="heroVideo" type="video/mp4">
       </video>
       <div class="cin-overlay"></div>
@@ -26,7 +26,7 @@
 
       <div class="cin-photo-credit">Video: <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a></div>
 
-      <div class="hero-trust-strip fade-section">
+      <div class="hero-trust-strip">
         <div class="trust-item">
           <div class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
           <div class="trust-title">Government data only</div>
@@ -110,7 +110,7 @@
 
     <!-- TEACHER STORY -->
     <div class="story-cin-wrap">
-      <div class="section-header centered story-section-header">
+      <div class="section-header centered story-section-header fade-section">
         <div class="section-eyebrow story-title-blue">A teacher's story</div>
         <h2>Meet Katie</h2>
       </div>
@@ -259,12 +259,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import heroVideo from '../assets/5198159-uhd_3840_2160_25fps.mp4'
 
 const emit = defineEmits(['navigate', 'view-lifestyle'])
 
 const scrollPct = ref(0)
+const heroParallaxY = ref(0)
+
+const heroVideoStyle = computed(() => ({
+  transform: `scale(1.06) translateY(${-heroParallaxY.value * 0.12}px)`
+}))
 
 // ── Teacher story slideshow ──
 const STORY_SLIDES = [
@@ -426,6 +431,7 @@ function onScroll() {
   const scrolled = el.scrollTop || document.body.scrollTop
   const total = el.scrollHeight - el.clientHeight
   scrollPct.value = total > 0 ? (scrolled / total) * 100 : 0
+  heroParallaxY.value = scrolled
 }
 
 let storyVisObs = null
@@ -652,13 +658,29 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-/* FADE-IN ON SCROLL */
+/* APPLE-STYLE ANIMATIONS */
 @keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes appleReveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes heroIn {
   from { opacity: 0; transform: translateY(28px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.fade-section { opacity: 0; transform: translateY(28px); }
-.fade-section.in-view { animation: fadeUp 0.55s ease forwards; }
+
+/* Scroll reveals — Apple spring easing */
+.fade-section { opacity: 0; transform: translateY(22px); }
+.fade-section.in-view { animation: fadeUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+/* Hero entrance — staggered on page load */
+.cin-eyebrow   { animation: heroIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.10s both; }
+.cin-hero-h1   { animation: heroIn 0.90s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both; }
+.cin-hero-acts { animation: heroIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.54s both; }
+.hero-trust-strip { animation: heroIn 0.80s cubic-bezier(0.22, 1, 0.36, 1) 0.76s both; }
 
 .btn-hero-p {
   padding: 16px 32px;
@@ -753,6 +775,7 @@ onUnmounted(() => {
   filter: blur(3px);
   transform: scale(1.06);
   z-index: 0;
+  will-change: transform;
 }
 
 .story-cin-section .cin-bg {
@@ -894,13 +917,13 @@ onUnmounted(() => {
 .cin-photo-credit a { color: rgba(255,255,255,0.45); text-decoration: none; }
 .cin-photo-credit a:hover { color: rgba(255,255,255,0.7); text-decoration: underline; }
 
-/* Why card stagger animations */
-.why-card { opacity: 0; transform: translateY(20px); }
-.why-card.in-view { animation: fadeUp 0.55s ease forwards; }
-.why-grid .why-card:nth-child(1).in-view { animation-delay: 0.05s; }
-.why-grid .why-card:nth-child(2).in-view { animation-delay: 0.15s; }
-.why-grid .why-card:nth-child(3).in-view { animation-delay: 0.25s; }
-.why-grid .why-card:nth-child(4).in-view { animation-delay: 0.35s; }
+/* Why card stagger animations — Apple scale reveal */
+.why-card { opacity: 0; transform: translateY(20px) scale(0.96); }
+.why-card.in-view { animation: appleReveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.why-grid .why-card:nth-child(1).in-view { animation-delay: 0.00s; }
+.why-grid .why-card:nth-child(2).in-view { animation-delay: 0.10s; }
+.why-grid .why-card:nth-child(3).in-view { animation-delay: 0.20s; }
+.why-grid .why-card:nth-child(4).in-view { animation-delay: 0.30s; }
 
 .why-card {
   background: var(--s);
@@ -950,7 +973,7 @@ onUnmounted(() => {
   transform: translateY(20px);
 }
 .story-cin-section.in-view {
-  animation: fadeUp 0.55s ease forwards;
+  animation: fadeUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .cin-tag-pill {
   font-size: 0.68rem;
@@ -1100,11 +1123,11 @@ onUnmounted(() => {
 .how-card { flex: 1; background: var(--s); border: 1px solid var(--b); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.18s; }
 .how-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.08); }
 
-.how-card { opacity: 0; transform: translateY(20px); }
-.how-card.in-view { animation: fadeUp 0.55s ease forwards; }
-.how-cards .how-card:nth-child(1).in-view { animation-delay: 0.05s; }
-.how-cards .how-card:nth-child(3).in-view { animation-delay: 0.18s; }
-.how-cards .how-card:nth-child(5).in-view { animation-delay: 0.31s; }
+.how-card { opacity: 0; transform: translateY(20px) scale(0.96); }
+.how-card.in-view { animation: appleReveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.how-cards .how-card:nth-child(1).in-view { animation-delay: 0.00s; }
+.how-cards .how-card:nth-child(3).in-view { animation-delay: 0.14s; }
+.how-cards .how-card:nth-child(5).in-view { animation-delay: 0.28s; }
 
 .how-card-img { height: 160px; background-size: cover; background-position: center; }
 .img-search {
