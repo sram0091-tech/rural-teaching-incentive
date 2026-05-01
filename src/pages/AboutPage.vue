@@ -60,37 +60,6 @@
       </div>
     </section>
 
-    <!-- MEDIA & STORY CREDITS -->
-    <section class="credits-section">
-      <div class="credits-inner">
-        <div class="credits-heading">
-          <span class="section-eyebrow">Media &amp; story credits</span>
-        </div>
-        <div class="credits-list">
-
-          <div class="credit-item">
-            <div class="credit-thumb" style="background-image: url('https://teach.qld.gov.au/teachinstateschools/publishingimages/thumbnail_farnorthqueenslandregion.jpg')"></div>
-            <div class="credit-body">
-              <div class="credit-label">Hero image — Far North Queensland region</div>
-              <div class="credit-text">Photograph of a teacher in Far North Queensland, used as the homepage hero background.</div>
-              <a href="https://teach.qld.gov.au" target="_blank" rel="noopener" class="data-card-link">teach.qld.gov.au</a>
-            </div>
-          </div>
-
-          <div class="credit-item">
-            <div class="credit-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-            </div>
-            <div class="credit-body">
-              <div class="credit-label">Katie's story — Acting Head of Department in her 20s</div>
-              <div class="credit-text">Teacher success story shared publicly by the Queensland Department of Education. Katie taught at Cooktown, Far North Queensland, progressing to Acting Head of Department.</div>
-              <a href="https://www.facebook.com/TeachQLD/" target="_blank" rel="noopener" class="data-card-link">Teach QLD on Facebook</a>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
 
     <!-- PRINCIPLES — warm off-white background, professional -->
     <section class="principles-section">
@@ -176,7 +145,7 @@ defineEmits(['navigate'])
 }
 
 /* DATA SECTION */
-.data-section { background: var(--bg); padding: 88px 0; border-bottom: 1px solid var(--b); }
+.data-section { background: var(--bg); padding: 60px 0 40px; }
 .data-inner { padding: 0 80px; }
 .section-header { margin-bottom: 44px; }
 .section-header.centered { text-align: center; }
@@ -261,10 +230,8 @@ defineEmits(['navigate'])
 
 /* PRINCIPLES — warm off-white, professional, not dark */
 .principles-section {
-  background: var(--s2);
-  padding: 88px 0;
-  border-top: 1px solid var(--b);
-  border-bottom: 1px solid var(--b);
+  background: var(--bg);
+  padding: 40px 0 60px;
 }
 
 .principles-inner { padding: 0 80px; }

@@ -967,7 +967,7 @@ const q3opts = [
 }
 
 .pc-search:hover { border-color: var(--blue); }
-.pc-guide:hover  { border-color: var(--green); }
+.pc-guide:hover  { border-color: var(--blue); }
 
 .pc-icon {
   width:56px;
@@ -979,7 +979,7 @@ const q3opts = [
 }
 
 .pc-icon.blue  { background: var(--blue-s); }
-.pc-icon.green { background: var(--green-s); }
+.pc-icon.green { background: var(--blue-s); color: var(--blue); }
 
 .pc-title {
   font-size:1.08rem;
@@ -1043,13 +1043,13 @@ const q3opts = [
 
 .pc-btn.green,
 .cmp-lifestyle-btn {
-  background: var(--green);
+  background: var(--blue);
   color:#fff;
 }
 
 .pc-btn.green:hover,
 .cmp-lifestyle-btn:hover {
-  background: var(--green-d);
+  background: var(--blue-d);
 }
 
 .exp-stats-bar {

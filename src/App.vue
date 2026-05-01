@@ -336,17 +336,17 @@ main {
 .path-card { background:var(--s); border:1px solid var(--b); border-radius:14px; padding:24px 20px; cursor:pointer; transition:border-color 0.18s,transform 0.18s,box-shadow 0.18s; text-align:center; display:flex; flex-direction:column; align-items:center; }
 .path-card:hover { border-color:var(--b2); transform:translateY(-2px); box-shadow:var(--sh-lg); }
 .path-card.pc-search:hover { border-color:var(--blue); }
-.path-card.pc-guide:hover { border-color:var(--green); }
+.path-card.pc-guide:hover { border-color:var(--blue); }
 .pc-icon { width:44px; height:44px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; margin:0 auto 12px; }
 .pc-icon.blue { background:var(--blue-s); }
-.pc-icon.green { background:var(--green-s); }
+.pc-icon.green { background:var(--blue-s); color:var(--blue); }
 .pc-title { font-size:0.92rem; font-weight:700; color:var(--ink); margin-bottom:5px; }
 .pc-sub { font-size:0.76rem; color:var(--ink2); line-height:1.55; margin-bottom:14px; }
 .pc-btn { display:inline-flex; align-items:center; gap:5px; padding:7px 16px; border-radius:99px; font-size:0.74rem; font-weight:600; border:none; cursor:pointer; transition:all 0.14s; }
 .pc-btn.blue { background:var(--blue-s); color:var(--blue); }
 .path-card.pc-search:hover .pc-btn.blue { background:var(--blue); color:#fff; }
-.pc-btn.green { background:var(--green-s); color:var(--green-d); }
-.path-card.pc-guide:hover .pc-btn.green { background:var(--green); color:#fff; }
+.pc-btn.green { background:var(--blue-s); color:var(--blue); }
+.path-card.pc-guide:hover .pc-btn.green { background:var(--blue); color:#fff; }
 
 .search-path { padding:20px 160px 32px; }
 .back-row { display:flex; align-items:center; gap:6px; font-size:0.74rem; font-weight:600; color:var(--ink2); cursor:pointer; margin-bottom:16px; width:fit-content; transition:color 0.12s; }
