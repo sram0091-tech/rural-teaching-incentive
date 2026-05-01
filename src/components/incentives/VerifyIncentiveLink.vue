@@ -17,6 +17,7 @@ import { fetchVerifyIncentiveLink } from '../../api/explorerApi.js'
 
 const props = defineProps({
   school: { type: Object, required: true },
+  compact: { type: Boolean, default: false },
 })
 
 const loading = ref(false)
@@ -49,9 +50,9 @@ watch(() => props.school?.school_id || props.school?.id, load)
 </script>
 
 <style scoped>
-.verify { margin-top:10px; }
-.verify-box { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-size:0.7rem; color:var(--ink2); }
-.verify a { color:var(--green-d); font-weight:800; text-decoration:none; }
+.verify { margin:0; }
+.verify-box { display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:0.82rem; color:var(--ink2); }
+.verify a { color:var(--green-d); font-size:0.82rem; font-weight:900; text-decoration:none; }
 .verify a:hover { text-decoration:underline; }
 .verify-muted { font-size:0.7rem; color:var(--ink3); }
 </style>

@@ -48,7 +48,7 @@
     <!-- Desktop inline detail -->
     <Transition name="detail">
       <div v-if="isOpen && !isMobile" class="srow-detail">
-        <IncentivePanel :school="school" @view-lifestyle="$emit('view-lifestyle', school.id)" />
+        <IncentivePanel :school="school" :profile="incentiveProfile" @view-lifestyle="$emit('view-lifestyle', school.id)" />
       </div>
     </Transition>
 
@@ -70,7 +70,7 @@
               <button class="sheet-close" @click="$emit('toggle', school.id)">✕</button>
             </div>
             <div class="sheet-body">
-              <IncentivePanel :school="school" @view-lifestyle="$emit('view-lifestyle', school.id)" />
+              <IncentivePanel :school="school" :profile="incentiveProfile" @view-lifestyle="$emit('view-lifestyle', school.id)" />
             </div>
           </div>
         </div>
@@ -91,6 +91,7 @@ defineProps({
   inCmp: Boolean,
   sort: String,
   empType: String,
+  incentiveProfile: Object,
 })
 defineEmits(['toggle', 'toggle-cmp', 'view-lifestyle'])
 

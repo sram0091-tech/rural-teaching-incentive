@@ -427,6 +427,7 @@ main {
 .mv-inc { color:var(--green-d); }
 .mv-none { font-size:0.69rem; font-weight:400; color:var(--ink3); }
 .msub { font-size:0.62rem; color:var(--ink3); margin-top:1px; }
+.msub-personalised { display:inline-flex; align-items:center; gap:3px; margin-top:3px; font-size:0.58rem; font-weight:700; color:var(--green-d); }
 .srow-acts { display:flex; gap:4px; flex-shrink:0; }
 .btn-cmp { font-size:0.67rem; padding:4px 8px; border-radius:var(--r2); border:1px solid var(--b); background:transparent; color:var(--ink2); cursor:pointer; transition:all 0.11s; white-space:nowrap; }
 .btn-cmp:hover { border-color:var(--b2); }
