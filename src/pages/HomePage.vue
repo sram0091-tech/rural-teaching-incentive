@@ -6,7 +6,9 @@
 
     <!-- HERO -->
     <section class="cin-section">
-      <div class="cin-bg"></div>
+      <video class="cin-video-bg" autoplay muted loop playsinline>
+        <source :src="heroVideo" type="video/mp4">
+      </video>
       <div class="cin-overlay"></div>
 
       <div class="cin-content">
@@ -14,25 +16,40 @@
         <div class="cin-slide cin-slide--active">
           <div class="cin-eyebrow">For Australian Teachers</div>
           <h1 class="cin-hero-h1">Rural teaching isn't a compromise.<br>It's an <em>opportunity</em>.</h1>
-          <p class="cin-hero-sub">Real incentive data. Real lifestyle metrics. 645 schools across QLD and NSW so you can make an informed choice.</p>
           <div class="cin-hero-acts">
-            <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Explore Schools</button>
-            <button class="btn-hero-s" @click="$emit('navigate', 'insights')">View Lifestyle Data</button>
+            <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find your school</button>
+            <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Explore Lifestyle</button>
           </div>
         </div>
 
       </div>
 
-      <div class="cin-photo-credit">Photo: <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a></div>
+      <div class="cin-photo-credit">Video: <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a></div>
 
-      <div class="cin-stats-bar">
-        <div class="hstat"><div class="hstat-n">645</div><div class="hstat-l">Schools with incentives</div></div>
-        <div class="hstat-sep"></div>
-        <div class="hstat"><div class="hstat-n">$30k+</div><div class="hstat-l">On top of base salary</div></div>
-        <div class="hstat-sep"></div>
-        <div class="hstat"><div class="hstat-n">2</div><div class="hstat-l">States covered</div></div>
-        <div class="hstat-sep"></div>
-        <div class="hstat"><div class="hstat-n">Free</div><div class="hstat-l">No sign-up needed</div></div>
+      <div class="hero-trust-strip fade-section">
+        <div class="trust-item">
+          <div class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="trust-title">Government data only</div>
+          <div class="trust-text">ACARA, ABS Census, QLD Directive 16/18, NSW RTI Review 2020</div>
+        </div>
+        <div class="hero-trust-div"></div>
+        <div class="trust-item">
+          <div class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <div class="trust-title">645 schools</div>
+          <div class="trust-text">Government, Catholic, and Independent across QLD and NSW</div>
+        </div>
+        <div class="hero-trust-div"></div>
+        <div class="trust-item">
+          <div class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="trust-title">Your decision</div>
+          <div class="trust-text">We show differences, not recommendations. You decide.</div>
+        </div>
+        <div class="hero-trust-div"></div>
+        <div class="trust-item">
+          <div class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <div class="trust-title">No sign-up required</div>
+          <div class="trust-text">Free and open access. No account or registration needed.</div>
+        </div>
       </div>
 
     </section>
@@ -42,7 +59,7 @@
       <div class="why-inner">
         <div class="section-header centered">
           <h2>What regional actually offers</h2>
-          <p>Four things that are genuinely true about teaching regionally. Not a pitch — a starting point for your own decision.</p>
+          <p>The parts of rural teaching people don't talk about. Backed by data.</p>
         </div>
 
         <div class="why-grid">
@@ -93,6 +110,10 @@
 
     <!-- TEACHER STORY -->
     <div class="story-cin-wrap">
+      <div class="section-header centered story-section-header">
+        <div class="section-eyebrow story-title-blue">A teacher's story</div>
+        <h2>Meet Katie</h2>
+      </div>
     <section class="cin-section story-cin-section fade-section">
       <div class="cin-bg story-cin-bg" :style="{ backgroundImage: `url(${STORY_SLIDES[storySlide].img})`, backgroundPosition: STORY_SLIDES[storySlide].pos }"></div>
       <div class="cin-overlay"></div>
@@ -103,7 +124,6 @@
 
             <!-- Slide 0: Journey intro — Katie's photo, journey path only -->
             <template v-if="storySlide === 0">
-              <div class="cin-tag-pill">Meet Katie</div>
               <h2 class="cin-headline">City girl.<br>Remote teacher.</h2>
               <p class="cin-sub story-intro-text">Who has found incredible joy and meaning in teaching in regional and remote Queensland state schools.</p>
             </template>
@@ -198,34 +218,6 @@
       </div>
     </section>
 
-    <!-- TRUST STRIP -->
-    <section class="trust-strip fade-section">
-      <div class="trust-inner">
-        <div class="trust-item">
-          <div class="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <div class="trust-title">Government data only</div>
-          <div class="trust-text">ACARA, ABS Census, QLD Directive 16/18, NSW RTI Review 2020</div>
-        </div>
-        <div class="trust-div"></div>
-        <div class="trust-item">
-          <div class="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-          <div class="trust-title">645 schools</div>
-          <div class="trust-text">Government, Catholic, and Independent across QLD and NSW</div>
-        </div>
-        <div class="trust-div"></div>
-        <div class="trust-item">
-          <div class="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-          <div class="trust-title">Your decision</div>
-          <div class="trust-text">We show differences, not recommendations. You decide.</div>
-        </div>
-        <div class="trust-div"></div>
-        <div class="trust-item">
-          <div class="trust-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
-          <div class="trust-title">No sign-up required</div>
-          <div class="trust-text">Free and open access. No account or registration needed.</div>
-        </div>
-      </div>
-    </section>
 
     <!-- READY TO EXPLORE CTA -->
     <section class="final-cta">
@@ -234,8 +226,8 @@
         <h2>Ready to explore real placements?</h2>
         <p>Browse 645 schools across QLD and NSW. Filter by pay, remoteness, and lifestyle then decide.</p>
         <div class="final-cta-btns">
-          <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find Schools</button>
-          <button class="btn-hero-s" @click="$emit('navigate', 'about')">Learn about the data</button>
+          <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find your school</button>
+          <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Explore Lifestyle</button>
         </div>
       </div>
     </section>
@@ -268,6 +260,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import heroVideo from '../assets/5198159-uhd_3840_2160_25fps.mp4'
 
 const emit = defineEmits(['navigate', 'view-lifestyle'])
 
@@ -470,7 +463,14 @@ onUnmounted(() => {
 /* STORY CINEMATIC SECTION — outer wrapper gives horizontal breathing room + top gap */
 .story-cin-wrap {
   background: var(--bg);
-  padding: 52px 140px 0;
+  padding: 0 140px 48px;
+}
+.story-section-header {
+  padding: 48px 0 24px;
+}
+.story-title-blue { color: var(--blue); }
+.story-cin-wrap .story-cin-section {
+  border-bottom: none;
 }
 .story-cin-section {
   border-radius: 24px;
@@ -696,13 +696,13 @@ onUnmounted(() => {
 
 /* WHY REGIONAL */
 .why-section {
-  background: linear-gradient(135deg, #0D1F3C 0%, #152B4A 50%, #0D1F3C 100%);
-  padding: 80px 24px;
+  background: var(--bg);
+  padding: 80px 24px 0;
   border-bottom: none;
 }
 .why-inner { max-width: 1200px; margin: 0 auto; }
-.why-inner h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1.12; margin-bottom: 6px; color: #fff; }
-.why-inner .section-header p { color: rgba(255,255,255,0.6); }
+.why-inner h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1.12; margin-bottom: 6px; color: var(--ink); }
+.why-inner .section-header p { color: var(--ink2); }
 .why-inner > .section-header { margin-bottom: 40px; }
 
 .why-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 8px; }
@@ -742,6 +742,17 @@ onUnmounted(() => {
   background-position: center 48%;
   animation: kenBurns 18s ease-in-out infinite;
   will-change: transform;
+}
+
+.cin-video-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(3px);
+  transform: scale(1.06);
+  z-index: 0;
 }
 
 .story-cin-section .cin-bg {
@@ -814,6 +825,34 @@ onUnmounted(() => {
 }
 .cin-hero-acts { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
+.hero-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  max-width: 620px;
+  margin: 0 auto 32px;
+}
+.hero-trust-tile {
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  padding: 12px 16px;
+  text-align: left;
+}
+.hero-trust-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+}
+.hero-trust-sub {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.60);
+  line-height: 1.5;
+}
+
 /* Stats bar at bottom of cinematic hero */
 .cin-stats-bar {
   position: relative;
@@ -864,8 +903,8 @@ onUnmounted(() => {
 .why-grid .why-card:nth-child(4).in-view { animation-delay: 0.35s; }
 
 .why-card {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--s);
+  border: 1px solid var(--b);
   border-radius: 16px;
   padding: 28px 24px;
   display: flex;
@@ -875,29 +914,29 @@ onUnmounted(() => {
   cursor: pointer;
 }
 .why-card:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.2);
+  background: var(--s2);
+  border-color: var(--b2);
   box-shadow: 0 8px 32px rgba(0,0,0,0.3);
   transform: translateY(-3px);
 }
 
 .why-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; flex-shrink: 0; }
-.why-financial .why-icon { background: rgba(209,250,229,0.15); color: #6EE7B7; }
-.why-cost .why-icon { background: rgba(219,234,254,0.15); color: #93C5FD; }
-.why-career .why-icon { background: rgba(254,243,199,0.15); color: #FCD34D; }
-.why-community .why-icon { background: rgba(237,233,254,0.15); color: #C4B5FD; }
+.why-financial .why-icon { background: #d1fae5; color: #059669; }
+.why-cost .why-icon { background: #dbeafe; color: #2563eb; }
+.why-career .why-icon { background: #fef3c7; color: #d97706; }
+.why-community .why-icon { background: #ede9fe; color: #7c3aed; }
 
 .why-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
-.why-financial .why-label { color: #6EE7B7; }
-.why-cost .why-label { color: #93C5FD; }
-.why-career .why-label { color: #FCD34D; }
-.why-community .why-label { color: #C4B5FD; }
+.why-financial .why-label { color: #059669; }
+.why-cost .why-label { color: #2563eb; }
+.why-career .why-label { color: #d97706; }
+.why-community .why-label { color: #7c3aed; }
 
-.why-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 4px; }
+.why-title { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 900; color: var(--ink); line-height: 1.2; margin-bottom: 4px; }
 .why-body { font-size: 0.85rem; color: rgba(255,255,255,0.65); line-height: 1.7; }
 .why-body li { padding-left: 0.25rem; margin-bottom: 4px; }
 .why-body { padding-left: 1.1rem; margin: 4px 0 0; }
-.why-card-learn { font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.45); margin-top: 10px; transition: color 0.15s; }
+.why-card-learn { font-size: 0.78rem; font-weight: 700; color: var(--blue); margin-top: 10px; transition: color 0.15s; }
 .why-card:hover .why-card-learn { color: rgba(255,255,255,0.8); }
 
 /* TEACHER STORY */
@@ -1051,7 +1090,7 @@ onUnmounted(() => {
 .section-header p { font-size: 0.96rem; color: var(--ink2); }
 
 /* HOW STEPS */
-.how-section { background: var(--bg); padding: 64px 24px; border-top: 1px solid var(--b); border-bottom: 1px solid var(--b); }
+.how-section { background: var(--bg); padding: 64px 24px; border-bottom: 1px solid var(--b); }
 .how-inner { max-width: 1200px; margin: 0 auto; }
 .how-inner .section-header { margin-bottom: 36px; }
 
@@ -1214,6 +1253,22 @@ onUnmounted(() => {
 .trust-title { font-size: 0.92rem; font-weight: 700; margin-bottom: 5px; }
 .trust-text { font-size: 0.79rem; color: var(--ink2); line-height: 1.55; }
 .trust-div { width: 1px; height: 52px; background: var(--b); flex-shrink: 0; }
+
+.hero-trust-strip {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  padding: 12px 80px;
+  background: rgba(8, 18, 40, 0.15);
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+.hero-trust-strip .trust-item { flex: 1; text-align: center; padding: 0 20px; }
+.hero-trust-strip .trust-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); margin: 0 auto 6px; }
+.hero-trust-strip .trust-title { color: #fff; font-size: 0.88rem; text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
+.hero-trust-strip .trust-text { color: rgba(255,255,255,0.85); font-size: 0.72rem; text-shadow: 0 1px 6px rgba(0,0,0,0.5); }
+.hero-trust-div { width: 1px; height: 32px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
 
 /* FINAL CTA — dark navy gradient, no image dependency */
 .final-cta {
