@@ -10,7 +10,7 @@
     </div>
     <div class="disclaimer">This is an estimate only. Verify your exact entitlement via the official government source.</div>
     <IncentiveEstimate
-      v-if="isEligible"
+      v-if="isEligible || isPartial"
       :school="school"
       :eligibility="result"
       :form="form"
@@ -31,7 +31,10 @@ const props = defineProps({
 
 const normalizedStatus = computed(() => {
   const raw = String(props.result.status || props.result.eligibility_status || '').toLowerCase()
+  const hasEligibleRows = incentiveList(props.result.eligible_incentives || props.result.eligibleIncentives).length > 0
+  const hasIneligibleRows = incentiveList(props.result.ineligible_incentives || props.result.ineligibleIncentives).length > 0
   if (raw.includes('partial')) return 'partial'
+  if (hasEligibleRows && (hasIneligibleRows || props.result.eligible === false)) return 'partial'
   if (raw.includes('ineligible') || props.result.eligible === false) return 'ineligible'
   if (raw.includes('eligible') || props.result.eligible === true) return 'eligible'
   return Number(props.school?.annual_incentive || 0) > 0 ? 'eligible' : 'ineligible'
@@ -61,8 +64,11 @@ const eligibleNames = computed(() => listNames(props.result.eligible_incentives 
 const ineligibleNames = computed(() => listNames(props.result.ineligible_incentives || props.result.ineligibleIncentives))
 
 function listNames(rows) {
-  if (!Array.isArray(rows)) return []
-  return rows.map((r) => typeof r === 'string' ? r : r.name || r.incentive_name).filter(Boolean)
+  return incentiveList(rows).map((r) => typeof r === 'string' ? r : r.name || r.incentive_name).filter(Boolean)
+}
+
+function incentiveList(rows) {
+  return Array.isArray(rows) ? rows : []
 }
 </script>
 

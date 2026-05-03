@@ -52,7 +52,7 @@ watch(() => props.school?.school_id || props.school?.id, load)
 <style scoped>
 .verify { margin:0; }
 .verify-box { display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:0.82rem; color:var(--ink2); }
-.verify a { color:var(--green-d); font-size:0.82rem; font-weight:900; text-decoration:none; }
+.verify a { color:var(--blue); font-size:0.82rem; font-weight:900; text-decoration:none; }
 .verify a:hover { text-decoration:underline; }
 .verify-muted { font-size:0.7rem; color:var(--ink3); }
 </style>

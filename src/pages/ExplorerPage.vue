@@ -44,9 +44,9 @@
               </tr>
               <tr class="cmp-sec"><td :colspan="compareSchools.length + 1">Incentives</td></tr>
               <tr>
-                <td>Annual incentive (on top of base salary)</td>
+                <td>Max annual package (on top of base salary)</td>
                 <td v-for="(s, i) in compareSchools" :key="s.id" :class="bestIncentiveIdx === i ? 'cmp-best' : 'cmp-lo'">
-                  <strong v-if="s.annual_incentive > 0">${{ Math.round(s.annual_incentive).toLocaleString() }}/yr</strong>
+                  <strong v-if="s.annual_incentive > 0">Up to ${{ Math.round(s.annual_incentive).toLocaleString() }}/yr</strong>
                   <span v-else>—</span>
                 </td>
               </tr>
@@ -195,7 +195,7 @@
         <button class="filter-tog" :class="{ open: filterOpen }" @click="filterOpen = !filterOpen">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
           Filters
-          <span v-if="filterBadgeCount > 0" class="f-badge">{{ filterBadgeCount }}</span>
+          <span v-if="effectiveFilterBadgeCount > 0" class="f-badge">{{ effectiveFilterBadgeCount }}</span>
         </button>
       </div>
 
@@ -206,7 +206,7 @@
               <div class="fp-lbl">State</div>
               <div class="fp-tiles">
                 <div v-for="s in stateOpts" :key="s.v" class="fp-tile"
-                  :class="fState === s.v ? 'sel-' + s.v : ''"
+                  :class="[fState === s.v ? 'sel-' + s.v : '', { selected: fState === s.v }]"
                   @click="onSelState(s.v)">
                   <span class="fp-tile-icon">{{ s.icon }}</span>{{ s.label }}
                 </div>
@@ -216,7 +216,7 @@
               <div class="fp-lbl">Employment</div>
               <div class="fp-tiles">
                 <div v-for="e in empOpts" :key="e.v" class="fp-tile"
-                  :class="fEmp === e.v ? 'sel-' + e.v : ''"
+                  :class="[employmentTileClass(e.v), { selected: isEmploymentTileActive(e.v) }]"
                   @click="onSelEmp(e.v)">
                   <span class="fp-tile-icon">{{ e.icon }}</span>{{ e.label }}
                 </div>
@@ -226,7 +226,7 @@
               <div class="fp-lbl">Remoteness <span style="font-weight:400;color:var(--ink3);font-size:0.6rem;text-transform:none;letter-spacing:0">· more remote = higher incentive</span></div>
               <div class="fp-tiles">
                 <div v-for="r in remotenessOpts" :key="r.v" class="fp-tile"
-                  :class="fRem.has(r.v) ? 'sel-rem' : ''"
+                  :class="[fRem.has(r.v) ? 'sel-rem' : '', { selected: fRem.has(r.v) }]"
                   @click="onToggleRem(r.v)">
                   <span class="fp-tile-icon">{{ r.icon }}</span>{{ r.label }}
                 </div>
@@ -476,6 +476,10 @@ const profileSummary = computed(() => {
   if (!incentiveProfile.value.ready) return 'Add your role and experience to personalise results.'
   return `${employmentLabel(incentiveProfile.value.employmentType)} · ${incentiveProfile.value.yearsExperience} year${Number(incentiveProfile.value.yearsExperience) === 1 ? '' : 's'} experience`
 })
+const effectiveFilterBadgeCount = computed(() => {
+  const profileAddsRole = preferencesApplied.value && incentiveProfile.value.ready && fEmp.value === 'both'
+  return filterBadgeCount.value + (profileAddsRole ? 1 : 0)
+})
 
 function profileEmployeeTypeForApi() {
   return {
@@ -483,6 +487,39 @@ function profileEmployeeTypeForApi() {
     temporary: 'temp',
     public_service_officer: 'public_service_officer',
   }[incentiveProfile.value.employmentType] || ''
+}
+
+function incentiveQueryProfile() {
+  return incentiveProfile.value.ready ? { ...incentiveProfile.value } : null
+}
+
+function normaliseEmploymentValue(value) {
+  return {
+    perm: 'permanent',
+    temp: 'temporary',
+    permanent: 'permanent',
+    temporary: 'temporary',
+    public_service_officer: 'public_service_officer',
+    nsbts: 'nsbts',
+  }[String(value || '').toLowerCase()] || String(value || '').toLowerCase()
+}
+
+function isEmploymentTileActive(value) {
+  const tile = normaliseEmploymentValue(value)
+  if (fEmp.value !== 'both') return normaliseEmploymentValue(fEmp.value) === tile
+  return preferencesApplied.value && incentiveProfile.value.ready && normaliseEmploymentValue(incentiveProfile.value.employmentType) === tile
+}
+
+function employmentTileClass(value) {
+  return isEmploymentTileActive(value) ? `sel-${normaliseEmploymentValue(value)}` : ''
+}
+
+function loadSearchWithProfile(text = searchQ.value) {
+  return loadSearchLocations(text, incentiveQueryProfile())
+}
+
+function loadGuideWithProfile() {
+  return loadGuideLocations(incentiveQueryProfile())
 }
 
 async function loadMapSchools() {
@@ -496,6 +533,7 @@ async function loadMapSchools() {
       state,
       sort: 'inc',
       employee_type,
+      employment_type: incentiveProfile.value.ready ? incentiveProfile.value.employmentType : '',
       remoteness_ids,
       years_experience: incentiveProfile.value.ready ? incentiveProfile.value.yearsExperience : '',
       has_dependants: incentiveProfile.value.ready ? incentiveProfile.value.hasDependants : '',
@@ -520,13 +558,12 @@ function handleProfileChange(profile) {
 
 function applyProfilePreferences(profile) {
   incentiveProfile.value = { ...profile }
-  const empFilter = profileEmployeeTypeForApi()
-  selEmp(empFilter || 'both')
+  selEmp('both')
   openRow.value = null
   preferencesApplied.value = true
   profileCardOpen.value = true
-  if (view.value === 'search') loadSearchLocations(searchQ.value)
-  if (view.value === 'guide' && guideStep.value === 3) loadGuideLocations()
+  if (view.value === 'search') loadSearchWithProfile()
+  if (view.value === 'guide' && guideStep.value === 3) loadGuideWithProfile()
   loadMapSchools()
 }
 
@@ -571,29 +608,29 @@ const visibleGuideListItems = computed(() => {
   return guideListItems.value.filter(s => String(s.id) === openRow.value)
 })
 
-function onSelState(v)  { selState(v);  loadSearchLocations(searchQ.value) }
-function onSelEmp(v)    { selEmp(v);    loadSearchLocations(searchQ.value) }
-function onToggleRem(v) { toggleRem(v); loadSearchLocations(searchQ.value) }
-function onSetSort(v)   { setSort(v);   loadSearchLocations(searchQ.value) }
+function onSelState(v)  { selState(v);  loadSearchWithProfile() }
+function onSelEmp(v)    { selEmp(v);    loadSearchWithProfile() }
+function onToggleRem(v) { toggleRem(v); loadSearchWithProfile() }
+function onSetSort(v)   { setSort(v);   loadSearchWithProfile() }
 
 let searchDebounce = null
 function onSearchInput() {
   clearTimeout(searchDebounce)
   searchDebounce = setTimeout(() => {
     currentPage.value = 1
-    loadSearchLocations(searchQ.value)
+    loadSearchWithProfile()
   }, 300)
 }
 
 function goPage(p) {
   currentPage.value = p
   openRow.value = null
-  loadSearchLocations(searchQ.value)
+  loadSearchWithProfile()
 }
 function goGuidePage(p) {
   guidePage.value = p
   openRow.value = null
-  loadGuideLocations()
+  loadGuideWithProfile()
 }
 
 function openCompare()  { if (cmpList.length) showCmp.value = true }
@@ -634,7 +671,7 @@ watch(view, (v) => {
     resetFilters()
     if (launchRem.value)  { toggleRem(launchRem.value);   launchRem.value  = null }
     if (launchSort.value) { setSort(launchSort.value);    launchSort.value = null }
-    nextTick(() => { searchInput.value?.focus(); loadSearchLocations(searchQ.value) })
+    nextTick(() => { searchInput.value?.focus(); loadSearchWithProfile() })
   }
   if (v === 'entry')  nextTick(() => {
     if (mapInstance) { mapInstance.remove(); mapInstance = null; qldLayer = null; nswLayer = null }
@@ -655,7 +692,7 @@ onMounted(() => {
   if (launchView.value) {
     view.value = launchView.value
     launchView.value = null
-    loadSearchLocations('')
+    loadSearchWithProfile('')
   }
   nextTick(() => initMap())
   loadMapSchools()
@@ -719,7 +756,7 @@ function initMap() {
   window.__mapSchoolSearch = (suburb) => {
     view.value = 'search'
     searchQ.value = suburb
-    loadSearchLocations(suburb)
+    loadSearchWithProfile(suburb)
     mapInstance?.closePopup()
   }
 
@@ -746,7 +783,7 @@ function plotMarkers() {
       <div style="font-family:'DM Sans',sans-serif;min-width:160px">
         <div style="font-weight:700;font-size:0.8rem;margin-bottom:2px">${s.name}</div>
         <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:5px">${s.suburb} · ${isQld ? 'QLD' : 'NSW'} · ${s.remoteness}</div>
-        <div style="font-size:0.88rem;font-weight:800;color:${color}">+$${inc}/yr on top of base</div>
+        <div style="font-size:0.88rem;font-weight:800;color:${color}">Up to $${inc}/yr max package</div>
       </div>`
 
     const popupHtml = `
@@ -754,7 +791,7 @@ function plotMarkers() {
         <div class="sp-tag ${isQld ? 'sp-qld' : 'sp-nsw'}">${isQld ? 'QLD' : 'NSW'} · ${s.remoteness || ''}</div>
         <div class="sp-name">${s.name}</div>
         <div class="sp-suburb">${s.suburb || ''}</div>
-        <div class="sp-inc"><span class="sp-inc-num">+$${inc}</span><span class="sp-inc-lbl">/yr on top of base</span></div>
+        <div class="sp-inc"><span class="sp-inc-num">Up to $${inc}</span><span class="sp-inc-lbl">/yr max package</span></div>
         <button class="sp-cta" onclick="window.__mapSchoolSearch('${escSub}')">Search ${s.suburb} schools →</button>
       </div>`
 
@@ -814,7 +851,7 @@ function gqFinish() {
   else setSort('inc')
   guidePage.value = 1
   guideStep.value = 3
-  loadGuideLocations()
+  loadGuideWithProfile()
 }
 
 const SVG_INC  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`
@@ -1528,11 +1565,14 @@ const q3opts = [
 .sel-both,
 .sel-permanent,
 .sel-temporary,
+.sel-public_service_officer,
+.sel-nsbts,
 .sel-rem,
+.fp-tile.selected,
 .sort-pill.active {
-  border-color: var(--blue);
-  background: var(--blue-s);
-  color: var(--blue-d);
+  border-color: rgba(30,158,86,0.55);
+  background: var(--green-s);
+  color: var(--green-d);
 }
 
 .fp-tile-icon { font-size:0.9rem; }

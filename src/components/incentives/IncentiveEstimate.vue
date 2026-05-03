@@ -32,10 +32,10 @@ const breakdown = ref(null)
 const fallbackTotal = computed(() => Number(props.school?.annual_incentive || 0))
 const rows = computed(() => {
   const payloadRows = estimate.value?.breakdown || estimate.value?.rows || estimate.value?.incentives
-  const estimateRows = Array.isArray(payloadRows) ? payloadRows : []
+  const estimateRows = Array.isArray(payloadRows) ? payloadRows.filter(isEligibleEstimateRow) : []
   const breakdownRows = rowsFromBreakdown(breakdown.value)
-  if (shouldUseBreakdownRows(estimateRows, breakdownRows)) return breakdownRows
   if (estimateRows.length) return estimateRows
+  if (shouldUseBreakdownRows(estimateRows, breakdownRows)) return breakdownRows
   if (fallbackTotal.value <= 0) return []
   return [{
     name: props.school?.inc_label || 'Incentive package',
@@ -44,7 +44,19 @@ const rows = computed(() => {
     notes: '',
   }]
 })
-const total = computed(() => Number(estimate.value?.total ?? estimate.value?.annual_total ?? fallbackTotal.value))
+const total = computed(() => {
+  const explicit =
+    estimate.value?.eligible_total ??
+    estimate.value?.eligible_annual_total ??
+    estimate.value?.personalised_total ??
+    estimate.value?.personalized_total ??
+    estimate.value?.total ??
+    estimate.value?.annual_total
+  const n = Number(explicit)
+  if (Number.isFinite(n)) return n
+  const rowsTotal = nonVariableTotal(rows.value)
+  return rowsTotal > 0 ? rowsTotal : fallbackTotal.value
+})
 const eligibleCount = computed(() => rows.value.filter((row) => row.eligible !== false).length)
 
 async function load() {
@@ -98,6 +110,12 @@ function estimateRowFromBreakdown(row, group = {}) {
     is_variable_amount: isVariable,
     eligible: row.eligible,
   }
+}
+
+function isEligibleEstimateRow(row) {
+  if (!row || typeof row !== 'object') return false
+  const status = String(row.status || row.eligibility_status || row.eligibilityStatus || '').toLowerCase()
+  return row.eligible !== false && row.ineligible !== true && status !== 'ineligible' && status !== 'not_eligible'
 }
 
 function shouldUseBreakdownRows(estimateRows, breakdownRows) {

@@ -15,10 +15,10 @@
       <div class="srow-metric">
         <template v-if="sort === 'inc'">
           <div v-if="numInc(school) > 0" class="mv mv-inc">
-            ${{ Math.round(numInc(school)).toLocaleString() }}<span style="font-size:0.6rem;font-weight:400">/yr</span>
+            <span style="font-size:0.6rem;font-weight:700;color:var(--ink3);margin-right:3px">Up to</span>${{ Math.round(numInc(school)).toLocaleString() }}<span style="font-size:0.6rem;font-weight:400">/yr</span>
           </div>
           <div v-else class="mv mv-none">No incentive</div>
-          <div class="msub">on top of base</div>
+          <div class="msub">max package</div>
         </template>
         <template v-else-if="sort === 'hc'">
           <div class="mv">{{ numHc(school) }}</div>

@@ -9,11 +9,11 @@
 
     <div class="package-content">
       <div v-if="hasIncentive" class="package-total">
-        <div class="inc-big">{{ money(school.annual_incentive) }}</div>
+        <div class="inc-big">{{ money(displayTotal) }}</div>
         <div class="hero-caption">
-          <span class="hero-caption-main">per year</span>
+          <span class="hero-caption-main">{{ profile?.ready ? 'personalised estimate' : 'up to max package' }}</span>
           <span class="hero-caption-dot">·</span>
-          <span class="hero-caption-sub">on top of base salary</span>
+          <span class="hero-caption-sub">per year on top of base salary</span>
         </div>
       </div>
       <div v-else class="no-inc">No incentive data linked to this school.</div>
@@ -39,7 +39,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { fetchIncentiveEstimate } from '../../api/explorerApi.js'
 import IncentiveBreakdownSummary from './IncentiveBreakdownSummary.vue'
 import VerifyIncentiveLink from './VerifyIncentiveLink.vue'
 
@@ -50,7 +51,11 @@ const props = defineProps({
 
 defineEmits(['view-lifestyle'])
 
-const hasIncentive = computed(() => Number(props.school?.annual_incentive || 0) > 0)
+const estimate = ref(null)
+const genericTotal = computed(() => Number(props.school?.annual_incentive || 0))
+const personalisedTotal = computed(() => estimateTotal(estimate.value))
+const displayTotal = computed(() => props.profile?.ready && personalisedTotal.value !== null ? personalisedTotal.value : genericTotal.value)
+const hasIncentive = computed(() => Number(displayTotal.value || 0) > 0 || Number(props.school?.annual_incentive || 0) > 0)
 const stateLabel = computed(() => props.school?.state_id === '1' ? 'QLD' : 'NSW')
 const policyOwner = computed(() => stateLabel.value === 'QLD' ? 'Teach Queensland' : 'Teach.NSW')
 const employmentLabel = computed(() => ({
@@ -63,10 +68,51 @@ function money(value) {
   return `$${Math.round(Number(value || 0)).toLocaleString()}`
 }
 
+function estimateTotal(payload) {
+  if (!payload || typeof payload !== 'object') return null
+  const value =
+    payload.personalised_total ??
+    payload.personalized_total ??
+    payload.personalised_annual_total ??
+    payload.personalized_annual_total ??
+    payload.annual_total ??
+    payload.annualTotal ??
+    payload.total
+  const n = Number(value)
+  return Number.isFinite(n) ? n : null
+}
+
+async function loadEstimate() {
+  const schoolId = props.school?.school_id || props.school?.id
+  if (!schoolId || !props.profile?.ready) {
+    estimate.value = null
+    return
+  }
+  try {
+    estimate.value = await fetchIncentiveEstimate({
+      school_id: schoolId,
+      employment_type: props.profile.employmentType,
+      years_experience: Number(props.profile.yearsExperience || 0),
+      has_dependants: Boolean(props.profile.hasDependants),
+    })
+  } catch (e) {
+    estimate.value = null
+  }
+}
+
+onMounted(loadEstimate)
+watch(() => [
+  props.school?.school_id || props.school?.id,
+  props.profile?.employmentType,
+  props.profile?.yearsExperience,
+  props.profile?.hasDependants,
+  props.profile?.ready,
+], loadEstimate)
+
 </script>
 
 <style scoped>
-.inc-panel { background:#fff; border:1px solid var(--b); border-left:4px solid var(--green); border-radius:0 var(--r) var(--r) 0; padding:24px 22px; }
+.inc-panel { background:#fff; border:1px solid var(--b); border-left:4px solid var(--blue); border-radius:0 var(--r) var(--r) 0; padding:24px 22px; }
 .est-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:6px; font-size:0.72rem; font-weight:700; margin-bottom:16px; }
 .est-badge--on { background:var(--green-s); color:var(--green-d); }
 .est-badge--off { background:var(--s2); color:var(--ink3); }
