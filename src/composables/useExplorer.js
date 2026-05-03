@@ -18,8 +18,8 @@ const DEFAULT_STATE_OPTS = [
 
 const DEFAULT_EMP_OPTS = [
   { v: 'both', icon: '🧭', label: 'All roles' },
-  { v: 'perm', icon: '📋', label: 'Permanent' },
-  { v: 'temp', icon: '📝', label: 'Temporary' },
+  { v: 'permanent', icon: '📋', label: 'Permanent' },
+  { v: 'temporary', icon: '📝', label: 'Temporary' },
 ]
 
 const DEFAULT_REMOTENESS_OPTS = [
@@ -157,8 +157,20 @@ function sortParamForApi(uiSort) {
   return uiSort
 }
 
-function buildLocationQuery({ page, searchText }) {
+function employeeTypeForApi(value) {
+  return {
+    perm: 'perm',
+    temp: 'temp',
+    permanent: 'perm',
+    temporary: 'temp',
+    public_service_officer: 'public_service_officer',
+    nsbts: 'nsbts',
+  }[String(value || '').toLowerCase()] || value
+}
+
+function buildLocationQuery({ page, searchText, incentiveProfile = null, includeProfileEmployee = true }) {
   const remoteness_ids = [...fRem].sort().join(',')
+  const profileReady = Boolean(incentiveProfile?.ready)
 
   const params = {
     page,
@@ -168,7 +180,17 @@ function buildLocationQuery({ page, searchText }) {
   }
 
   if (fEmp.value && fEmp.value !== 'both') {
-    params.employee_type = fEmp.value
+    params.employee_type = employeeTypeForApi(fEmp.value)
+  }
+
+  if (profileReady && includeProfileEmployee) {
+    params.employee_type = employeeTypeForApi(incentiveProfile.employmentType)
+  }
+
+  if (profileReady) {
+    params.employment_type = incentiveProfile.employmentType
+    params.years_experience = incentiveProfile.yearsExperience
+    params.has_dependants = Boolean(incentiveProfile.hasDependants)
   }
 
   if (remoteness_ids) {
@@ -220,7 +242,7 @@ const filterBadgeCount = computed(() => {
 
 const remSize = computed(() => fRem.size)
 
-async function loadSearchLocations(searchText) {
+async function loadSearchLocations(searchText, incentiveProfile = null) {
   searchError.value = null
 
   if (shouldSkipSearchList(searchText)) {
@@ -231,9 +253,14 @@ async function loadSearchLocations(searchText) {
 
   searchLoading.value = true
   try {
-    const { items, total } = await fetchExplorerLocations(
-      buildLocationQuery({ page: currentPage.value, searchText })
+    let { items, total } = await fetchExplorerLocations(
+      buildLocationQuery({ page: currentPage.value, searchText, incentiveProfile })
     )
+    if (incentiveProfile?.ready && total === 0) {
+      ;({ items, total } = await fetchExplorerLocations(
+        buildLocationQuery({ page: currentPage.value, searchText, incentiveProfile, includeProfileEmployee: false })
+      ))
+    }
     searchListItems.value = normalizeLocationList(items)
     searchTotal.value = total
   } catch (e) {
@@ -246,14 +273,19 @@ async function loadSearchLocations(searchText) {
   }
 }
 
-async function loadGuideLocations() {
+async function loadGuideLocations(incentiveProfile = null) {
   guideError.value = null
   guideLoading.value = true
 
   try {
-    const { items, total } = await fetchExplorerLocations(
-      buildLocationQuery({ page: guidePage.value, searchText: '' })
+    let { items, total } = await fetchExplorerLocations(
+      buildLocationQuery({ page: guidePage.value, searchText: '', incentiveProfile })
     )
+    if (incentiveProfile?.ready && total === 0) {
+      ;({ items, total } = await fetchExplorerLocations(
+        buildLocationQuery({ page: guidePage.value, searchText: '', incentiveProfile, includeProfileEmployee: false })
+      ))
+    }
     guideListItems.value = normalizeLocationList(items)
     guideTotal.value = total
   } catch (e) {

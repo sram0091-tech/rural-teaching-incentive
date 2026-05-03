@@ -122,12 +122,18 @@ function groupRows(rows) {
 function rowsFromEstimate(payload) {
   const rows = payload?.breakdown || payload?.rows || payload?.incentives
   if (!Array.isArray(rows)) return []
-  return rows.map((row) => ({
+  return rows.filter(isEligibleEstimateRow).map((row) => ({
     ...row,
     category: row.category || row.allowance_type || row.allowanceType || 'Incentive',
     amount: row.amount ?? row.annual_amount ?? row.annualAmount ?? 0,
     frequency: row.frequency || 'annual',
   }))
+}
+
+function isEligibleEstimateRow(row) {
+  if (!row || typeof row !== 'object') return false
+  const status = String(row.status || row.eligibility_status || row.eligibilityStatus || '').toLowerCase()
+  return row.eligible !== false && row.ineligible !== true && status !== 'ineligible' && status !== 'not_eligible'
 }
 
 function displayName(row, group) {

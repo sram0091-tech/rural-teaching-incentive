@@ -37,6 +37,10 @@
             <input v-model="form.yearsExperience" type="number" min="0" max="40" step="1" placeholder="0" :disabled="loading" />
             <span class="exp-suffix">years taught</span>
           </div>
+          <label class="dependant-toggle">
+            <input v-model="form.hasDependants" type="checkbox" :disabled="loading" />
+            <span>I have a dependent spouse or child <em>(applies to QLD incentives)</em></span>
+          </label>
           <small v-if="errors.yearsExperience">{{ errors.yearsExperience }}</small>
         </label>
         <button v-else-if="compact && step.key === 'estimate'" class="step-action" type="submit" :disabled="loading">
@@ -238,9 +242,8 @@ watch(
 .checker-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
 .checker-title { font-size:0.9rem; font-weight:900; color:var(--ink); line-height:1.25; letter-spacing:0; }
 .checker-sub { margin-top:2px; font-size:0.68rem; color:var(--ink3); line-height:1.35; }
-/* compact: section title matches site heading font */
-.elig-checker.compact .checker-title { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:900; color:var(--ink); letter-spacing:0; text-transform:none; }
-.elig-checker.compact .checker-sub { font-size:0.82rem; max-width:38rem; color:var(--ink2); margin-top:6px; font-weight:400; }
+.elig-checker.compact .checker-title { font-size:0.92rem; font-weight:900; color:var(--ink); letter-spacing:0; text-transform:none; }
+.elig-checker.compact .checker-sub { font-size:0.74rem; max-width:38rem; color:var(--ink2); margin-top:4px; font-weight:400; }
 .profile-status { flex-shrink:0; border:1px solid var(--b); border-radius:99px; padding:4px 9px; font-size:0.62rem; font-weight:800; color:var(--ink3); background:#fbfaf8; }
 .profile-status.ready { color:var(--green-d); background:var(--green-s); border-color:rgba(30,158,86,0.28); }
 .profile-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
@@ -248,7 +251,7 @@ watch(
 .profile-step { position:relative; display:flex; align-items:center; gap:10px; min-width:0; padding:10px 11px; border:1px solid rgba(217,211,202,0.72); border-radius:var(--r2); background:rgba(255,255,255,0.74); }
 .profile-step.active { background:var(--blue-s); }
 .profile-step.complete { background:var(--green-s); }
-.elig-checker.compact .profile-step { display:grid; grid-template-columns:auto 1fr; align-items:start; min-height:auto; background:linear-gradient(150deg,#f2efe9 0%,#fff 70%); border-top:2.5px solid var(--b2); box-shadow:0 2px 8px rgba(13,31,60,0.05); padding:12px 14px; }
+.elig-checker.compact .profile-step { display:grid; grid-template-columns:auto 1fr; grid-template-rows:42px auto; align-items:start; min-height:auto; background:linear-gradient(150deg,#f2efe9 0%,#fff 70%); border-top:2.5px solid var(--b2); box-shadow:0 2px 8px rgba(13,31,60,0.05); padding:12px 14px; }
 .elig-checker.compact .profile-step:nth-child(1) { background:linear-gradient(150deg,#eef4fd 0%,#fff 70%); border-top-color:#93bef5; }
 .elig-checker.compact .profile-step:nth-child(2) { background:linear-gradient(150deg,#fef8e8 0%,#fff 70%); border-top-color:#f0c84a; }
 .elig-checker.compact .profile-step:nth-child(3) { background:linear-gradient(150deg,#ebf8f2 0%,#fff 70%); border-top-color:#72d4a2; }
@@ -264,7 +267,7 @@ watch(
 .elig-checker.compact .step-copy small { font-size:0.7rem; }
 .step-control { display:flex; flex-direction:column; gap:4px; min-width:0; }
 .elig-checker.compact .step-control,
-.elig-checker.compact .step-action { grid-column:1 / -1; margin-top:4px; }
+.elig-checker.compact .step-action { grid-column:1 / -1; grid-row:2; margin-top:12px; }
 .step-control select,
 .step-control input { width:100%; min-height:42px; border:1px solid rgba(217,211,202,0.9); border-radius:var(--r2); padding:8px 10px; font:inherit; font-size:0.84rem; color:var(--ink); background:rgba(255,255,255,0.88); }
 .exp-input-wrap { display:flex; align-items:center; border:1px solid rgba(217,211,202,0.9); border-radius:var(--r2); background:rgba(255,255,255,0.88); overflow:hidden; }
@@ -272,7 +275,10 @@ watch(
 .exp-input-wrap input:focus { outline:none; }
 .exp-suffix { flex:1; padding:0 10px 0 4px; font-size:0.78rem; color:var(--ink3); font-weight:600; white-space:nowrap; border-left:1px solid rgba(217,211,202,0.6); padding-left:10px; }
 .step-control small { font-size:0.62rem; color:var(--red); }
-.step-action { width:100%; min-height:42px; justify-content:center; display:inline-flex; align-items:center; gap:7px; border:0; border-radius:var(--r2); background:var(--green); color:#fff; padding:10px 14px; font:inherit; font-size:0.86rem; font-weight:900; cursor:pointer; box-shadow:none; }
+.dependant-toggle { display:flex; align-items:center; gap:7px; margin-top:7px; color:var(--ink2); font-size:0.68rem; font-weight:700; line-height:1.25; }
+.dependant-toggle input { width:14px; height:14px; accent-color:var(--blue); flex-shrink:0; }
+.dependant-toggle em { color:var(--ink3); font-style:normal; font-weight:600; }
+.step-action { width:100%; min-height:42px; justify-content:center; display:inline-flex; align-items:center; gap:7px; border:0; border-radius:var(--r2); background:var(--blue); color:#fff; padding:10px 14px; font:inherit; font-size:0.86rem; font-weight:900; cursor:pointer; box-shadow:none; }
 .step-action:disabled { opacity:0.7; cursor:wait; }
 .form-title { margin-bottom:9px; font-size:0.75rem; color:var(--ink2); }
 .checker-grid { display:grid; grid-template-columns:1fr; gap:10px; }
@@ -284,7 +290,7 @@ watch(
 .elig-checker.compact .field input { min-height:42px; font-size:0.84rem; padding:8px 10px; }
 .field small { font-size:0.62rem; color:var(--red); }
 .toggle-field { grid-column:1 / -1; display:flex; align-items:center; gap:8px; padding:8px 10px; background:#fbfaf8; border:1px solid var(--b); border-radius:var(--r2); }
-.check-btn { width:100%; justify-content:center; margin-top:10px; display:inline-flex; align-items:center; gap:7px; border:0; border-radius:var(--r2); background:var(--green); color:#fff; padding:10px 13px; font:inherit; font-size:0.78rem; font-weight:900; cursor:pointer; }
+.check-btn { width:100%; justify-content:center; margin-top:10px; display:inline-flex; align-items:center; gap:7px; border:0; border-radius:var(--r2); background:var(--blue); color:#fff; padding:10px 13px; font:inherit; font-size:0.78rem; font-weight:900; cursor:pointer; }
 .check-btn:disabled { opacity:0.7; cursor:wait; }
 .spinner { width:13px; height:13px; border:2px solid rgba(255,255,255,0.45); border-top-color:#fff; border-radius:50%; animation:spin 0.75s linear infinite; }
 .api-error { margin-top:8px; font-size:0.66rem; color:#9a640e; }

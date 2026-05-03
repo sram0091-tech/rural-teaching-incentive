@@ -16,6 +16,7 @@
         <div class="cin-slide cin-slide--active">
           <div class="cin-eyebrow">For Australian Teachers</div>
           <h1 class="cin-hero-h1">Rural teaching isn't a compromise.<br>It's an <em>opportunity</em>.</h1>
+          <p class="cin-hero-sub">Find schools, compare incentives, and understand the lifestyle before you decide.</p>
           <div class="cin-hero-acts">
             <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find your school</button>
             <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Explore Lifestyle</button>
@@ -54,56 +55,51 @@
 
     </section>
 
-    <!-- WHY REGIONAL -->
-    <section class="why-section fade-section">
-      <div class="why-inner">
-        <div class="section-header centered">
-          <h2>What regional actually offers</h2>
-          <p>The parts of rural teaching people don't talk about. Backed by data.</p>
+    <!-- DECISION NARRATIVE -->
+    <section class="decision-section fade-section">
+      <div class="decision-inner">
+        <div class="decision-header">
+          <div class="section-eyebrow">Decision support, not guesswork</div>
+          <h2>Start with the two questions teachers actually ask.</h2>
+          <p>What could I earn, and what would life there feel like? HardStaff Connect keeps both answers together.</p>
         </div>
 
-        <div class="why-grid">
-
-          <div class="why-card why-financial" @click="openModal('financial')">
-            <div class="why-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-            <div class="why-label">Financial</div>
-            <h3 class="why-title">A real pay difference</h3>
-            <div class="why-card-learn">See the breakdown →</div>
+        <div class="decision-grid">
+          <div class="decision-panel proof-panel">
+            <div class="panel-kicker">What regional can offer</div>
+            <button class="proof-row" type="button" @click="openModal('financial')">
+              <span class="proof-icon proof-green">$</span>
+              <span><strong>A real pay difference</strong><small>Incentives and retention payments, checked against policy.</small><em>See the pay breakdown →</em></span>
+            </button>
+            <button class="proof-row" type="button" @click="openModal('cost')">
+              <span class="proof-icon proof-gold">⌂</span>
+              <span><strong>Cost of living context</strong><small>Rent, distance, services, and trade-offs in one place.</small><em>Explore cost of living →</em></span>
+            </button>
+            <button class="proof-row" type="button" @click="openModal('career')">
+              <span class="proof-icon proof-rust">↗</span>
+              <span><strong>Faster career breadth</strong><small>Smaller schools can mean broader responsibility sooner.</small><em>How careers progress →</em></span>
+            </button>
+            <button class="proof-row" type="button" @click="openModal('community')">
+              <span class="proof-icon proof-teal">◎</span>
+              <span><strong>Community visibility</strong><small>You are known by families, not lost in a large system.</small><em>What this means in practice →</em></span>
+            </button>
           </div>
 
-          <div class="why-card why-cost" @click="openModal('cost')">
-            <div class="why-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            <div class="why-label">Cost of living</div>
-            <h3 class="why-title">Your salary stretches further</h3>
-            <div class="why-card-learn">What the data shows →</div>
+          <div class="decision-panel process-panel">
+            <div class="panel-kicker">How the site helps</div>
+            <button class="process-row" type="button" @click="openModal('search')">
+              <span class="process-num">01</span>
+              <span><strong>Find by incentive</strong><small>Search 645 schools across QLD and NSW.</small><em>How it works →</em></span>
+            </button>
+            <button class="process-row" type="button" @click="openModal('rural')">
+              <span class="process-num">02</span>
+              <span><strong>Check the lifestyle</strong><small>Healthcare, rent, city distance, and nature access.</small><em>How it works →</em></span>
+            </button>
+            <button class="process-row" type="button" @click="openModal('compare')">
+              <span class="process-num">03</span>
+              <span><strong>Compare side by side</strong><small>Shortlist schools and decide with the data visible.</small><em>How it works →</em></span>
+            </button>
           </div>
-
-          <div class="why-card why-career" @click="openModal('career')">
-            <div class="why-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 0 3-3h7z"/></svg>
-            </div>
-            <div class="why-label">Career pace</div>
-            <h3 class="why-title">Smaller schools, broader role</h3>
-            <div class="why-card-learn">How careers progress →</div>
-          </div>
-
-          <div class="why-card why-community" @click="openModal('community')">
-            <div class="why-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div class="why-label">Community</div>
-            <h3 class="why-title">You are not anonymous</h3>
-            <div class="why-card-learn">What this means in practice →</div>
-          </div>
-
-        </div>
-
-        <div class="why-disclaimer">
-          All figures drawn from government sources: ABS Census 2021, NSW RTI Review 2020, QLD Directive 16/18. Verify eligibility with your state education department.
         </div>
       </div>
     </section>
@@ -173,51 +169,56 @@
     </section>
     </div>
 
-    <!-- HOW IT WORKS -->
-    <section class="how-section fade-section">
-      <div class="how-inner">
-        <div class="section-header centered">
-          <div class="section-eyebrow">How it works</div>
-          <h2>Three steps to your decision</h2>
+    <!-- STATE SPLIT -->
+    <section class="state-split-section">
+      <div class="state-split-header">
+        <div class="section-eyebrow">Incentive Programs by State</div>
+        <h2>Choose your state</h2>
+        <p>Queensland and NSW each run their own rural incentive program — same goal, different structures.</p>
+      </div>
+      <div class="state-split-grid">
+        <div class="state-card" @click="$emit('navigate', 'explorer')">
+          <div class="state-card-bg state-bg-qld"></div>
+          <div class="state-card-overlay"></div>
+          <div class="state-card-content">
+            <div class="state-chip state-chip-qld">QLD</div>
+            <h3 class="state-card-h">Queensland</h3>
+            <p class="state-card-desc">Locality Allowance paid fortnightly to all eligible government school teachers, based on location zone.</p>
+            <div class="state-stats">
+              <div class="state-stat">
+                <div class="state-stat-val">$11,470/yr</div>
+                <div class="state-stat-lab">Max annual incentive</div>
+              </div>
+              <div class="state-stat-div"></div>
+              <div class="state-stat">
+                <div class="state-stat-val">All gov schools</div>
+                <div class="state-stat-lab">In eligible zones</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="how-cards">
-          <div class="how-card" @click="openModal('search')">
-            <div class="how-card-img img-search"></div>
-            <div class="how-card-body">
-              <div class="how-card-num">01</div>
-              <div class="how-card-title">Find by incentive</div>
-              <p class="how-card-text">Search 645 schools. Filter by state, remoteness, and role. Sort by highest incentive package.</p>
-              <div class="how-card-learn">Learn how it works ↗</div>
-            </div>
-          </div>
-          <div class="how-connector">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </div>
-          <div class="how-card" @click="openModal('rural')">
-            <div class="how-card-img img-rural"></div>
-            <div class="how-card-body">
-              <div class="how-card-num">02</div>
-              <div class="how-card-title">Explore the lifestyle</div>
-              <p class="how-card-text">Every school links to its Lifestyle Insights profile: healthcare, rent, distance to city, and nature access.</p>
-              <div class="how-card-learn">See what's measured ↗</div>
-            </div>
-          </div>
-          <div class="how-connector">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </div>
-          <div class="how-card" @click="openModal('compare')">
-            <div class="how-card-img img-compare"></div>
-            <div class="how-card-body">
-              <div class="how-card-num">03</div>
-              <div class="how-card-title">Compare side by side</div>
-              <p class="how-card-text">Add up to 4 schools to your compare tray. Incentives and lifestyle in one table.</p>
-              <div class="how-card-learn">How comparing works ↗</div>
+        <div class="state-card" @click="$emit('navigate', 'explorer')">
+          <div class="state-card-bg state-bg-nsw"></div>
+          <div class="state-card-overlay"></div>
+          <div class="state-card-content">
+            <div class="state-chip state-chip-nsw">NSW</div>
+            <h3 class="state-card-h">New South Wales</h3>
+            <p class="state-card-desc">Rural Teaching Incentive scales with remoteness. Retention bonus adds $5k/yr for up to 10 years on top.</p>
+            <div class="state-stats">
+              <div class="state-stat">
+                <div class="state-stat-val">$30,000/yr</div>
+                <div class="state-stat-lab">Max annual incentive</div>
+              </div>
+              <div class="state-stat-div"></div>
+              <div class="state-stat">
+                <div class="state-stat-val">All gov schools</div>
+                <div class="state-stat-lab">In eligible zones</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
-
 
     <!-- READY TO EXPLORE CTA -->
     <section class="final-cta">
@@ -469,10 +470,10 @@ onUnmounted(() => {
 /* STORY CINEMATIC SECTION — outer wrapper gives horizontal breathing room + top gap */
 .story-cin-wrap {
   background: var(--bg);
-  padding: 0 140px 48px;
+  padding: 0 80px 24px;
 }
 .story-section-header {
-  padding: 48px 0 24px;
+  padding: 28px 0 12px;
 }
 .story-title-blue { color: var(--blue); }
 .story-cin-wrap .story-cin-section {
@@ -719,8 +720,9 @@ onUnmounted(() => {
 /* WHY REGIONAL */
 .why-section {
   background: var(--bg);
-  padding: 80px 24px 0;
+  padding: 40px 24px 0;
   border-bottom: none;
+  border-top: 1px solid var(--b);
 }
 .why-inner { max-width: 1200px; margin: 0 auto; }
 .why-inner h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1.12; margin-bottom: 6px; color: var(--ink); }
@@ -732,7 +734,7 @@ onUnmounted(() => {
 .why-disclaimer {
   margin-top: 24px;
   font-size: 0.7rem;
-  color: rgba(255,255,255,0.25);
+  color: var(--ink3);
   text-align: center;
   line-height: 1.6;
   padding: 0 16px;
@@ -748,9 +750,8 @@ onUnmounted(() => {
 
 .cin-section {
   position: relative;
-  height: 88vh;
-  max-height: 840px;
-  min-height: 520px;
+  height: 100vh;
+  min-height: 580px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -798,7 +799,7 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
+  padding: 48px 24px 64px;
   text-align: center;
 }
 
@@ -964,9 +965,9 @@ onUnmounted(() => {
 
 /* TEACHER STORY */
 .story-cin-section {
-  height: 78vh;
-  min-height: 560px;
-  max-height: 760px;
+  height: 58vh;
+  min-height: 460px;
+  max-height: 600px;
   border-top: 1px solid rgba(255,255,255,0.08);
   border-bottom: 1px solid rgba(255,255,255,0.08);
   opacity: 0;
@@ -1112,10 +1113,152 @@ onUnmounted(() => {
 .section-header h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1.12; margin-bottom: 10px; }
 .section-header p { font-size: 0.96rem; color: var(--ink2); }
 
+/* COMPACT DECISION NARRATIVE */
+.decision-section {
+  background: var(--bg);
+  padding: 36px 24px 34px;
+  border-top: 1px solid var(--b);
+}
+.decision-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.decision-header {
+  max-width: 760px;
+  margin: 0 auto 24px;
+  text-align: center;
+}
+.decision-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.65rem, 3vw, 2.45rem);
+  font-weight: 900;
+  line-height: 1.08;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+.decision-header p {
+  max-width: 620px;
+  margin: 0 auto;
+  color: var(--ink2);
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+.decision-grid {
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: 16px;
+  align-items: stretch;
+}
+.decision-panel {
+  background: rgba(255,255,255,0.76);
+  border: 1px solid var(--b);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 16px 36px rgba(42, 35, 24, 0.07);
+}
+.panel-kicker {
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 12px;
+}
+.proof-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.proof-panel .panel-kicker {
+  grid-column: 1 / -1;
+}
+.proof-row,
+.process-row {
+  width: 100%;
+  border: 1px solid rgba(217,211,202,0.9);
+  border-radius: 10px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.16s, background 0.16s, transform 0.16s, box-shadow 0.16s;
+}
+.proof-row {
+  min-height: 86px;
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 11px;
+  align-items: center;
+  padding: 12px;
+}
+.proof-row:hover,
+.process-row:hover {
+  border-color: rgba(31,111,235,0.35);
+  background: #fbfaf5;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(42,35,24,0.07);
+}
+.proof-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+.proof-green { background: #d1fae5; color: #059669; }
+.proof-gold { background: #dbeafe; color: #2563eb; }
+.proof-rust { background: #fef3c7; color: #d97706; }
+.proof-teal { background: #ede9fe; color: #7c3aed; }
+.proof-row strong,
+.process-row strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.25;
+  margin-bottom: 3px;
+}
+.proof-row small,
+.process-row small {
+  display: block;
+  color: var(--ink2);
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+.proof-row em,
+.process-row em {
+  display: inline-block;
+  margin-top: 5px;
+  color: var(--blue);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 900;
+}
+.process-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.process-row {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 14px;
+}
+.process-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--blue);
+  line-height: 1;
+}
 /* HOW STEPS */
-.how-section { background: var(--bg); padding: 64px 24px; border-bottom: 1px solid var(--b); }
+.how-section { background: var(--bg); padding: 36px 24px; border-bottom: 1px solid var(--b); }
 .how-inner { max-width: 1200px; margin: 0 auto; }
-.how-inner .section-header { margin-bottom: 36px; }
+.how-inner .section-header { margin-bottom: 24px; }
 
 .how-cards { display: flex; align-items: stretch; gap: 0; }
 .how-connector { display: flex; align-items: center; justify-content: center; color: var(--b); flex-shrink: 0; padding: 0 4px; margin-top: -40px; }
@@ -1278,14 +1421,13 @@ onUnmounted(() => {
 .trust-div { width: 1px; height: 52px; background: var(--b); flex-shrink: 0; }
 
 .hero-trust-strip {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  z-index: 3;
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  padding: 12px 80px;
-  background: rgba(8, 18, 40, 0.15);
-  border-top: 1px solid rgba(255,255,255,0.15);
+  padding: 14px 80px;
+  background: #253045;
+  border-top: 1px solid rgba(255,255,255,0.12);
 }
 .hero-trust-strip .trust-item { flex: 1; text-align: center; padding: 0 20px; }
 .hero-trust-strip .trust-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); margin: 0 auto 6px; }
@@ -1293,10 +1435,10 @@ onUnmounted(() => {
 .hero-trust-strip .trust-text { color: rgba(255,255,255,0.85); font-size: 0.72rem; text-shadow: 0 1px 6px rgba(0,0,0,0.5); }
 .hero-trust-div { width: 1px; height: 32px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
 
-/* FINAL CTA — dark navy gradient, no image dependency */
+/* FINAL CTA */
 .final-cta {
   position: relative;
-  padding: 100px 0;
+  padding: 60px 0;
   background: linear-gradient(135deg, #0D1F3C 0%, #1A3557 50%, #0F2D4A 100%);
   overflow: hidden;
 }
@@ -1318,9 +1460,141 @@ onUnmounted(() => {
 .final-cta-inner p { font-size: 1rem; color: rgba(255,255,255,0.62); line-height: 1.7; margin-bottom: 30px; }
 .final-cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
+/* STATE SPLIT SECTION */
+.state-split-section {
+  background: var(--bg);
+  border-top: 1px solid var(--b);
+  padding: 0 24px 64px;
+}
+.state-split-header {
+  max-width: 580px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 28px 0 22px;
+}
+.state-split-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--ink);
+  margin: 5px 0 8px;
+}
+.state-split-header p {
+  color: var(--ink2);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.state-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  min-height: 260px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.state-card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  min-height: 250px;
+  border-radius: 8px;
+  box-shadow: 0 18px 44px rgba(42, 35, 24, 0.12);
+}
+.state-card-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.55s ease;
+}
+.state-bg-qld {
+  background-color: #0e2310;
+  background-image: url('https://commons.wikimedia.org/wiki/Special:FilePath/1%20-%20Atherton%20Tableland%2C%20Queensland%2C%20Australia.jpg');
+  background-position: center 50%;
+}
+.state-bg-nsw {
+  background-color: #0d1f3c;
+  background-image: url('https://images.pexels.com/photos/440731/pexels-photo-440731.jpeg?auto=compress&cs=tinysrgb&w=900');
+  background-position: center 42%;
+}
+.state-card:hover .state-card-bg { transform: scale(1.04); }
+.state-card-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(6,14,36,0.92) 0%, rgba(6,14,36,0.72) 38%, rgba(6,14,36,0.28) 76%, rgba(6,14,36,0.12) 100%),
+    linear-gradient(to top, rgba(6,14,36,0.86) 0%, rgba(6,14,36,0.36) 58%, rgba(6,14,36,0.18) 100%);
+}
+.state-card-content {
+  position: relative;
+  z-index: 2;
+  padding: 22px 28px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 250px;
+}
+.state-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 0.63rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  width: fit-content;
+}
+.state-chip-qld { background: rgba(31,111,235,0.22); color: #7DB4FF; border: 1px solid rgba(125,180,255,0.35); }
+.state-chip-nsw { background: rgba(31,111,235,0.22); color: #7DB4FF; border: 1px solid rgba(125,180,255,0.35); }
+.state-card-h {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.05;
+  margin-bottom: 7px;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+}
+.state-card-desc {
+  font-size: 0.79rem;
+  color: rgba(255,255,255,0.68);
+  line-height: 1.58;
+  margin-bottom: 14px;
+  max-width: 340px;
+}
+.state-stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.state-stat-val {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #fff;
+}
+.state-stat-lab {
+  font-size: 0.61rem;
+  color: rgba(255,255,255,0.50);
+  font-weight: 600;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.state-stat-div {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,0.18);
+  flex-shrink: 0;
+}
+
 /* MOBILE */
 @media (max-width: 900px) {
-  .cin-section { height: 85vh; max-height: none; min-height: 420px; }
+  .cin-section { height: 100vh; min-height: 480px; }
   .cin-hero-h1 { font-size: 2.6rem; }
   .cin-eyebrow { font-size: 0.78rem; letter-spacing: 0.1em; padding: 7px 12px; }
   .cin-hero-sub { font-size: 0.95rem; }
@@ -1329,6 +1603,16 @@ onUnmounted(() => {
   .hstat-sep { display: none; }
   .why-section { padding: 48px 16px; }
   .why-grid { grid-template-columns: 1fr; gap: 12px; }
+  .decision-section { padding: 38px 16px 28px; }
+  .decision-grid { grid-template-columns: 1fr; }
+  .state-split-section { padding: 0 16px 44px; }
+  .state-split-grid { grid-template-columns: 1fr; gap: 14px; }
+  .state-card { min-height: 230px; }
+  .state-card-content { padding: 18px 20px; min-height: 230px; }
+  .state-split-header { padding: 22px 0 16px; }
+  .state-card-h { font-size: 1.35rem; }
+  .proof-panel { grid-template-columns: 1fr; }
+  .decision-panel { padding: 14px; }
   .story-cin-section { height: 78vh; min-height: 520px; }
   .cin-headline { font-size: 2.6rem; }
   .cin-qtext { font-size: 1.15rem; }
