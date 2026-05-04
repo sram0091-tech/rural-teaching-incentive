@@ -2,7 +2,6 @@
   <div class="verify">
     <div v-if="loading" class="verify-muted">Checking official policy link...</div>
     <div v-else-if="hasData" class="verify-box">
-      <span>Want to verify your exact entitlement?</span>
       <a :href="policyUrl" target="_blank" rel="noopener noreferrer">
         View official {{ stateLabel }} incentive policy →
       </a>
@@ -26,8 +25,8 @@ const response = ref(null)
 const stateLabel = computed(() => props.school?.state_id === '1' ? 'QLD' : 'NSW')
 const fallbackUrl = computed(() =>
   props.school?.state_id === '1'
-    ? 'https://teach.qld.gov.au/teach-in-queensland-state-schools/pay-benefits-and-incentives'
-    : 'https://education.nsw.gov.au/teach-nsw/find-teaching-jobs/choose-rural'
+    ? 'https://www.forgov.qld.gov.au/__data/assets/pdf_file/0028/185491/1618-locality-allowances.pdf'
+    : 'https://education.nsw.gov.au/content/dam/main-education/about-us/strategies-and-reports/media/documents/Final_Societel_Copy_Edited_240921.pdf'
 )
 const hasData = computed(() => response.value?.has_incentive_data ?? props.school?.has_incentive_data ?? Number(props.school?.annual_incentive || 0) > 0)
 const policyUrl = computed(() => response.value?.url || response.value?.policy_url || fallbackUrl.value)
