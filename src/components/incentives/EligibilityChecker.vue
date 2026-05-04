@@ -1,6 +1,6 @@
 <template>
   <form class="elig-checker" :class="{ compact }" @submit.prevent="submit">
-    <div class="checker-head">
+    <div v-if="showHeader" class="checker-head">
       <div>
         <div class="checker-title">{{ title }}</div>
         <div class="checker-sub">{{ subtitle }}</div>
@@ -37,18 +37,19 @@
             <input v-model="form.yearsExperience" type="number" min="0" max="40" step="1" placeholder="0" :disabled="loading" />
             <span class="exp-suffix">years taught</span>
           </div>
-          <label class="dependant-toggle">
-            <input v-model="form.hasDependants" type="checkbox" :disabled="loading" />
-            <span>I have a dependent spouse or child <em>(applies to QLD incentives)</em></span>
-          </label>
           <small v-if="errors.yearsExperience">{{ errors.yearsExperience }}</small>
         </label>
-        <button v-else-if="compact && step.key === 'estimate'" class="step-action" type="submit" :disabled="loading">
+        <button v-else-if="compact && step.key === 'estimate'" class="step-action" :class="{ 'step-action--done': estimateComplete }" type="submit" :disabled="loading">
           <span v-if="loading" class="spinner"></span>
           {{ loading ? 'Updating...' : compactEstimateLabel }}
         </button>
       </div>
     </div>
+
+    <label v-if="compact && isQld" class="dependant-toggle compact-dependant">
+      <input v-model="form.hasDependants" type="checkbox" :disabled="loading" />
+      <span>I have a dependent spouse or child <em>(used for QLD full-rate allowance)</em></span>
+    </label>
 
     <div v-if="!compact" class="checker-title form-title">Check your eligibility</div>
     <div v-if="!compact" class="checker-grid">
@@ -95,6 +96,7 @@ const props = defineProps({
   school: { type: Object, default: null },
   compact: { type: Boolean, default: false },
   showResult: { type: Boolean, default: true },
+  showHeader: { type: Boolean, default: true },
   initialProfile: { type: Object, default: null },
   title: { type: String, default: 'Your incentive profile' },
   subtitle: { type: String, default: 'Personalise the package for your role and experience.' },
@@ -181,6 +183,7 @@ async function submit() {
     result.value = provisionalResult()
   } finally {
     loading.value = false
+    applied.value = true
     emit('result-change', Boolean(result.value))
   }
 }
@@ -225,7 +228,14 @@ watch(
 watch(
   () => props.initialProfile,
   (profile) => {
-    if (!profile) return
+    if (!profile) {
+      form.employmentType = ''
+      form.yearsExperience = ''
+      form.hasDependants = false
+      applied.value = false
+      result.value = null
+      return
+    }
     form.employmentType = profile.employmentType || ''
     form.yearsExperience = profile.yearsExperience ?? ''
     form.hasDependants = Boolean(profile.hasDependants)
@@ -255,10 +265,10 @@ watch(
 .elig-checker.compact .profile-step:nth-child(1) { background:linear-gradient(150deg,#eef4fd 0%,#fff 70%); border-top-color:#93bef5; }
 .elig-checker.compact .profile-step:nth-child(2) { background:linear-gradient(150deg,#fef8e8 0%,#fff 70%); border-top-color:#f0c84a; }
 .elig-checker.compact .profile-step:nth-child(3) { background:linear-gradient(150deg,#ebf8f2 0%,#fff 70%); border-top-color:#72d4a2; }
-.elig-checker.compact .profile-step.active { background:var(--blue-s); border-top-color:var(--blue); border-color:rgba(31,111,235,0.28); }
+.elig-checker.compact .profile-step.active { background:var(--green-s); border-top-color:var(--green); border-color:rgba(30,158,86,0.3); }
 .elig-checker.compact .profile-step.complete { background:var(--green-s); border-top-color:var(--green); border-color:rgba(30,158,86,0.26); }
 .step-dot { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:28px; height:28px; border-radius:50%; border:1px solid var(--b2); background:var(--s); color:var(--ink2); font-size:0.68rem; font-weight:900; }
-.profile-step.active .step-dot { border-color:var(--blue); color:var(--blue-d); }
+.profile-step.active .step-dot { border-color:var(--green); color:var(--green-d); }
 .profile-step.complete .step-dot { border-color:var(--green); background:var(--green); color:#fff; }
 .step-copy { min-width:0; display:flex; flex-direction:column; line-height:1.25; }
 .step-copy span { font-size:0.74rem; font-weight:900; color:var(--ink); }
@@ -276,9 +286,11 @@ watch(
 .exp-suffix { flex:1; padding:0 10px 0 4px; font-size:0.78rem; color:var(--ink3); font-weight:600; white-space:nowrap; border-left:1px solid rgba(217,211,202,0.6); padding-left:10px; }
 .step-control small { font-size:0.62rem; color:var(--red); }
 .dependant-toggle { display:flex; align-items:center; gap:7px; margin-top:7px; color:var(--ink2); font-size:0.68rem; font-weight:700; line-height:1.25; }
+.compact-dependant { margin:2px 0 0; padding:10px 12px; border:1px solid rgba(30,158,86,0.24); border-radius:var(--r2); background:var(--green-s); }
 .dependant-toggle input { width:14px; height:14px; accent-color:var(--blue); flex-shrink:0; }
 .dependant-toggle em { color:var(--ink3); font-style:normal; font-weight:600; }
-.step-action { width:100%; min-height:42px; justify-content:center; display:inline-flex; align-items:center; gap:7px; border:0; border-radius:var(--r2); background:var(--blue); color:#fff; padding:10px 14px; font:inherit; font-size:0.86rem; font-weight:900; cursor:pointer; box-shadow:none; }
+.step-action { width:100%; min-height:42px; justify-content:center; display:inline-flex; align-items:center; gap:7px; border:0; border-radius:var(--r2); background:var(--blue); color:#fff; padding:10px 14px; font:inherit; font-size:0.86rem; font-weight:900; cursor:pointer; box-shadow:none; transition:background 0.22s ease; }
+.step-action--done { background:var(--green); }
 .step-action:disabled { opacity:0.7; cursor:wait; }
 .form-title { margin-bottom:9px; font-size:0.75rem; color:var(--ink2); }
 .checker-grid { display:grid; grid-template-columns:1fr; gap:10px; }

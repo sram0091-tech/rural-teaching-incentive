@@ -73,41 +73,8 @@
     <div v-if="!showCmp && view === 'entry'" class="exp-entry anim-fadeup">
       <div class="exp-entry-h">
         <h2>How would you like to find a school?</h2>
-        <p>Choose the path that suits you. Both lead to the same results.</p>
-        <div v-if="preferencesApplied" class="entry-personalised-note">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Results and incentive estimates are personalised to your profile
-        </div>
+        <p>Choose the path that suits you — both lead to the same results</p>
       </div>
-
-      <section class="explorer-profile-card" :class="{ collapsed: !isProfileExpanded }">
-        <div class="explorer-profile-inner">
-          <template v-if="isProfileExpanded">
-            <button v-if="preferencesApplied" class="profile-collapse-btn" type="button" @click="profileCardOpen = false">
-              Collapse preferences
-            </button>
-            <EligibilityChecker
-              compact
-              :initial-profile="incentiveProfile"
-              :show-result="false"
-              title="See your exact incentive amount"
-              subtitle="Add your role and experience to see what you'd personally be eligible for."
-              action-label="Update my matches"
-              ready-label="Ready"
-              @profile-change="handleProfileChange"
-              @profile-submit="applyProfilePreferences"
-            />
-            <div v-if="preferencesApplied" class="profile-applied">Your matches, map, and school incentive packages are now personalised.</div>
-          </template>
-          <button v-else class="profile-summary-bar" type="button" @click="profileCardOpen = true">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--blue);flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-            <span class="profile-summary-title">Incentive preferences</span>
-            <span class="profile-summary-divider">·</span>
-            <span class="profile-summary-copy">{{ profileSummary }}</span>
-            <span class="profile-summary-edit">Edit</span>
-          </button>
-        </div>
-      </section>
 
       <div class="two-paths">
         <div class="path-card pc-search" @click="view = 'search'">
@@ -160,7 +127,6 @@
         <div class="exp-map-header">
           <div class="exp-map-label">
             Schools with incentives — QLD &amp; NSW
-            <span v-if="preferencesApplied" class="map-personalised-chip">Filtered by your profile</span>
           </div>
           <div class="exp-map-hint">Hover for a preview · click any dot to see school details · use QLD/NSW to focus</div>
         </div>
@@ -195,7 +161,7 @@
         <button class="filter-tog" :class="{ open: filterOpen }" @click="filterOpen = !filterOpen">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
           Filters
-          <span v-if="effectiveFilterBadgeCount > 0" class="f-badge">{{ effectiveFilterBadgeCount }}</span>
+          <span v-if="filterBadgeCount > 0" class="f-badge">{{ filterBadgeCount }}</span>
         </button>
       </div>
 
@@ -216,7 +182,7 @@
               <div class="fp-lbl">Employment</div>
               <div class="fp-tiles">
                 <div v-for="e in empOpts" :key="e.v" class="fp-tile"
-                  :class="[employmentTileClass(e.v), { selected: isEmploymentTileActive(e.v) }]"
+                  :class="[fEmp === e.v ? 'sel-' + e.v : '', { selected: fEmp === e.v }]"
                   @click="onSelEmp(e.v)">
                   <span class="fp-tile-icon">{{ e.icon }}</span>{{ e.label }}
                 </div>
@@ -272,7 +238,6 @@
               :in-cmp="isCmp(s.id)"
               :sort="fSort"
               :emp-type="fEmp"
-              :incentive-profile="incentiveProfile"
               @toggle="handleToggleRow"
               @toggle-cmp="handleToggleCmp"
               @view-lifestyle="handleViewLifestyle"
@@ -387,7 +352,6 @@
                     :in-cmp="isCmp(s.id)"
                     :sort="fSort"
                     :emp-type="fEmp"
-                    :incentive-profile="incentiveProfile"
                     @toggle="handleToggleRow"
                     @toggle-cmp="handleToggleCmp"
                     @view-lifestyle="handleViewLifestyle"
@@ -430,7 +394,6 @@ import { normalizeLocationList } from '../utils/locationFields.js'
 import SchoolRow from '../components/SchoolRow.vue'
 import AppPagination from '../components/AppPagination.vue'
 import CompareTray from '../components/CompareTray.vue'
-import EligibilityChecker from '../components/incentives/EligibilityChecker.vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -463,80 +426,38 @@ let qldLayer      = null
 let nswLayer      = null
 
 const mapSchools = ref([])
-const incentiveProfile = ref({
-  employmentType: '',
-  yearsExperience: '',
-  hasDependants: false,
-  ready: false,
-})
-const preferencesApplied = ref(false)
-const profileCardOpen = ref(true)
-const isProfileExpanded = computed(() => profileCardOpen.value && (!preferencesApplied.value || view.value === 'entry' || view.value === 'search' || view.value === 'guide'))
-const profileSummary = computed(() => {
-  if (!incentiveProfile.value.ready) return 'Add your role and experience to personalise results.'
-  return `${employmentLabel(incentiveProfile.value.employmentType)} · ${incentiveProfile.value.yearsExperience} year${Number(incentiveProfile.value.yearsExperience) === 1 ? '' : 's'} experience`
-})
-const effectiveFilterBadgeCount = computed(() => {
-  const profileAddsRole = preferencesApplied.value && incentiveProfile.value.ready && fEmp.value === 'both'
-  return filterBadgeCount.value + (profileAddsRole ? 1 : 0)
-})
-
-function profileEmployeeTypeForApi() {
-  return {
-    permanent: 'perm',
-    temporary: 'temp',
-    public_service_officer: 'public_service_officer',
-  }[incentiveProfile.value.employmentType] || ''
-}
-
-function incentiveQueryProfile() {
-  return incentiveProfile.value.ready ? { ...incentiveProfile.value } : null
-}
-
-function normaliseEmploymentValue(value) {
-  return {
-    perm: 'permanent',
-    temp: 'temporary',
-    permanent: 'permanent',
-    temporary: 'temporary',
-    public_service_officer: 'public_service_officer',
-    nsbts: 'nsbts',
-  }[String(value || '').toLowerCase()] || String(value || '').toLowerCase()
-}
-
-function isEmploymentTileActive(value) {
-  const tile = normaliseEmploymentValue(value)
-  if (fEmp.value !== 'both') return normaliseEmploymentValue(fEmp.value) === tile
-  return preferencesApplied.value && incentiveProfile.value.ready && normaliseEmploymentValue(incentiveProfile.value.employmentType) === tile
-}
-
-function employmentTileClass(value) {
-  return isEmploymentTileActive(value) ? `sel-${normaliseEmploymentValue(value)}` : ''
-}
 
 function loadSearchWithProfile(text = searchQ.value) {
-  return loadSearchLocations(text, incentiveQueryProfile())
+  return loadSearchLocations(text)
 }
 
 function loadGuideWithProfile() {
-  return loadGuideLocations(incentiveQueryProfile())
+  return loadGuideLocations()
+}
+
+function employeeTypeForApi(value) {
+  return {
+    perm: 'perm',
+    temp: 'temp',
+    permanent: 'perm',
+    temporary: 'temp',
+    public_service_officer: 'public_service_officer',
+    nsbts: 'nsbts',
+  }[String(value || '').toLowerCase()] || value
 }
 
 async function loadMapSchools() {
   try {
     const stateList = fState.value === 'both' ? ['qld', 'nsw'] : [fState.value]
     const remoteness_ids = [...fRem].sort().join(',')
-    const employee_type = profileEmployeeTypeForApi() || (fEmp.value !== 'both' ? fEmp.value : '')
+    const employee_type = fEmp.value !== 'both' ? employeeTypeForApi(fEmp.value) : ''
     const responses = await Promise.all(stateList.map((state) => fetchExplorerLocations({
       page: 1,
       page_size: 200,
       state,
       sort: 'inc',
       employee_type,
-      employment_type: incentiveProfile.value.ready ? incentiveProfile.value.employmentType : '',
       remoteness_ids,
-      years_experience: incentiveProfile.value.ready ? incentiveProfile.value.yearsExperience : '',
-      has_dependants: incentiveProfile.value.ready ? incentiveProfile.value.hasDependants : '',
     })))
     const all = responses.flatMap((r) => normalizeLocationList(r.items)).filter(s => s.annual_incentive > 0)
     mapSchools.value = all
@@ -544,35 +465,6 @@ async function loadMapSchools() {
     console.warn('loadMapSchools failed:', e)
     mapSchools.value = heroTop.value.filter(s => s.annual_incentive > 0)
   }
-}
-
-function handleProfileChange(profile) {
-  const unchanged =
-    incentiveProfile.value.employmentType === profile.employmentType &&
-    String(incentiveProfile.value.yearsExperience) === String(profile.yearsExperience) &&
-    Boolean(incentiveProfile.value.hasDependants) === Boolean(profile.hasDependants) &&
-    Boolean(incentiveProfile.value.ready) === Boolean(profile.ready)
-  incentiveProfile.value = { ...profile }
-  if (!unchanged) preferencesApplied.value = false
-}
-
-function applyProfilePreferences(profile) {
-  incentiveProfile.value = { ...profile }
-  selEmp('both')
-  openRow.value = null
-  preferencesApplied.value = true
-  profileCardOpen.value = true
-  if (view.value === 'search') loadSearchWithProfile()
-  if (view.value === 'guide' && guideStep.value === 3) loadGuideWithProfile()
-  loadMapSchools()
-}
-
-function employmentLabel(value) {
-  return {
-    permanent: 'Permanent',
-    temporary: 'Temporary',
-    public_service_officer: 'Public Service Officer',
-  }[value] || 'Role not set'
 }
 
 const topIncentive = computed(() => {
@@ -666,7 +558,6 @@ function resetFilters() {
 }
 
 watch(view, (v) => {
-  if (!preferencesApplied.value) profileCardOpen.value = v === 'entry'
   if (v === 'search') {
     resetFilters()
     if (launchRem.value)  { toggleRem(launchRem.value);   launchRem.value  = null }
@@ -683,9 +574,6 @@ watch(view, (v) => {
 const showBackTop = ref(false)
 function onScroll() {
   showBackTop.value = window.scrollY > 400
-  if (preferencesApplied.value && profileCardOpen.value && window.scrollY > 260) {
-    profileCardOpen.value = false
-  }
 }
 
 onMounted(() => {
@@ -1204,7 +1092,6 @@ const q3opts = [
 }
 
 .exp-entry-h h2 {
-  font-family:'Playfair Display', serif;
   font-size:2.3rem;
   font-weight:900;
   line-height:1.1;
