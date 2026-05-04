@@ -6,8 +6,8 @@
 
     <!-- HERO -->
     <section class="cin-section">
-      <video ref="videoRef" class="cin-video-bg" autoplay loop playsinline :style="heroVideoStyle">
-        <source :src="heroVideo" type="video/mp4">
+      <video ref="videoRef" class="cin-video-bg" loop playsinline :style="heroVideoStyle">
+        <source src="/hero.mp4" type="video/mp4">
       </video>
       <div class="cin-overlay"></div>
 
@@ -55,55 +55,6 @@
 
     </section>
 
-    <!-- DECISION NARRATIVE -->
-    <section class="decision-section fade-section">
-      <div class="decision-inner">
-        <div class="decision-header">
-          <div class="section-eyebrow">Decision support, not guesswork</div>
-          <h2>Start with the two questions teachers actually ask.</h2>
-          <p>What could I earn, and what would life there feel like? HardStaff Connect keeps both answers together.</p>
-        </div>
-
-        <div class="decision-grid">
-          <div class="decision-panel proof-panel">
-            <div class="panel-kicker">What regional can offer</div>
-            <button class="proof-row" type="button" @click="openModal('financial')">
-              <span class="proof-icon proof-green">$</span>
-              <span><strong>A real pay difference</strong><small>Incentives and retention payments, checked against policy.</small><em>See the pay breakdown →</em></span>
-            </button>
-            <button class="proof-row" type="button" @click="openModal('cost')">
-              <span class="proof-icon proof-gold">⌂</span>
-              <span><strong>Cost of living context</strong><small>Rent, distance, services, and trade-offs in one place.</small><em>Explore cost of living →</em></span>
-            </button>
-            <button class="proof-row" type="button" @click="openModal('career')">
-              <span class="proof-icon proof-rust">↗</span>
-              <span><strong>Faster career breadth</strong><small>Smaller schools can mean broader responsibility sooner.</small><em>How careers progress →</em></span>
-            </button>
-            <button class="proof-row" type="button" @click="openModal('community')">
-              <span class="proof-icon proof-teal">◎</span>
-              <span><strong>Community visibility</strong><small>You are known by families, not lost in a large system.</small><em>What this means in practice →</em></span>
-            </button>
-          </div>
-
-          <div class="decision-panel process-panel">
-            <div class="panel-kicker">How the site helps</div>
-            <button class="process-row" type="button" @click="openModal('search')">
-              <span class="process-num">01</span>
-              <span><strong>Find by incentive</strong><small>Search 645 schools across QLD and NSW.</small><em>How it works →</em></span>
-            </button>
-            <button class="process-row" type="button" @click="openModal('rural')">
-              <span class="process-num">02</span>
-              <span><strong>Check the lifestyle</strong><small>Healthcare, rent, city distance, and nature access.</small><em>How it works →</em></span>
-            </button>
-            <button class="process-row" type="button" @click="openModal('compare')">
-              <span class="process-num">03</span>
-              <span><strong>Compare side by side</strong><small>Shortlist schools and decide with the data visible.</small><em>How it works →</em></span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- TEACHER STORY -->
     <div class="story-cin-wrap">
       <div class="section-header centered story-section-header fade-section">
@@ -128,7 +79,7 @@
             <template v-else-if="storySlide === 1">
               <div class="cin-tag-pill">On career</div>
               <div class="story-quote-block">
-                <p class="story-qtext">“Going rural gave me career opportunities I don't imagine I would've got elsewhere, including a backfilling position as a <span class="story-qhilite">Head of Department</span>, which is pretty awesome for someone in their 20s.”</p>
+                <p class="story-qtext">"Going rural gave me career opportunities I don't imagine I would've got elsewhere, including a backfilling position as a <span class="story-qhilite">Head of Department</span>, which is pretty awesome for someone in their 20s."</p>
                 <div class="story-qattr">— Katie, Cooktown QLD</div>
               </div>
             </template>
@@ -137,7 +88,7 @@
             <template v-else>
               <div class="cin-tag-pill">On lifestyle</div>
               <div class="story-quote-block">
-                <p class="story-qtext">“If you told me 6 years ago that I'd be working in Cape York in a remote community, I would've laughed in your face, but <span class="story-qhilite">now I can't imagine ever going back to the city.</span>”</p>
+                <p class="story-qtext">"If you told me 6 years ago that I'd be working in Cape York in a remote community, I would've laughed in your face, but <span class="story-qhilite">now I can't imagine ever going back to the city.</span>"</p>
                 <div class="story-qattr">— Katie, Cooktown QLD</div>
               </div>
             </template>
@@ -168,6 +119,37 @@
       <div class="cin-photo-credit">Photo: <a :href="STORY_SLIDES[storySlide].creditUrl" target="_blank" rel="noopener">{{ STORY_SLIDES[storySlide].credit }}</a></div>
     </section>
     </div>
+
+    <!-- WHAT REGIONAL CAN OFFER -->
+    <section class="decision-section fade-section">
+      <div class="decision-inner">
+        <div class="decision-header">
+          <div class="section-eyebrow">What regional can offer</div>
+          <h2>The real advantages of a rural placement.</h2>
+          <p>Beyond the incentives: career growth, lifestyle, and community that city schools rarely offer.</p>
+        </div>
+        <div class="decision-grid decision-grid--single">
+          <div class="decision-panel proof-panel">
+            <button class="proof-row" type="button" @click="openModal('financial')">
+              <span class="proof-icon proof-green">$</span>
+              <span><strong>A real pay difference</strong><small>Incentives and retention payments, checked against policy.</small><em>See the pay breakdown →</em></span>
+            </button>
+            <button class="proof-row" type="button" @click="openModal('cost')">
+              <span class="proof-icon proof-gold">⌂</span>
+              <span><strong>Cost of living context</strong><small>Rent, distance, services, and trade-offs in one place.</small><em>Explore cost of living →</em></span>
+            </button>
+            <button class="proof-row" type="button" @click="openModal('career')">
+              <span class="proof-icon proof-rust">↗</span>
+              <span><strong>Faster career breadth</strong><small>Smaller schools can mean broader responsibility sooner.</small><em>How careers progress →</em></span>
+            </button>
+            <button class="proof-row" type="button" @click="openModal('community')">
+              <span class="proof-icon proof-teal">◎</span>
+              <span><strong>Community visibility</strong><small>You are known by families, not lost in a large system.</small><em>What this means in practice →</em></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- STATE SPLIT -->
     <section class="state-split-section">
@@ -220,6 +202,33 @@
       </div>
     </section>
 
+    <!-- HOW THE SITE HELPS -->
+    <section class="decision-section fade-section">
+      <div class="decision-inner">
+        <div class="decision-header">
+          <div class="section-eyebrow">How this site helps</div>
+          <h2>From browsing to deciding in three steps.</h2>
+          <p>Find schools, understand the lifestyle, and compare options — all in one place.</p>
+        </div>
+        <div class="decision-grid decision-grid--single">
+          <div class="decision-panel process-panel">
+            <button class="process-row" type="button" @click="openModal('search')">
+              <span class="process-num">01</span>
+              <span><strong>Find schools and incentives</strong><small>Filter by state, remoteness, and pay. 645 schools with verified government data.</small><em>Open school explorer →</em></span>
+            </button>
+            <button class="process-row" type="button" @click="openModal('rural')">
+              <span class="process-num">02</span>
+              <span><strong>Explore lifestyle and cost</strong><small>Rent, healthcare, distance to city — the full picture of what regional life looks like.</small><em>Browse lifestyle insights →</em></span>
+            </button>
+            <button class="process-row" type="button" @click="openModal('compare')">
+              <span class="process-num">03</span>
+              <span><strong>Compare schools side by side</strong><small>Pin up to 4 schools and compare pay, remoteness, and lifestyle in one table.</small><em>Start comparing →</em></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- READY TO EXPLORE CTA -->
     <section class="final-cta">
       <div class="final-cta-overlay"></div>
@@ -261,7 +270,6 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import heroVideo from '../assets/5198159-uhd_3840_2160_25fps.mp4'
 
 const emit = defineEmits(['navigate', 'view-lifestyle'])
 
@@ -1151,6 +1159,11 @@ onUnmounted(() => {
   grid-template-columns: 1.12fr 0.88fr;
   gap: 16px;
   align-items: stretch;
+}
+.decision-grid--single {
+  grid-template-columns: 1fr;
+  max-width: 760px;
+  margin: 0 auto;
 }
 .decision-panel {
   background: rgba(255,255,255,0.76);
