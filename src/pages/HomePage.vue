@@ -447,7 +447,13 @@ function onScroll() {
 let storyVisObs = null
 
 onMounted(() => {
-  if (videoRef.value) { videoRef.value.muted = true; videoRef.value.play().catch(() => {}) }
+  if (videoRef.value) {
+    videoRef.value.muted = true
+    videoRef.value.load()
+    videoRef.value.addEventListener('loadedmetadata', () => {
+      videoRef.value.play().catch(() => {})
+    }, { once: true })
+  }
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('keydown', onKeydown)
   const observer = new IntersectionObserver(
