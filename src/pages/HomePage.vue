@@ -6,9 +6,7 @@
 
     <!-- HERO -->
     <section class="cin-section">
-      <video class="cin-video-bg" autoplay muted loop playsinline :style="heroVideoStyle">
-        <source :src="heroVideo" type="video/mp4">
-      </video>
+      <div class="cin-video-bg" :style="heroVideoStyle"></div>
       <div class="cin-overlay"></div>
 
       <div class="cin-content">
@@ -25,7 +23,7 @@
 
       </div>
 
-      <div class="cin-photo-credit">Video: <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a></div>
+      <div class="cin-photo-credit">Photo: <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a></div>
 
       <div class="hero-trust-strip">
         <div class="trust-item">
@@ -297,7 +295,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import heroVideo from '../assets/5198159-uhd_3840_2160_25fps.mp4'
+import heroImage from '../assets/hero.jpg'
 
 const emit = defineEmits(['navigate', 'view-lifestyle'])
 
@@ -305,7 +303,7 @@ const scrollPct = ref(0)
 const heroParallaxY = ref(0)
 
 const heroVideoStyle = computed(() => ({
-  transform: `scale(1.06) translateY(${-heroParallaxY.value * 0.12}px)`
+  backgroundImage: `url(${heroImage})`,
 }))
 
 // ── Teacher story slideshow ──
@@ -786,7 +784,7 @@ onUnmounted(() => {
 
 .cin-section {
   position: relative;
-  height: 100vh;
+  height: 93vh;
   min-height: 580px;
   overflow: hidden;
   display: flex;
@@ -805,14 +803,11 @@ onUnmounted(() => {
 
 .cin-video-bg {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: blur(3px);
-  transform: scale(1.06);
+  inset: -8px;
+  background-size: cover;
+  background-position: center 20%;
+  filter: blur(2px);
   z-index: 0;
-  will-change: transform;
 }
 
 .story-cin-section .cin-bg {
@@ -823,8 +818,8 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 43%, rgba(13,31,60,0.06) 0%, rgba(13,31,60,0.18) 44%, rgba(8,20,40,0.36) 100%),
-    linear-gradient(to bottom, rgba(8,20,40,0.20) 0%, rgba(8,20,40,0.08) 36%, rgba(8,20,40,0.44) 100%);
+    radial-gradient(circle at 50% 43%, rgba(13,31,60,0.03) 0%, rgba(13,31,60,0.10) 44%, rgba(8,20,40,0.22) 100%),
+    linear-gradient(to bottom, rgba(8,20,40,0.12) 0%, rgba(8,20,40,0.04) 36%, rgba(8,20,40,0.28) 100%);
 }
 
 .cin-content {
