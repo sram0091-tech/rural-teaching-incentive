@@ -55,51 +55,46 @@
 
     </section>
 
-    <!-- DECISION NARRATIVE -->
-    <section class="decision-section fade-section">
-      <div class="decision-inner">
-        <div class="decision-header">
-          <div class="section-eyebrow">Decision support, not guesswork</div>
-          <h2>Start with the two questions teachers actually ask.</h2>
-          <p>What could I earn, and what would life there feel like? HardStaff Connect keeps both answers together.</p>
+    <!-- REGIONAL BENEFITS -->
+    <section class="regional-section">
+      <div class="how-inner">
+        <div class="section-header centered">
+          <div class="section-eyebrow">What regional can offer</div>
+          <h2>Look beyond the incentive figure.</h2>
         </div>
-
-        <div class="decision-grid">
-          <div class="decision-panel proof-panel">
-            <div class="panel-kicker">What regional can offer</div>
-            <button class="proof-row" type="button" @click="openModal('financial')">
-              <span class="proof-icon proof-green">$</span>
-              <span><strong>A real pay difference</strong><small>Incentives and retention payments, checked against policy.</small><em>See the pay breakdown →</em></span>
-            </button>
-            <button class="proof-row" type="button" @click="openModal('cost')">
-              <span class="proof-icon proof-gold">⌂</span>
-              <span><strong>Cost of living context</strong><small>Rent, distance, services, and trade-offs in one place.</small><em>Explore cost of living →</em></span>
-            </button>
-            <button class="proof-row" type="button" @click="openModal('career')">
-              <span class="proof-icon proof-rust">↗</span>
-              <span><strong>Faster career breadth</strong><small>Smaller schools can mean broader responsibility sooner.</small><em>How careers progress →</em></span>
-            </button>
-            <button class="proof-row" type="button" @click="openModal('community')">
-              <span class="proof-icon proof-teal">◎</span>
-              <span><strong>Community visibility</strong><small>You are known by families, not lost in a large system.</small><em>What this means in practice →</em></span>
-            </button>
-          </div>
-
-          <div class="decision-panel process-panel">
-            <div class="panel-kicker">How the site helps</div>
-            <button class="process-row" type="button" @click="openModal('search')">
-              <span class="process-num">01</span>
-              <span><strong>Find by incentive</strong><small>Search 645 schools across QLD and NSW.</small><em>How it works →</em></span>
-            </button>
-            <button class="process-row" type="button" @click="openModal('rural')">
-              <span class="process-num">02</span>
-              <span><strong>Check the lifestyle</strong><small>Healthcare, rent, city distance, and nature access.</small><em>How it works →</em></span>
-            </button>
-            <button class="process-row" type="button" @click="openModal('compare')">
-              <span class="process-num">03</span>
-              <span><strong>Compare side by side</strong><small>Shortlist schools and decide with the data visible.</small><em>How it works →</em></span>
-            </button>
-          </div>
+        <div class="proof-card-grid">
+          <button class="proof-card" type="button" @click="openModal('financial')">
+            <div class="proof-card-icon proof-icon-green">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="proof-card-cat cat-green">Financial</div>
+            <div class="proof-card-title">A real pay difference</div>
+            <div class="proof-card-link">See the breakdown →</div>
+          </button>
+          <button class="proof-card" type="button" @click="openModal('cost')">
+            <div class="proof-card-icon proof-icon-blue">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="proof-card-cat cat-blue">Cost of Living</div>
+            <div class="proof-card-title">Your salary stretches further</div>
+            <div class="proof-card-link">What the data shows →</div>
+          </button>
+          <button class="proof-card" type="button" @click="openModal('career')">
+            <div class="proof-card-icon proof-icon-amber">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div class="proof-card-cat cat-amber">Career Pace</div>
+            <div class="proof-card-title">Smaller schools, broader role</div>
+            <div class="proof-card-link">How careers progress →</div>
+          </button>
+          <button class="proof-card" type="button" @click="openModal('community')">
+            <div class="proof-card-icon proof-icon-purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="proof-card-cat cat-purple">Community</div>
+            <div class="proof-card-title">You are not anonymous</div>
+            <div class="proof-card-link">What this means in practice →</div>
+          </button>
         </div>
       </div>
     </section>
@@ -128,7 +123,7 @@
             <template v-else-if="storySlide === 1">
               <div class="cin-tag-pill">On career</div>
               <div class="story-quote-block">
-                <p class="story-qtext">“Going rural gave me career opportunities I don't imagine I would've got elsewhere, including a backfilling position as a <span class="story-qhilite">Head of Department</span>, which is pretty awesome for someone in their 20s.”</p>
+                <p class="story-qtext">"Going rural gave me career opportunities I don't imagine I would've got elsewhere, including a backfilling position as a <span class="story-qhilite">Head of Department</span>, which is pretty awesome for someone in their 20s."</p>
                 <div class="story-qattr">— Katie, Cooktown QLD</div>
               </div>
             </template>
@@ -137,7 +132,7 @@
             <template v-else>
               <div class="cin-tag-pill">On lifestyle</div>
               <div class="story-quote-block">
-                <p class="story-qtext">“If you told me 6 years ago that I'd be working in Cape York in a remote community, I would've laughed in your face, but <span class="story-qhilite">now I can't imagine ever going back to the city.</span>”</p>
+                <p class="story-qtext">"If you told me 6 years ago that I'd be working in Cape York in a remote community, I would've laughed in your face, but <span class="story-qhilite">now I can't imagine ever going back to the city.</span>"</p>
                 <div class="story-qattr">— Katie, Cooktown QLD</div>
               </div>
             </template>
@@ -214,6 +209,47 @@
                 <div class="state-stat-val">All gov schools</div>
                 <div class="state-stat-lab">In eligible zones</div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-section">
+      <div class="how-inner">
+        <div class="section-header centered">
+          <div class="section-eyebrow">How it works</div>
+          <h2>Three steps to your decision</h2>
+        </div>
+        <div class="how-cards">
+          <div class="how-card" @click="openModal('search')">
+            <div class="how-card-img img-search"></div>
+            <div class="how-card-body">
+              <div class="how-card-num">01</div>
+              <div class="how-card-title">Find by incentive</div>
+              <p class="how-card-text">Search 645 schools. Filter by state, remoteness, and role. Sort by highest incentive package.</p>
+              <span class="how-card-learn">Learn how it works ↗</span>
+            </div>
+          </div>
+          <div class="how-connector">›</div>
+          <div class="how-card" @click="openModal('rural')">
+            <div class="how-card-img img-rural"></div>
+            <div class="how-card-body">
+              <div class="how-card-num">02</div>
+              <div class="how-card-title">Explore the lifestyle</div>
+              <p class="how-card-text">Every school links to its Lifestyle Insights profile: healthcare, rent, distance to city, and nature access.</p>
+              <span class="how-card-learn">See what's measured ↗</span>
+            </div>
+          </div>
+          <div class="how-connector">›</div>
+          <div class="how-card" @click="openModal('compare')">
+            <div class="how-card-img img-compare"></div>
+            <div class="how-card-body">
+              <div class="how-card-num">03</div>
+              <div class="how-card-title">Compare side by side</div>
+              <p class="how-card-text">Add up to 4 schools to your compare tray. Incentives and lifestyle in one table.</p>
+              <span class="how-card-learn">How comparing works ↗</span>
             </div>
           </div>
         </div>
@@ -1116,8 +1152,78 @@ onUnmounted(() => {
 /* COMPACT DECISION NARRATIVE */
 .decision-section {
   background: var(--bg);
-  padding: 36px 24px 34px;
+  padding: 44px 24px 30px;
   border-top: 1px solid var(--b);
+}
+.regional-section {
+  background: var(--bg);
+  padding: 44px 24px 52px;
+  border-top: 1px solid var(--b);
+}
+
+/* PROOF CARDS — regional benefits grid */
+.proof-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.proof-card {
+  background: var(--s);
+  border: 1px solid var(--b);
+  border-radius: 12px;
+  padding: 20px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+.proof-card:hover {
+  border-color: var(--b2);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+.proof-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  flex-shrink: 0;
+}
+.proof-icon-green { background: #d1fae5; color: #059669; }
+.proof-icon-blue  { background: #dbeafe; color: #2563eb; }
+.proof-icon-amber { background: #fef3c7; color: #d97706; }
+.proof-icon-purple { background: #ede9fe; color: #7c3aed; }
+.proof-card-cat {
+  font-size: 0.60rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.cat-green  { color: #059669; }
+.cat-blue   { color: #2563eb; }
+.cat-amber  { color: #d97706; }
+.cat-purple { color: #7c3aed; }
+.proof-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.2;
+  margin: 3px 0 8px;
+}
+.proof-card-link {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--blue);
+  margin-top: auto;
 }
 .decision-inner {
   max-width: 1180px;
@@ -1172,6 +1278,17 @@ onUnmounted(() => {
 .proof-panel .panel-kicker {
   grid-column: 1 / -1;
 }
+.flow-steps,
+.proof-grid {
+  display: grid;
+  gap: 14px;
+}
+.flow-steps {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.proof-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
 .proof-row,
 .process-row {
   width: 100%;
@@ -1185,12 +1302,12 @@ onUnmounted(() => {
   transition: border-color 0.16s, background 0.16s, transform 0.16s, box-shadow 0.16s;
 }
 .proof-row {
-  min-height: 86px;
+  min-height: 160px;
   display: grid;
-  grid-template-columns: 38px 1fr;
-  gap: 11px;
-  align-items: center;
-  padding: 12px;
+  grid-template-columns: 1fr;
+  gap: 13px;
+  align-items: start;
+  padding: 16px;
 }
 .proof-row:hover,
 .process-row:hover {
@@ -1243,10 +1360,11 @@ onUnmounted(() => {
 }
 .process-row {
   display: grid;
-  grid-template-columns: 42px 1fr;
-  gap: 12px;
+  grid-template-columns: 44px 1fr;
+  gap: 14px;
   align-items: center;
-  padding: 13px 14px;
+  min-height: 130px;
+  padding: 18px;
 }
 .process-num {
   font-family: 'Playfair Display', serif;
@@ -1604,7 +1722,13 @@ onUnmounted(() => {
   .why-section { padding: 48px 16px; }
   .why-grid { grid-template-columns: 1fr; gap: 12px; }
   .decision-section { padding: 38px 16px 28px; }
+  .regional-section { padding: 28px 16px 38px; }
   .decision-grid { grid-template-columns: 1fr; }
+  .flow-steps,
+  .proof-grid { grid-template-columns: 1fr; }
+  .proof-card-grid { grid-template-columns: 1fr 1fr; }
+  .proof-row { min-height: 0; }
+  .process-row { min-height: 0; }
   .state-split-section { padding: 0 16px 44px; }
   .state-split-grid { grid-template-columns: 1fr; gap: 14px; }
   .state-card { min-height: 230px; }
@@ -1655,6 +1779,7 @@ onUnmounted(() => {
 }
 
 @media (max-width: 540px) {
+  .proof-card-grid { grid-template-columns: 1fr; }
   .cin-hero-h1 { font-size: 2.1rem; }
   .btn-hero-p, .btn-hero-s { width: 100%; display: block; text-align: center; }
   .cin-hero-acts { flex-direction: column; }
