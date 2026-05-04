@@ -6,7 +6,7 @@
 
     <!-- HERO -->
     <section class="cin-section">
-      <video class="cin-video-bg" autoplay muted loop playsinline :style="heroVideoStyle">
+      <video ref="videoRef" class="cin-video-bg" autoplay loop playsinline :style="heroVideoStyle">
         <source :src="heroVideo" type="video/mp4">
       </video>
       <div class="cin-overlay"></div>
@@ -266,6 +266,7 @@ import heroVideo from '../assets/5198159-uhd_3840_2160_25fps.mp4'
 const emit = defineEmits(['navigate', 'view-lifestyle'])
 
 const scrollPct = ref(0)
+const videoRef = ref(null)
 const heroParallaxY = ref(0)
 
 const heroVideoStyle = computed(() => ({
@@ -274,7 +275,7 @@ const heroVideoStyle = computed(() => ({
 
 // ── Teacher story slideshow ──
 const STORY_SLIDES = [
-  { img: 'https://teach.qld.gov.au/teachinstateschools/publishingimages/thumbnail_farnorthqueenslandregion.jpg', pos: '72% center', credit: 'Teach QLD', creditUrl: 'https://teach.qld.gov.au/' },
+  { img: 'https://teach.qld.gov.au/teachinstateschools/publishingimages/thumbnail_farnorthqueenslandregion.jpg', pos: '75% 25%', credit: 'Teach QLD', creditUrl: 'https://teach.qld.gov.au/' },
   { img: 'https://pbs.twimg.com/media/EtRhym-XUAAwNWG?format=jpg&name=medium', pos: 'center 30%', credit: 'Teach QLD (@TeachQLD)', creditUrl: 'https://twitter.com/TeachQLD' },
   { img: 'https://live-production.wcms.abc-cdn.net.au/728faaf9dcf36c033bb5111d3031eab1?impolicy=wcms_crop_resize&cropH=512&cropW=768&xPos=0&yPos=256&width=862&height=575', pos: 'center 40%', credit: 'ABC News', creditUrl: 'https://www.abc.net.au/' },
 ]
@@ -438,6 +439,7 @@ function onScroll() {
 let storyVisObs = null
 
 onMounted(() => {
+  if (videoRef.value) { videoRef.value.muted = true; videoRef.value.play().catch(() => {}) }
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('keydown', onKeydown)
   const observer = new IntersectionObserver(
@@ -450,7 +452,7 @@ onMounted(() => {
     (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); cardObserver.unobserve(e.target) } }),
     { threshold: 0.12 }
   )
-  document.querySelectorAll('.why-card, .how-card').forEach(el => cardObserver.observe(el))
+  document.querySelectorAll('.why-card, .how-card, .proof-row, .process-row').forEach(el => cardObserver.observe(el))
 
   const storySectionEl = document.querySelector('.story-cin-section')
   if (storySectionEl) storyVisObs = startStoryIfVisible(storySectionEl)
@@ -680,8 +682,9 @@ onUnmounted(() => {
 /* Hero entrance — staggered on page load */
 .cin-eyebrow   { animation: heroIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.10s both; }
 .cin-hero-h1   { animation: heroIn 0.90s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both; }
-.cin-hero-acts { animation: heroIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.54s both; }
-.hero-trust-strip { animation: heroIn 0.80s cubic-bezier(0.22, 1, 0.36, 1) 0.76s both; }
+.cin-hero-sub  { animation: heroIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.46s both; }
+.cin-hero-acts { animation: heroIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.60s both; }
+.hero-trust-strip { animation: heroIn 0.80s cubic-bezier(0.22, 1, 0.36, 1) 0.82s both; }
 
 .btn-hero-p {
   padding: 16px 32px;
@@ -750,7 +753,7 @@ onUnmounted(() => {
 
 .cin-section {
   position: relative;
-  height: 100vh;
+  height: 94vh;
   min-height: 580px;
   overflow: hidden;
   display: flex;
@@ -1172,6 +1175,23 @@ onUnmounted(() => {
 .proof-panel .panel-kicker {
   grid-column: 1 / -1;
 }
+.proof-row,
+.process-row {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.proof-row.in-view,
+.process-row.in-view {
+  animation: appleReveal 0.60s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.proof-panel .proof-row:nth-child(2).in-view  { animation-delay: 0.00s; }
+.proof-panel .proof-row:nth-child(3).in-view  { animation-delay: 0.08s; }
+.proof-panel .proof-row:nth-child(4).in-view  { animation-delay: 0.16s; }
+.proof-panel .proof-row:nth-child(5).in-view  { animation-delay: 0.24s; }
+.process-panel .process-row:nth-child(2).in-view { animation-delay: 0.06s; }
+.process-panel .process-row:nth-child(3).in-view { animation-delay: 0.14s; }
+.process-panel .process-row:nth-child(4).in-view { animation-delay: 0.22s; }
+
 .proof-row,
 .process-row {
   width: 100%;

@@ -69,45 +69,45 @@
       </div>
     </div>
 
-    <section v-if="!showCmp" class="explorer-profile-card" :class="{ collapsed: !isProfileExpanded }">
-      <div class="explorer-profile-inner">
-        <template v-if="isProfileExpanded">
-          <button v-if="preferencesApplied" class="profile-collapse-btn" type="button" @click="profileCardOpen = false">
-            Collapse preferences
-          </button>
-          <EligibilityChecker
-            compact
-            :initial-profile="incentiveProfile"
-            :show-result="false"
-            title="See incentives that apply to you"
-            subtitle="Tell us your role and experience so schools, map pins, and each incentive package reflect what you may actually be eligible for."
-            action-label="Update my matches"
-            ready-label="Ready"
-            @profile-change="handleProfileChange"
-            @profile-submit="applyProfilePreferences"
-          />
-          <div v-if="preferencesApplied" class="profile-applied">Your matches, map, and school incentive packages are now personalised.</div>
-        </template>
-        <button v-else class="profile-summary-bar" type="button" @click="profileCardOpen = true">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--blue);flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-          <span class="profile-summary-title">Incentive preferences</span>
-          <span class="profile-summary-divider">·</span>
-          <span class="profile-summary-copy">{{ profileSummary }}</span>
-          <span class="profile-summary-edit">Edit</span>
-        </button>
-      </div>
-    </section>
-
     <!-- ── Entry ── -->
     <div v-if="!showCmp && view === 'entry'" class="exp-entry anim-fadeup">
       <div class="exp-entry-h">
         <h2>How would you like to find a school?</h2>
-        <p>Choose the path that suits you — both lead to the same results</p>
+        <p>Choose the path that suits you. Both lead to the same results.</p>
         <div v-if="preferencesApplied" class="entry-personalised-note">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           Results and incentive estimates are personalised to your profile
         </div>
       </div>
+
+      <section class="explorer-profile-card" :class="{ collapsed: !isProfileExpanded }">
+        <div class="explorer-profile-inner">
+          <template v-if="isProfileExpanded">
+            <button v-if="preferencesApplied" class="profile-collapse-btn" type="button" @click="profileCardOpen = false">
+              Collapse preferences
+            </button>
+            <EligibilityChecker
+              compact
+              :initial-profile="incentiveProfile"
+              :show-result="false"
+              title="See your exact incentive amount"
+              subtitle="Add your role and experience to see what you'd personally be eligible for."
+              action-label="Update my matches"
+              ready-label="Ready"
+              @profile-change="handleProfileChange"
+              @profile-submit="applyProfilePreferences"
+            />
+            <div v-if="preferencesApplied" class="profile-applied">Your matches, map, and school incentive packages are now personalised.</div>
+          </template>
+          <button v-else class="profile-summary-bar" type="button" @click="profileCardOpen = true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--blue);flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+            <span class="profile-summary-title">Incentive preferences</span>
+            <span class="profile-summary-divider">·</span>
+            <span class="profile-summary-copy">{{ profileSummary }}</span>
+            <span class="profile-summary-edit">Edit</span>
+          </button>
+        </div>
+      </section>
 
       <div class="two-paths">
         <div class="path-card pc-search" @click="view = 'search'">
@@ -1204,6 +1204,7 @@ const q3opts = [
 }
 
 .exp-entry-h h2 {
+  font-family:'Playfair Display', serif;
   font-size:2.3rem;
   font-weight:900;
   line-height:1.1;
