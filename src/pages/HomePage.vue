@@ -17,7 +17,7 @@
           <p class="cin-hero-sub">Find schools, compare incentives, and understand the lifestyle before you decide.</p>
           <div class="cin-hero-acts">
             <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find your school</button>
-            <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Explore Lifestyle</button>
+            <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Know the Place</button>
           </div>
         </div>
 
@@ -52,115 +52,6 @@
       </div>
 
     </section>
-
-    <!-- REGIONAL BENEFITS -->
-    <section class="regional-section">
-      <div class="how-inner">
-        <div class="section-header centered">
-          <div class="section-eyebrow">What regional can offer</div>
-          <h2>Look beyond the incentive figure.</h2>
-        </div>
-        <div class="proof-card-grid">
-          <button class="proof-card" type="button" @click="openModal('financial')">
-            <div class="proof-card-icon proof-icon-green">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-            <div class="proof-card-cat cat-green">Financial</div>
-            <div class="proof-card-title">A real pay difference</div>
-            <div class="proof-card-link">See the breakdown →</div>
-          </button>
-          <button class="proof-card" type="button" @click="openModal('cost')">
-            <div class="proof-card-icon proof-icon-blue">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            <div class="proof-card-cat cat-blue">Cost of Living</div>
-            <div class="proof-card-title">Your salary stretches further</div>
-            <div class="proof-card-link">What the data shows →</div>
-          </button>
-          <button class="proof-card" type="button" @click="openModal('career')">
-            <div class="proof-card-icon proof-icon-amber">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            </div>
-            <div class="proof-card-cat cat-amber">Career Pace</div>
-            <div class="proof-card-title">Smaller schools, broader role</div>
-            <div class="proof-card-link">How careers progress →</div>
-          </button>
-          <button class="proof-card" type="button" @click="openModal('community')">
-            <div class="proof-card-icon proof-icon-purple">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div class="proof-card-cat cat-purple">Community</div>
-            <div class="proof-card-title">You are not anonymous</div>
-            <div class="proof-card-link">What this means in practice →</div>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- TEACHER STORY -->
-    <div class="story-cin-wrap">
-      <div class="section-header centered story-section-header fade-section">
-        <div class="section-eyebrow story-title-blue">A teacher's story</div>
-        <h2>Meet Katie</h2>
-      </div>
-    <section class="cin-section story-cin-section fade-section">
-      <div class="cin-bg story-cin-bg" :style="{ backgroundImage: `url(${STORY_SLIDES[storySlide].img})`, backgroundPosition: STORY_SLIDES[storySlide].pos }"></div>
-      <div class="cin-overlay"></div>
-
-      <div class="cin-content story-cin-content">
-        <Transition name="sslide" mode="out-in">
-          <div :key="storySlide" class="story-content-pad">
-
-            <!-- Slide 0: Journey intro — Katie's photo, journey path only -->
-            <template v-if="storySlide === 0">
-              <h2 class="cin-headline">City girl.<br>Remote teacher.</h2>
-              <p class="cin-sub story-intro-text">Who has found incredible joy and meaning in teaching in regional and remote Queensland state schools.</p>
-            </template>
-
-            <!-- Slide 1: Career quote — teacher at whiteboard background -->
-            <template v-else-if="storySlide === 1">
-              <div class="cin-tag-pill">On career</div>
-              <div class="story-quote-block">
-                <p class="story-qtext">"Going rural gave me career opportunities I don't imagine I would've got elsewhere, including a backfilling position as a <span class="story-qhilite">Head of Department</span>, which is pretty awesome for someone in their 20s."</p>
-                <div class="story-qattr">— Katie, Cooktown QLD</div>
-              </div>
-            </template>
-
-            <!-- Slide 2: Life change + CTA — Queensland landscape background -->
-            <template v-else>
-              <div class="cin-tag-pill">On lifestyle</div>
-              <div class="story-quote-block">
-                <p class="story-qtext">"If you told me 6 years ago that I'd be working in Cape York in a remote community, I would've laughed in your face, but <span class="story-qhilite">now I can't imagine ever going back to the city.</span>"</p>
-                <div class="story-qattr">— Katie, Cooktown QLD</div>
-              </div>
-            </template>
-
-          </div>
-        </Transition>
-      </div>
-
-      <div class="cin-dots">
-        <button
-          v-for="i in STORY_SLIDE_COUNT"
-          :key="i"
-          class="cin-dot"
-          :class="{ 'cin-dot--active': storySlide === i - 1 }"
-          @click="goStorySlide(i - 1)"
-        ></button>
-        <button
-          class="cin-pause"
-          :class="{ paused: storyPaused }"
-          @click="toggleStoryPause"
-          :aria-label="storyPaused ? 'Resume story slideshow' : 'Pause story slideshow'"
-          :title="storyPaused ? 'Resume slideshow' : 'Pause slideshow'"
-        >
-          {{ storyPaused ? '▶' : 'Ⅱ' }}
-        </button>
-      </div>
-
-      <div class="cin-photo-credit">Photo: <a :href="STORY_SLIDES[storySlide].creditUrl" target="_blank" rel="noopener">{{ STORY_SLIDES[storySlide].credit }}</a></div>
-    </section>
-    </div>
 
     <!-- STATE SPLIT -->
     <section class="state-split-section">
@@ -213,6 +104,50 @@
       </div>
     </section>
 
+    <!-- REGIONAL BENEFITS -->
+    <section class="regional-section">
+      <div class="how-inner">
+        <div class="section-header centered">
+          <div class="section-eyebrow">What regional can offer</div>
+          <h2>Look beyond the incentive figure.</h2>
+        </div>
+        <div class="proof-card-grid">
+          <button class="proof-card" type="button" @click="openModal('financial')">
+            <div class="proof-card-icon proof-icon-green">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="proof-card-cat cat-green">Financial</div>
+            <div class="proof-card-title">A real pay difference</div>
+            <div class="proof-card-link">See the breakdown →</div>
+          </button>
+          <button class="proof-card" type="button" @click="openModal('cost')">
+            <div class="proof-card-icon proof-icon-blue">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="proof-card-cat cat-blue">Cost of Living</div>
+            <div class="proof-card-title">Your salary stretches further</div>
+            <div class="proof-card-link">What the data shows →</div>
+          </button>
+          <button class="proof-card" type="button" @click="openModal('career')">
+            <div class="proof-card-icon proof-icon-amber">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div class="proof-card-cat cat-amber">Career Pace</div>
+            <div class="proof-card-title">Smaller schools, broader role</div>
+            <div class="proof-card-link">How careers progress →</div>
+          </button>
+          <button class="proof-card" type="button" @click="openModal('community')">
+            <div class="proof-card-icon proof-icon-purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="proof-card-cat cat-purple">Community</div>
+            <div class="proof-card-title">You are not anonymous</div>
+            <div class="proof-card-link">What this means in practice →</div>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- HOW IT WORKS -->
     <section class="how-section">
       <div class="how-inner">
@@ -236,7 +171,7 @@
             <div class="how-card-body">
               <div class="how-card-num">02</div>
               <div class="how-card-title">Explore the lifestyle</div>
-              <p class="how-card-text">Every school links to its Lifestyle Insights profile: healthcare, rent, distance to city, and nature access.</p>
+              <p class="how-card-text">Every school links to its Know the Place profile: healthcare, rent, distance to city, and nature access.</p>
               <span class="how-card-learn">See what's measured ↗</span>
             </div>
           </div>
@@ -254,6 +189,36 @@
       </div>
     </section>
 
+    <!-- TEACHER STORY -->
+    <div class="story-plain-wrap fade-section">
+      <div class="story-plain-card">
+      <div class="story-plain-split">
+        <div class="story-plain-player">
+          <div class="story-video-card">
+            <iframe
+              ref="storyFrameEl"
+              class="story-plain-frame"
+              allowfullscreen
+              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+              scrolling="no"
+              frameborder="0"
+            ></iframe>
+          </div>
+        </div>
+        <div class="story-plain-text">
+          <div class="section-eyebrow story-title-blue story-eyebrow-centered">Why Teachers Stay</div>
+          <p class="story-plain-context">Many teachers who move regional report stronger career growth, community connection, and better work-life balance.</p>
+          <h2 class="story-plain-h">Meet Katie.</h2>
+          <p class="story-plain-desc">Katie moved from the city to teach at a remote school in <strong>Cooktown, Cape York Peninsula, Far North Queensland</strong>. It changed everything.</p>
+          <ul class="story-plain-points">
+            <li>Landed a <strong>Head of Department role in her 20s</strong>, career opportunities she never would have seen staying in the city</li>
+            <li>Six years in, she's found a community and lifestyle that makes <strong>going back feel unimaginable</strong></li>
+          </ul>
+        </div>
+      </div>
+      </div>
+    </div>
+
     <!-- READY TO EXPLORE CTA -->
     <section class="final-cta">
       <div class="final-cta-overlay"></div>
@@ -262,7 +227,7 @@
         <p>Browse 645 schools across QLD and NSW. Filter by pay, remoteness, and lifestyle then decide.</p>
         <div class="final-cta-btns">
           <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find your school</button>
-          <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Explore Lifestyle</button>
+          <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Know the Place</button>
         </div>
       </div>
     </section>
@@ -306,51 +271,11 @@ const heroVideoStyle = computed(() => ({
   backgroundImage: `url(${heroImage})`,
 }))
 
-// ── Teacher story slideshow ──
-const STORY_SLIDES = [
-  { img: 'https://teach.qld.gov.au/teachinstateschools/publishingimages/thumbnail_farnorthqueenslandregion.jpg', pos: '72% center', credit: 'Teach QLD', creditUrl: 'https://teach.qld.gov.au/' },
-  { img: 'https://pbs.twimg.com/media/EtRhym-XUAAwNWG?format=jpg&name=medium', pos: 'center 30%', credit: 'Teach QLD (@TeachQLD)', creditUrl: 'https://twitter.com/TeachQLD' },
-  { img: 'https://live-production.wcms.abc-cdn.net.au/728faaf9dcf36c033bb5111d3031eab1?impolicy=wcms_crop_resize&cropH=512&cropW=768&xPos=0&yPos=256&width=862&height=575', pos: 'center 40%', credit: 'ABC News', creditUrl: 'https://www.abc.net.au/' },
-]
-const STORY_SLIDE_COUNT = STORY_SLIDES.length
-const storySlide = ref(0)
-const storyPaused = ref(false)
-let storyTimer = null
 
-let storyVisible = false
-
-function scheduleStorySlide() {
-  if (storyTimer) clearTimeout(storyTimer)
-  if (storyPaused.value || !storyVisible) return
-  storyTimer = setTimeout(() => {
-    storySlide.value = (storySlide.value + 1) % STORY_SLIDE_COUNT
-    scheduleStorySlide()
-  }, 5000)
-}
-
-function goStorySlide(n) {
-  storySlide.value = n
-  scheduleStorySlide()
-}
-
-function toggleStoryPause() {
-  storyPaused.value = !storyPaused.value
-  scheduleStorySlide()
-}
-
-function startStoryIfVisible(el) {
-  const obs = new IntersectionObserver(([entry]) => {
-    storyVisible = entry.isIntersecting
-    if (storyVisible) {
-      storySlide.value = 0
-      scheduleStorySlide()
-    } else {
-      if (storyTimer) clearTimeout(storyTimer)
-    }
-  }, { threshold: 0.4 })
-  obs.observe(el)
-  return obs
-}
+// ── Story iframe autoplay on scroll ──
+const storyFrameEl = ref(null)
+const FB_SRC = 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1667299444305344&show_text=false&width=560&autoplay=1&mute=1'
+const FB_SRC_PAUSED = 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1667299444305344&show_text=false&width=560&autoplay=0&mute=0'
 
 // ── How-it-works modals ──
 const activeModal = ref(null)
@@ -371,7 +296,7 @@ const modals = {
   },
   rural: {
     image: 'https://images.pexels.com/photos/1687093/pexels-photo-1687093.jpeg?auto=compress&cs=tinysrgb&w=900',
-    tag: 'Step 02 · Lifestyle Insights',
+    tag: 'Step 02 · Know the Place',
     title: 'What the lifestyle metrics measure',
     items: [
       'Healthcare nearby. Clinics and hospitals within your area.',
@@ -380,7 +305,7 @@ const modals = {
       'Nature access: parks and reserves on your doorstep',
     ],
     source: 'ABS Census 2021 · ACARA My School 2025',
-    cta: { label: 'View Lifestyle Insights', nav: 'insights' },
+    cta: { label: 'View Know the Place', nav: 'insights' },
   },
   compare: {
     image: 'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=900',
@@ -469,8 +394,6 @@ function onScroll() {
   heroParallaxY.value = scrolled
 }
 
-let storyVisObs = null
-
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('keydown', onKeydown)
@@ -486,13 +409,21 @@ onMounted(() => {
   )
   document.querySelectorAll('.why-card, .how-card').forEach(el => cardObserver.observe(el))
 
-  const storySectionEl = document.querySelector('.story-cin-section')
-  if (storySectionEl) storyVisObs = startStoryIfVisible(storySectionEl)
+  if (storyFrameEl.value) {
+    storyFrameEl.value.src = FB_SRC_PAUSED
+    const frameObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (storyFrameEl.value) {
+          storyFrameEl.value.src = entry.isIntersecting ? FB_SRC : FB_SRC_PAUSED
+        }
+      },
+      { threshold: 0.5 }
+    )
+    frameObserver.observe(storyFrameEl.value)
+  }
 })
 
 onUnmounted(() => {
-  if (storyTimer) clearTimeout(storyTimer)
-  if (storyVisObs) storyVisObs.disconnect()
   window.removeEventListener('scroll', onScroll)
   window.removeEventListener('keydown', onKeydown)
   document.body.style.overflow = ''
@@ -501,184 +432,113 @@ onUnmounted(() => {
 
 <style scoped>
 
-/* STORY CINEMATIC SECTION — outer wrapper gives horizontal breathing room + top gap */
-.story-cin-wrap {
-  background: var(--bg);
-  padding: 0 80px 24px;
-}
-.story-section-header {
-  padding: 28px 0 12px;
-}
 .story-title-blue { color: var(--blue); }
-.story-cin-wrap .story-cin-section {
-  border-bottom: none;
-}
-.story-cin-section {
-  border-radius: 24px;
-  overflow: hidden;
-}
 
-/* Override overlay to gradient left→right so face on the right stays visible */
-.story-cin-section .cin-overlay {
-  background: linear-gradient(
-    to right,
-    rgba(8, 18, 40, 0.88) 0%,
-    rgba(8, 18, 40, 0.60) 45%,
-    rgba(8, 18, 40, 0.10) 100%
-  );
+/* TEACHER STORY — plain split layout, no box */
+.story-plain-wrap {
+  padding: 48px 80px;
+  background: var(--bg);
 }
-
-/* Push content to the left half */
-.story-cin-content {
-  align-items: flex-start !important;
-  padding-left: 6% !important;
-  padding-right: 50% !important;
+.story-plain-card {
+  max-width: 1080px;
+  margin: 0 auto;
+  background: var(--s2);
+  border: 1px solid var(--b);
+  border-radius: 20px;
+  padding: 36px 48px 48px;
+  box-shadow: 0 2px 12px rgba(26,23,20,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
-
-/* Frosted glass content card — readable on any background photo */
-.story-content-pad {
-  max-width: 440px;
+.story-plain-split {
+  display: flex;
+  align-items: stretch;
+  gap: 48px;
+}
+.story-plain-player {
+  flex: 0 0 34%;
+  aspect-ratio: 9 / 16;
+}
+.story-video-card {
   width: 100%;
-  padding: 28px 34px 32px;
-  margin: 0;
-  text-align: left;
-  background: rgba(8, 18, 40, 0.40);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  height: 100%;
   border-radius: 18px;
-  overflow: visible;
+  overflow: hidden;
+  background: #0d1f3c;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22);
 }
-.story-cin-section .cin-headline {
-  font-size: 2.8rem;
-  margin-bottom: 10px;
-  text-align: left;
+.story-plain-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
 }
-.story-cin-section .cin-sub {
-  margin-bottom: 20px;
+.story-plain-text {
+  flex: 1;
+  display: grid;
+  align-content: center;
+  gap: 12px;
+}
+.story-eyebrow-centered {
+  text-align: center;
+}
+.story-plain-context {
+  font-size: 0.9rem;
+  color: var(--ink3);
+  line-height: 1.6;
+  margin: 0;
+}
+.story-plain-h {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.1;
+  margin: 2px 0 0;
+}
+.story-plain-desc {
+  font-size: 0.94rem;
+  color: var(--ink2);
+  line-height: 1.65;
+  margin: 0;
+}
+.story-plain-points {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.story-plain-points li {
+  font-family: 'DM Sans', sans-serif;
   font-size: 0.93rem;
-  color: rgba(255, 255, 255, 0.72);
-  text-align: left;
-}
-.story-cin-section .cin-journey {
-  margin-top: 8px;
-  justify-content: flex-start;
-}
-.story-journey-label {
-  margin-top: 14px !important;
-  margin-bottom: 0 !important;
-  font-size: 0.75rem !important;
-  color: rgba(255, 255, 255, 0.48) !important;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-}
-.story-cin-section .cin-location {
-  margin-bottom: 8px;
-  text-align: left;
-}
-.story-cin-section .cin-tag-pill {
-  margin-bottom: 18px;
-  display: inline-block;
-  font-size: 0.84rem;
-  padding: 8px 18px;
-}
-.story-cin-section .cin-tag-pill:first-child {
-  background: rgba(31, 111, 235, 0.22);
-  border-color: rgba(125, 180, 255, 0.58);
-  color: #fff;
-  box-shadow: 0 0 24px rgba(31,111,235,0.20);
-}
-.story-intro-text {
-  max-width: 410px;
-  margin-top: 16px !important;
-  color: rgba(255,255,255,0.78) !important;
-  line-height: 1.65 !important;
-}
-.story-cin-section .cin-qmark {
-  text-align: left;
-  margin-bottom: 8px;
-}
-.story-cin-section .cin-qtext {
-  text-align: left;
-  margin: 0 0 12px;
-  font-size: 1.25rem;
-}
-.story-cin-section .cin-qattr {
-  text-align: left;
-}
-.story-cta-btn {
-  margin-top: 22px;
-  font-size: 0.88rem;
-  padding: 12px 24px;
-}
-
-/* Quote block — compact editorial card */
-.story-quote-block {
+  color: var(--ink2);
+  line-height: 1.55;
+  padding-left: 1.1em;
   position: relative;
-  margin-top: 0;
-  max-width: 500px;
 }
-.story-qtext {
-  position: relative;
-  z-index: 1;
-  font-family: 'DM Sans', sans-serif;
-  font-size: clamp(0.94rem, 1.08vw, 1.08rem);
-  font-weight: 650;
-  color: #fff;
-  line-height: 1.64;
-  margin: 0 0 16px;
-  letter-spacing: 0;
-  max-width: 420px;
+.story-plain-points li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--blue);
+  font-weight: 700;
 }
-.story-qhilite {
-  color: #7DB4FF;
-  font-weight: 900;
-}
-.story-qattr {
-  position: relative;
-  z-index: 1;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.68rem;
-  font-weight: 900;
-  color: rgba(255, 255, 255, 0.62);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  max-width: 420px;
-}
+.story-plain-points li strong { color: var(--ink); font-weight: 700; }
 
-/* Slide transition */
-.sslide-enter-active { transition: opacity 0.5s ease, transform 0.5s ease; }
-.sslide-leave-active { transition: opacity 0.3s ease, transform 0.3s ease; }
-.sslide-enter-from   { opacity: 0; transform: translateY(18px); }
-.sslide-leave-to     { opacity: 0; transform: translateY(-12px); }
-
-@media (max-width: 768px) {
-  .story-cin-wrap { padding: 32px 24px 0; }
-  .story-cin-section { border-radius: 16px; }
-  .story-cin-content {
-    align-items: center !important;
-    padding-left: 20px !important;
-    padding-right: 20px !important;
-  }
-  .story-content-pad {
-    padding: 18px 18px 24px;
-    text-align: center;
-    margin: 0 auto;
-  }
-  .story-cin-section .cin-headline { font-size: 1.72rem; text-align: center; }
-  .story-cin-section .cin-sub { text-align: center; }
-  .story-intro-text { max-width: 320px; margin-left: auto !important; margin-right: auto !important; }
-  .story-cin-section .cin-location { text-align: center; }
-  .story-cin-section .cin-qtext { text-align: center; font-size: 1.05rem; }
-  .story-cin-section .cin-qattr { text-align: center; }
-  .story-cin-section .cin-qmark { text-align: center; }
-  .story-cin-section .cin-journey { justify-content: center; }
-  .story-journey-label { margin-top: 10px !important; }
-  .story-cin-section .cin-overlay {
-    background: rgba(8, 18, 40, 0.65);
-  }
+@media (max-width: 900px) {
+  .story-plain-wrap { padding: 32px 24px; }
+  .story-plain-card { padding: 32px; }
+  .story-plain-player { flex: 0 0 38%; }
+  .story-plain-split { gap: 32px; }
+}
+@media (max-width: 640px) {
+  .story-plain-wrap { padding: 24px 16px; }
+  .story-plain-card { padding: 24px 20px; }
+  .story-plain-split { flex-direction: column; gap: 24px; }
+  .story-plain-player { flex: 0 0 auto; width: 72vw; max-width: 260px; }
 }
 
 /* SCROLL PROGRESS */
@@ -1088,55 +948,6 @@ onUnmounted(() => {
   font-size: 0.82rem;
   color: rgba(255,255,255,0.5);
   letter-spacing: 0.06em;
-}
-.cin-dots {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-  padding: 14px 0;
-}
-.cin-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.45);
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-  transition: all 0.25s ease;
-}
-.cin-dot--active {
-  width: 24px;
-  border-radius: 4px;
-  background: #fff;
-  border-color: #fff;
-}
-.cin-pause {
-  width: 26px;
-  height: 26px;
-  margin-left: 6px;
-  border-radius: 999px;
-  border: 1.5px solid rgba(255,255,255,0.38);
-  background: rgba(255,255,255,0.10);
-  color: rgba(255,255,255,0.86);
-  font-size: 0.68rem;
-  font-weight: 900;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: background 0.18s, border-color 0.18s, color 0.18s;
-}
-.cin-pause:hover,
-.cin-pause.paused {
-  background: rgba(255,255,255,0.22);
-  border-color: rgba(255,255,255,0.7);
-  color: #fff;
 }
 .section-header { margin-bottom: 40px; text-align: center;}
 .section-header.centered { text-align: center; }
@@ -1576,7 +1387,6 @@ onUnmounted(() => {
 /* STATE SPLIT SECTION */
 .state-split-section {
   background: var(--bg);
-  border-top: 1px solid var(--b);
   padding: 0 24px 64px;
 }
 .state-split-header {
@@ -1732,9 +1542,7 @@ onUnmounted(() => {
   .state-card-h { font-size: 1.35rem; }
   .proof-panel { grid-template-columns: 1fr; }
   .decision-panel { padding: 14px; }
-  .story-cin-section { height: 78vh; min-height: 520px; }
   .cin-headline { font-size: 2.6rem; }
-  .cin-qtext { font-size: 1.15rem; }
   /* ── How-cards: horizontal swipe ── */
   .how-section { padding: 48px 0; }
   .how-section .section-header { padding: 0 24px; }
@@ -1778,22 +1586,9 @@ onUnmounted(() => {
   .cin-hero-h1 { font-size: 2.1rem; }
   .btn-hero-p, .btn-hero-s { width: 100%; display: block; text-align: center; }
   .cin-hero-acts { flex-direction: column; }
-  .story-cin-wrap { padding: 24px 16px 0; }
-  .story-cin-section { height: 74vh; min-height: 520px; }
-  .story-cin-section .cin-content { padding: 28px 14px 2px; }
-  .story-content-pad { max-height: calc(100% - 34px); padding: 16px 16px 18px; }
-  .story-cin-section .cin-tag-pill { margin-bottom: 12px; font-size: 0.78rem; padding: 7px 15px; }
-  .story-cin-section .cin-location { font-size: 0.72rem; line-height: 1.55; margin-bottom: 8px; }
-  .story-cin-section .cin-headline { font-size: 1.55rem; line-height: 1.08; margin-bottom: 8px; }
-  .story-intro-text { font-size: 0.78rem !important; line-height: 1.55 !important; }
-  .story-journey-label { font-size: 0.62rem !important; margin-top: 8px !important; }
-  .cin-journey { flex-direction: column; }
-  .story-cin-section .cin-journey { gap: 6px; margin-top: 4px; }
-  .cj-stop { font-size: 1rem; }
-  .cj-stop--dest { font-size: 1.22rem; }
-  .cj-arr { transform: rotate(90deg); }
-  .cin-dots { padding: 6px 0 10px; }
-  .cin-photo-credit { bottom: 42px; }
+  .story-plain-wrap { padding: 28px 16px 36px; }
+  .story-plain-split { flex-direction: column; gap: 20px; }
+  .story-plain-h { font-size: 1.8rem; }
   .how-step-body { padding: 28px 20px; }
 }
 </style>
