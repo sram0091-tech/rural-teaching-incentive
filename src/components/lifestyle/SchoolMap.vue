@@ -1,5 +1,5 @@
 <template>
-  <div class="school-map-section">
+  <div class="school-map-section" :class="{ 'school-map-fullscreen': isFullscreen }">
     <div class="nearby-bar">
       <span class="nearby-label">Nearby Places</span>
       <div class="nby-radius-ctrl">
@@ -28,6 +28,10 @@
         <strong v-if="cat.loading">…</strong>
         <strong v-else>{{ cat.count ?? '…' }}</strong>
       </span>
+      <button class="nby-fullscreen-btn" @click="toggleFullscreen" :title="isFullscreen ? 'Exit fullscreen' : 'Fullscreen'">
+        <svg v-if="!isFullscreen" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/></svg>
+      </button>
     </div>
     <div ref="mapEl" class="school-map"></div>
   </div>
@@ -42,7 +46,14 @@ const props = defineProps({ school: { type: Object, required: true } })
 
 const mapEl = ref(null)
 const radius = ref(10000)
+const isFullscreen = ref(false)
 let currentLatLng = null
+
+function toggleFullscreen() {
+  isFullscreen.value = !isFullscreen.value
+  setTimeout(() => mapInstance?.invalidateSize(), 50)
+}
+
 
 const categories = ref([
   { key: 'grocery',    label: 'Supermarkets',    tags: '["shop"~"supermarket|grocery|convenience"]',                  color: '#f97316', count: null, loading: false },
@@ -55,11 +66,43 @@ const categories = ref([
 let mapInstance = null
 let baseGroup = null       // circle + school pin
 let catGroups = {}         // per-category layer groups
+let radiusCircle = null
+let maskLayer = null
+let pinchEndTimer = null
 const activeFilter = ref(null) // null = all visible, key = only that category
 
-function dotIcon(color, size = 10) {
+function buildMask(lat, lng, r) {
+  const outer = [[-90, -180], [-90, 180], [90, 180], [90, -180]]
+  const inner = []
+  const steps = 72
+  const cosLat = Math.cos(lat * Math.PI / 180)
+  for (let i = 0; i < steps; i++) {
+    const a = (i / steps) * 2 * Math.PI
+    inner.push([lat + (r / 111320) * Math.cos(a), lng + (r / (111320 * cosLat)) * Math.sin(a)])
+  }
+  return L.polygon([outer, inner], {
+    color: 'none', fillColor: '#000', fillOpacity: 0.22, stroke: false, interactive: false,
+  })
+}
+
+const SCHOOL_PIN_HTML = (name) =>
+  `<div class="school-pin">
+    <svg class="school-pin-svg" width="30" height="40" viewBox="0 0 30 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 0C6.716 0 0 6.716 0 15c0 10.5 15 25 15 25S30 25.5 30 15C30 6.716 23.284 0 15 0z" fill="#f59e0b"/>
+      <path d="M15 0C6.716 0 0 6.716 0 15c0 10.5 15 25 15 25S30 25.5 30 15C30 6.716 23.284 0 15 0z" fill="url(#sp)" opacity="0.18"/>
+      <defs><linearGradient id="sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient></defs>
+      <circle cx="15" cy="15" r="7" fill="#fff" opacity="0.95"/>
+      <text x="15" y="19" text-anchor="middle" font-size="9" font-family="sans-serif" fill="#d97706">🏫</text>
+    </svg>
+    <div class="school-pin-label">${name}</div>
+  </div>`
+
+function dotIcon(color, size = 20) {
   return L.divIcon({
-    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.35)"></div>`,
+    html: `<div class="nby-marker" style="--mc:${color};width:${size}px;height:${size}px">
+      <span class="nby-ring nby-ring--1"></span>
+      <span class="nby-ring nby-ring--2"></span>
+    </div>`,
     className: '',
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
@@ -79,7 +122,15 @@ async function initMap() {
   if (mapInstance) { mapInstance.remove(); mapInstance = null }
   catGroups = {}
 
-  mapInstance = L.map(mapEl.value, { zoomControl: true }).setView([lat, lng], 13)
+  mapInstance = L.map(mapEl.value, { zoomControl: true, scrollWheelZoom: false, touchZoom: true }).setView([lat, lng], 13)
+
+  // Trackpad pinch sends ctrlKey+wheel — re-enable scroll zoom only for that gesture
+  mapEl.value.addEventListener('wheel', (e) => {
+    if (!e.ctrlKey || !mapInstance) return
+    mapInstance.scrollWheelZoom.enable()
+    clearTimeout(pinchEndTimer)
+    pinchEndTimer = setTimeout(() => mapInstance?.scrollWheelZoom.disable(), 300)
+  }, { passive: true })
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -93,7 +144,7 @@ async function initMap() {
     catGroups[cat.key] = L.layerGroup().addTo(mapInstance)
   }
 
-  L.circle([lat, lng], {
+  radiusCircle = L.circle([lat, lng], {
     radius: radius.value,
     color: '#1F6FEB',
     fillColor: '#1F6FEB',
@@ -102,14 +153,14 @@ async function initMap() {
     dashArray: '6 4',
   }).addTo(baseGroup)
 
+  if (maskLayer) { mapInstance.removeLayer(maskLayer); maskLayer = null }
+  maskLayer = buildMask(lat, lng, radius.value).addTo(mapInstance)
+
   const schoolIcon = L.divIcon({
-    html: `<div class="school-pin">
-      <div class="school-pin-dot"></div>
-      <div class="school-pin-label">${props.school.name}</div>
-    </div>`,
+    html: SCHOOL_PIN_HTML(props.school.name),
     className: '',
-    iconSize: [0, 0],
-    iconAnchor: [0, 0],
+    iconSize: [30, 40],
+    iconAnchor: [15, 40],
   })
   L.marker([lat, lng], { icon: schoolIcon, zIndexOffset: 1000 }).addTo(baseGroup)
 
@@ -191,7 +242,7 @@ out center;`
       const elements = data.elements || []
       cat.count = elements.length
 
-      const icon = dotIcon(cat.color, 10)
+      const icon = dotIcon(cat.color, 20)
       for (const el of elements) {
         const elLat = el.lat ?? el.center?.lat
         const elLng = el.lon ?? el.center?.lon
@@ -246,25 +297,36 @@ async function refreshPlaces() {
     }
   }
 
-  L.circle([lat, lng], {
+  radiusCircle = L.circle([lat, lng], {
     radius: radius.value,
     color: '#1F6FEB', fillColor: '#1F6FEB', fillOpacity: 0.04,
     weight: 1.5, dashArray: '6 4',
   }).addTo(baseGroup)
 
+  if (maskLayer) { mapInstance.removeLayer(maskLayer); maskLayer = null }
+  maskLayer = buildMask(lat, lng, radius.value).addTo(mapInstance)
+  mapInstance.fitBounds(radiusCircle.getBounds(), { padding: [30, 30] })
+
   const schoolIcon = L.divIcon({
-    html: `<div class="school-pin"><div class="school-pin-dot"></div><div class="school-pin-label">${props.school.name}</div></div>`,
-    className: '', iconSize: [0, 0], iconAnchor: [0, 0],
+    html: SCHOOL_PIN_HTML(props.school.name),
+    className: '',
+    iconSize: [30, 40],
+    iconAnchor: [15, 40],
   })
   L.marker([lat, lng], { icon: schoolIcon, zIndexOffset: 1000 }).addTo(baseGroup)
 
   await fetchNearby(lat, lng)
 }
 
-onMounted(initMap)
+function onKeydown(e) { if (e.key === 'Escape' && isFullscreen.value) toggleFullscreen() }
+
+onMounted(() => { initMap(); document.addEventListener('keydown', onKeydown) })
 watch(() => props.school?.id, initMap)
 watch(radius, refreshPlaces)
-onUnmounted(() => { if (mapInstance) { mapInstance.remove(); mapInstance = null } })
+onUnmounted(() => {
+  if (mapInstance) { mapInstance.remove(); mapInstance = null }
+  document.removeEventListener('keydown', onKeydown)
+})
 </script>
 
 <style scoped>
@@ -366,11 +428,67 @@ onUnmounted(() => { if (mapInstance) { mapInstance.remove(); mapInstance = null 
 .nby-pill strong { font-weight: 700; }
 .school-map {
   width: 100%;
-  height: 340px;
+  height: 520px;
+}
+.school-map-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  border-radius: 0 !important;
+  border: none !important;
+  display: flex;
+  flex-direction: column;
+}
+.school-map-fullscreen .school-map {
+  flex: 1;
+  height: 100% !important;
+}
+.nby-fullscreen-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1.5px solid var(--b2);
+  background: var(--s);
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.13s;
+}
+.nby-fullscreen-btn:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-s);
 }
 </style>
 
 <style>
+.nby-marker {
+  border-radius: 50%;
+  background: var(--mc);
+  border: 2.5px solid #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  position: relative;
+}
+.nby-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--mc);
+  animation: nby-pulse 2.2s ease-out infinite;
+  opacity: 0;
+}
+.nby-ring--2 {
+  animation-delay: 1.1s;
+}
+@keyframes nby-pulse {
+  0%   { transform: scale(1);   opacity: 0.75; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
 .osm-popup .leaflet-popup-content-wrapper {
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.14);
@@ -389,18 +507,13 @@ onUnmounted(() => { if (mapInstance) { mapInstance.remove(); mapInstance = null 
   align-items: center;
   pointer-events: none;
 }
-.school-pin-dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #1F6FEB;
-  border: 3px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  flex-shrink: 0;
+.school-pin-svg {
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));
+  display: block;
 }
 .school-pin-label {
   margin-top: 4px;
-  background: #1F6FEB;
+  background: #f59e0b;
   color: #fff;
   font-family: 'DM Sans', sans-serif;
   font-size: 0.72rem;

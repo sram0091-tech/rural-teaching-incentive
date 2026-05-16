@@ -121,6 +121,13 @@
           </div>
         </div>
 
+        <div class="section-source-row anim-fadeup" style="animation-delay:0.03s">
+          <button class="source-badge source-badge--data" @click="goDataSources" title="Where does the data come from?">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Verified data
+          </button>
+        </div>
+
         <div class="life-grid anim-fadeup" style="animation-delay:0.05s">
           <div class="life-card">
             <div class="lc-title">Location & Cost</div>
@@ -179,7 +186,13 @@
 
         <!-- AI Trade-offs Summary -->
         <div class="editorial anim-fadeup" style="animation-delay:0.1s">
-          <div class="editorial-title">Life in {{ insSchool.suburb }}</div>
+          <div class="editorial-title">
+            Life in {{ insSchool.suburb }}
+            <span class="source-badge source-badge--ai">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 0 2h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1 0-2h1a7 7 0 0 1 7-7h1V5.73A2 2 0 0 1 10 4a2 2 0 0 1 2-2z"/></svg>
+              AI-generated
+            </span>
+          </div>
           <div v-if="aiLoading" class="ai-skeleton">
             <div class="ai-skel-cols">
               <div class="ai-skel-col">
@@ -361,6 +374,11 @@ const {
   launchView,
   launchSort,
 } = useExplorer()
+
+function goDataSources() {
+  sessionStorage.setItem('about_scroll', 'data-sources')
+  emit('navigate', 'about')
+}
 
 function goExplorerSort(sort) {
   launchSort.value = sort
@@ -963,6 +981,42 @@ function applyUrl(school) {
   font-size: 0.78rem;
 }
 
+.section-source-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 99px;
+}
+.source-badge--data {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s;
+}
+.source-badge--data:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+.source-badge--ai {
+  background: #f5f3ff;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
 .editorial {
   background: #fff;
   border: 1px solid var(--b);
@@ -971,8 +1025,13 @@ function applyUrl(school) {
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 .editorial-title {
+  display: flex;
+  align-items: center;
+  gap: 0;
   color: var(--ink);
   font-family: 'DM Sans', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
 }
 .ai-cols {
   display: grid;
