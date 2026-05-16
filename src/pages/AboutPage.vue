@@ -7,7 +7,7 @@
     </div>
 
     <!-- DATA SOURCES -->
-    <section class="data-section">
+    <section id="data-sources" class="data-section">
       <div class="data-inner">
         <div class="section-header">
           <div class="section-eyebrow">Data sources</div>
@@ -110,7 +110,18 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 defineEmits(['navigate'])
+
+onMounted(() => {
+  const target = sessionStorage.getItem('about_scroll')
+  if (target) {
+    sessionStorage.removeItem('about_scroll')
+    setTimeout(() => {
+      document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 80)
+  }
+})
 </script>
 
 <style scoped>
