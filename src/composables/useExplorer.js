@@ -188,8 +188,12 @@ function buildLocationQuery({ page, searchText, incentiveProfile = null, include
   }
 
   if (profileReady) {
+    const years = Number(incentiveProfile.yearsExperience || 0)
     params.employment_type = incentiveProfile.employmentType
-    params.years_experience = incentiveProfile.yearsExperience
+    params.years_experience = years
+    params.years_of_experience = years
+    params.experience_years = years
+    params.years_experience_band = yearsExperienceBand(years)
     params.has_dependants = Boolean(incentiveProfile.hasDependants)
   }
 
@@ -203,6 +207,12 @@ function buildLocationQuery({ page, searchText, incentiveProfile = null, include
   }
 
   return params
+}
+
+function yearsExperienceBand(years) {
+  if (years < 2) return '0-1'
+  if (years < 5) return '2-4'
+  return '5+'
 }
 
 function shouldSkipSearchList(searchText) {

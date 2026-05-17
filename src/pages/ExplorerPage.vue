@@ -44,10 +44,11 @@
               </tr>
               <tr class="cmp-sec"><td :colspan="compareSchools.length + 1">Incentives</td></tr>
               <tr>
-                <td>Max annual package (on top of base salary)</td>
+                <td>Personalised incentive (on top of base salary)</td>
                 <td v-for="(s, i) in compareSchools" :key="s.id" :class="bestIncentiveIdx === i ? 'cmp-best' : 'cmp-lo'">
-                  <strong v-if="s.annual_incentive > 0">Up to ${{ Math.round(s.annual_incentive).toLocaleString() }}/yr</strong>
+                  <strong v-if="compareIncentiveValue(s) > 0">{{ compareIncentiveLabel(s) }}</strong>
                   <span v-else>—</span>
+                  <div v-if="compareIncentiveSubtext(s)" class="cmp-cell-note">{{ compareIncentiveSubtext(s) }}</div>
                 </td>
               </tr>
               <tr class="cmp-sec"><td :colspan="compareSchools.length + 1">Job Site</td></tr>
@@ -74,6 +75,45 @@
       <div class="exp-entry-h">
         <h2>How would you like to find a school?</h2>
         <p>Choose the path that suits you — both lead to the same results</p>
+      </div>
+
+      <div class="explorer-profile-card" :class="{ collapsed: profileCollapsed && activeIncentiveProfile?.ready }">
+        <div class="explorer-profile-inner">
+          <button
+            v-if="profileCollapsed && activeIncentiveProfile?.ready"
+            class="profile-summary-bar"
+            type="button"
+            @click="profileCollapsed = false"
+          >
+            <span class="profile-summary-title">Incentive preferences</span>
+            <span class="profile-summary-divider">·</span>
+            <span class="profile-summary-copy">{{ explorerProfileSummary }}</span>
+            <span class="profile-summary-edit">Edit</span>
+          </button>
+          <template v-else>
+            <button
+              v-if="activeIncentiveProfile?.ready"
+              class="profile-collapse-btn"
+              type="button"
+              @click="profileCollapsed = true"
+            >
+              Collapse ↑
+            </button>
+            <EligibilityChecker
+              compact
+              show-dependants
+              :initial-profile="activeIncentiveProfile"
+              :show-result="false"
+              title="Incentive preferences"
+              subtitle="Filter schools by your role, experience, and QLD dependant status before choosing a path."
+              action-label="Apply preferences"
+              @profile-submit="applyExplorerProfile"
+            />
+            <div v-if="activeIncentiveProfile?.ready" class="profile-applied">
+              Preferences ready for {{ explorerProfileSummary }}
+            </div>
+          </template>
+        </div>
       </div>
 
       <div class="two-paths">
@@ -153,6 +193,7 @@
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
         Back to overview
       </div>
+
       <div class="srch-row">
         <div class="srch-wrap">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink3);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -238,6 +279,7 @@
               :in-cmp="isCmp(s.id)"
               :sort="fSort"
               :emp-type="fEmp"
+              :incentive-profile="activeIncentiveProfile"
               @toggle="handleToggleRow"
               @toggle-cmp="handleToggleCmp"
               @view-lifestyle="handleViewLifestyle"
@@ -246,8 +288,8 @@
           <AppPagination v-if="!openRow" :total="searchTotal" :page="currentPage" @change="goPage" />
         </template>
         <div v-else class="search-empty-state">
-          <div class="ses-title">{{ searchQ || remSize > 0 || fState !== 'both' ? 'No schools match' : 'Search for a school' }}</div>
-          <div class="ses-sub">{{ searchQ || remSize > 0 || fState !== 'both' ? 'Try adjusting your filters or search term.' : 'Type a name or suburb, or use filters.' }}</div>
+          <div class="ses-title">{{ hasActiveSearchCriteria ? 'No schools match' : 'Search for a school' }}</div>
+          <div class="ses-sub">{{ hasActiveSearchCriteria ? 'Try adjusting your preferences, filters, or search term.' : 'Type a name or suburb, use filters, or add incentive preferences.' }}</div>
         </div>
       </div>
     </div>
@@ -350,11 +392,12 @@
                     :school="s"
                     :is-open="openRow === String(s.id)"
                     :in-cmp="isCmp(s.id)"
-                    :sort="fSort"
-                    :emp-type="fEmp"
-                    @toggle="handleToggleRow"
-                    @toggle-cmp="handleToggleCmp"
-                    @view-lifestyle="handleViewLifestyle"
+                  :sort="fSort"
+                  :emp-type="fEmp"
+                  :incentive-profile="activeIncentiveProfile"
+                  @toggle="handleToggleRow"
+                  @toggle-cmp="handleToggleCmp"
+                  @view-lifestyle="handleViewLifestyle"
                   />
                 </div>
                 <AppPagination v-if="!openRow" :total="guideTotal" :page="guidePage" @change="goGuidePage" />
@@ -394,6 +437,8 @@ import { normalizeLocationList } from '../utils/locationFields.js'
 import SchoolRow from '../components/SchoolRow.vue'
 import AppPagination from '../components/AppPagination.vue'
 import CompareTray from '../components/CompareTray.vue'
+import EligibilityChecker from '../components/incentives/EligibilityChecker.vue'
+import { usePersonalisedIncentives } from '../composables/usePersonalisedIncentives.js'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -421,18 +466,48 @@ const filterOpen  = ref(false)
 const searchQ     = ref('')
 const searchInput = ref(null)
 const mapEl       = ref(null)
+const activeIncentiveProfile = ref(null)
+const profileCollapsed = ref(false)
 let mapInstance   = null
 let qldLayer      = null
 let nswLayer      = null
 
 const mapSchools = ref([])
+const { getPersonalisedIncentive } = usePersonalisedIncentives()
 
 function loadSearchWithProfile(text = searchQ.value) {
-  return loadSearchLocations(text)
+  return loadSearchLocations(text, activeIncentiveProfile.value?.ready ? activeIncentiveProfile.value : null)
 }
 
 function loadGuideWithProfile() {
-  return loadGuideLocations()
+  return loadGuideLocations(activeIncentiveProfile.value?.ready ? activeIncentiveProfile.value : null)
+}
+
+const explorerProfileSummary = computed(() => {
+  const p = activeIncentiveProfile.value
+  if (!p?.ready) return 'No preferences applied'
+  const roleMap = {
+    permanent: 'Permanent',
+    temporary: 'Temporary',
+    public_service_officer: 'Public Service Officer',
+  }
+  const yrs = Number(p.yearsExperience)
+  const parts = [
+    roleMap[p.employmentType] || p.employmentType || 'Selected role',
+    `${Number.isNaN(yrs) ? 0 : yrs} year${yrs === 1 ? '' : 's'} experience`,
+    p.hasDependants ? 'with QLD dependants' : 'no QLD dependants',
+  ]
+  return parts.join(' · ')
+})
+
+function applyExplorerProfile(profile) {
+  activeIncentiveProfile.value = { ...profile }
+  profileCollapsed.value = true
+  currentPage.value = 1
+  guidePage.value = 1
+  openRow.value = null
+  if (view.value === 'guide') loadGuideWithProfile()
+  else if (view.value === 'search') loadSearchWithProfile()
 }
 
 function employeeTypeForApi(value) {
@@ -478,11 +553,37 @@ const sortLabel = computed(() =>
   ({ inc: 'highest incentive first', hc: 'best healthcare first', dist: 'closest to nearest city first', az: 'A → Z by name' }[fSort.value] || 'highest incentive first')
 )
 
+const hasActiveSearchCriteria = computed(() =>
+  Boolean(searchQ.value || remSize.value > 0 || fState.value !== 'both' || activeIncentiveProfile.value?.ready)
+)
+
 const bestIncentiveIdx = computed(() => {
   if (!compareSchools.value.length) return -1
-  const vals = compareSchools.value.map(s => s.annual_incentive || 0)
+  const vals = compareSchools.value.map(s => compareIncentiveValue(s))
   return vals.indexOf(Math.max(...vals))
 })
+
+function comparePersonalisedEstimate(school) {
+  return getPersonalisedIncentive(school) || getPersonalisedIncentive(school?.school_id) || getPersonalisedIncentive(school?.id)
+}
+
+function compareIncentiveValue(school) {
+  const personalised = comparePersonalisedEstimate(school)
+  if (personalised) return Number(personalised.total || 0)
+  return Number(school?.annual_incentive || 0)
+}
+
+function compareIncentiveLabel(school) {
+  const value = compareIncentiveValue(school)
+  if (value <= 0) return '—'
+  const amount = `$${Math.round(value).toLocaleString()}/yr`
+  return comparePersonalisedEstimate(school) ? amount : `Up to ${amount}`
+}
+
+function compareIncentiveSubtext(school) {
+  const personalised = comparePersonalisedEstimate(school)
+  return personalised ? 'personalised incentive' : 'max package until personalised'
+}
 
 function cmpApplyUrl(school) {
   return school?.state_id === '1'
@@ -930,8 +1031,8 @@ const q3opts = [
 }
 
 .explorer-profile-card.collapsed {
-  width: fit-content;
-  margin: 0 auto 22px;
+  width: min(980px, 100%);
+  margin: -10px auto 26px;
   padding: 8px 20px;
   background: transparent;
   border-bottom: 0;
@@ -950,7 +1051,7 @@ const q3opts = [
 }
 
 .collapsed .explorer-profile-inner {
-  width: fit-content;
+  width: 100%;
   padding: 0;
   border: 0;
   background: transparent;
@@ -990,24 +1091,40 @@ const q3opts = [
 }
 
 .profile-summary-bar {
-  width:auto;
-  min-height:40px;
+  width:100%;
+  min-height:58px;
   display:flex;
   align-items:center;
-  justify-content:center;
-  gap:10px;
-  border:1px solid var(--b);
-  border-radius:8px;
-  background:var(--s);
-  padding:8px 14px;
+  justify-content:flex-start;
+  gap:12px;
+  border:1.5px solid rgba(31,111,235,0.42);
+  border-left:5px solid var(--blue);
+  border-radius:14px;
+  background:linear-gradient(135deg,#fff 0%,#f4f8ff 70%,#ecfdf5 100%);
+  padding:12px 18px;
   font:inherit;
   text-align:left;
   cursor:pointer;
-  box-shadow:0 8px 20px rgba(13,31,60,0.06);
+  box-shadow:0 18px 38px rgba(13,31,60,0.16);
+}
+
+.profile-summary-bar::before {
+  content:'$';
+  width:30px;
+  height:30px;
+  border-radius:9px;
+  flex-shrink:0;
+  background:var(--blue);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  box-shadow:0 10px 20px rgba(31,111,235,0.22);
 }
 
 .profile-summary-title {
-  font-size:0.76rem;
+  font-size:0.9rem;
   font-weight:900;
   color:var(--ink);
   white-space:nowrap;
@@ -1020,9 +1137,9 @@ const q3opts = [
 
 .profile-summary-copy {
   flex:1 1 auto;
-  color:var(--ink3);
-  font-size:0.76rem;
-  font-weight:600;
+  color:var(--ink2);
+  font-size:0.86rem;
+  font-weight:800;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
@@ -1030,12 +1147,13 @@ const q3opts = [
 
 .profile-summary-edit {
   flex-shrink:0;
-  font-size:0.72rem;
-  font-weight:800;
-  color:var(--blue);
+  font-size:0.82rem;
+  font-weight:900;
+  color:#fff;
   border:1px solid var(--blue);
-  border-radius:5px;
-  padding:2px 8px;
+  background:var(--blue);
+  border-radius:8px;
+  padding:7px 12px;
   margin-left:4px;
 }
 
@@ -1760,6 +1878,13 @@ const q3opts = [
 
 .cmp-best {
   background: #f1fbf5;
+}
+
+.cmp-cell-note {
+  margin-top: 4px;
+  color: var(--ink3);
+  font-size: 0.66rem;
+  font-weight: 700;
 }
 
 .cmp-apply-btn {

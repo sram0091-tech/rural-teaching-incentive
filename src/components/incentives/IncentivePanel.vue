@@ -26,12 +26,16 @@
         <p class="no-inc-msg">No incentive data linked to this school.</p>
       </template>
       <div v-else class="est-placeholder">
-        <p class="est-ph-body">Use the calculator below to know your personalised incentive</p>
+        <div class="est-ph-icon" aria-hidden="true">$</div>
+        <div>
+          <p class="est-ph-title">Personalise this package</p>
+          <p class="est-ph-body">{{ showCalculator ? 'Enter your role, experience, and dependant status to see the incentive amount that applies to you.' : 'Use the Explorer incentive preferences above to see the amount that applies to you.' }}</p>
+        </div>
       </div>
     </div>
 
     <!-- ── INCENTIVE CALCULATOR ── -->
-    <div class="school-calculator" :class="{ 'school-calculator--open': calculatorOpen }">
+    <div v-if="showCalculator" class="school-calculator" :class="{ 'school-calculator--open': calculatorOpen }">
 
       <!-- Collapsed pill -->
       <button v-if="!calculatorOpen" class="calc-pill" type="button" @click="calculatorOpen = true">
@@ -96,6 +100,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { fetchIncentiveEstimate } from '../../api/explorerApi.js'
+import { usePersonalisedIncentives } from '../../composables/usePersonalisedIncentives.js'
 import EligibilityChecker from './EligibilityChecker.vue'
 import IncentiveBreakdownSummary from './IncentiveBreakdownSummary.vue'
 import VerifyIncentiveLink from './VerifyIncentiveLink.vue'
@@ -103,13 +108,16 @@ import VerifyIncentiveLink from './VerifyIncentiveLink.vue'
 const props = defineProps({
   school: { type: Object, required: true },
   profile: { type: Object, default: null },
+  showCalculator: { type: Boolean, default: true },
 })
 
 defineEmits(['view-lifestyle'])
 
+const { setPersonalisedIncentive } = usePersonalisedIncentives()
+
 const estimate = ref(null)
 const calculatorOpen = ref(true)
-const submitted = ref(false)
+const submitted = ref(Boolean(props.profile?.ready))
 const localProfile = ref({
   employmentType: props.profile?.employmentType || '',
   yearsExperience: props.profile?.yearsExperience ?? '',
@@ -119,7 +127,11 @@ const localProfile = ref({
 
 const isQld = computed(() => props.school?.state_id === '1')
 const genericTotal = computed(() => Number(props.school?.annual_incentive || 0))
-const personalisedTotal = computed(() => estimateTotal(estimate.value))
+const personalisedBreakdownTotal = computed(() => eligibleRowsTotal(rowsFromEstimate(estimate.value)))
+const personalisedTotal = computed(() => {
+  if (personalisedBreakdownTotal.value !== null) return personalisedBreakdownTotal.value
+  return estimateTotal(estimate.value)
+})
 const activeProfile = computed(() => localProfile.value?.ready ? localProfile.value : null)
 const displayTotal = computed(() =>
   activeProfile.value?.ready && personalisedTotal.value !== null
@@ -184,6 +196,38 @@ function estimateTotal(payload) {
   return Number.isFinite(n) ? n : null
 }
 
+function rowsFromEstimate(payload) {
+  const rows = payload?.breakdown || payload?.rows || payload?.incentives || payload?.eligible_incentives || payload?.eligibleIncentives
+  if (!Array.isArray(rows)) return []
+  return rows.flatMap((row) => {
+    const nested = row?.rows || row?.incentives || row?.variants
+    if (Array.isArray(nested)) return nested
+    return row
+  }).filter(isEligibleEstimateRow)
+}
+
+function isEligibleEstimateRow(row) {
+  if (!row || typeof row !== 'object') return false
+  const status = String(row.status || row.eligibility_status || row.eligibilityStatus || '').toLowerCase()
+  return row.eligible !== false && row.ineligible !== true && status !== 'ineligible' && status !== 'not_eligible'
+}
+
+function numericRowAmount(row) {
+  const value = row.amount ?? row.annual_amount ?? row.annualAmount ?? row.value
+  if (row.is_variable_amount || row.variable || String(value).trim() === '—') return null
+  const n = Number(value)
+  return Number.isFinite(n) ? n : null
+}
+
+function eligibleRowsTotal(rows) {
+  if (!Array.isArray(rows) || !rows.length) return null
+  const total = rows.reduce((sum, row) => {
+    const n = numericRowAmount(row)
+    return n === null ? sum : sum + n
+  }, 0)
+  return total > 0 ? total : null
+}
+
 async function loadEstimate() {
   const schoolId = props.school?.school_id || props.school?.id
   if (!schoolId || !activeProfile.value?.ready) { estimate.value = null; return }
@@ -192,11 +236,20 @@ async function loadEstimate() {
       school_id: schoolId,
       employment_type: activeProfile.value.employmentType,
       years_experience: Number(activeProfile.value.yearsExperience || 0),
+      years_of_experience: Number(activeProfile.value.yearsExperience || 0),
+      experience_years: Number(activeProfile.value.yearsExperience || 0),
+      years_experience_band: yearsExperienceBand(Number(activeProfile.value.yearsExperience || 0)),
       has_dependants: Boolean(activeProfile.value.hasDependants),
     })
   } catch (e) {
     estimate.value = null
   }
+}
+
+function yearsExperienceBand(years) {
+  if (years < 2) return '0-1'
+  if (years < 5) return '2-4'
+  return '5+'
 }
 
 function applyLocalProfile(profile) {
@@ -215,11 +268,53 @@ watch(() => [
 ], loadEstimate)
 
 watch(() => props.school?.school_id || props.school?.id, () => {
-  submitted.value = false
+  submitted.value = Boolean(props.profile?.ready)
   calculatorOpen.value = true
-  localProfile.value = { employmentType: '', yearsExperience: '', hasDependants: false, ready: false }
+  localProfile.value = {
+    employmentType: props.profile?.employmentType || '',
+    yearsExperience: props.profile?.yearsExperience ?? '',
+    hasDependants: Boolean(props.profile?.hasDependants),
+    ready: Boolean(props.profile?.ready),
+  }
   estimate.value = null
 })
+
+watch(() => props.profile, (profile) => {
+  localProfile.value = {
+    employmentType: profile?.employmentType || '',
+    yearsExperience: profile?.yearsExperience ?? '',
+    hasDependants: Boolean(profile?.hasDependants),
+    ready: Boolean(profile?.ready),
+  }
+  submitted.value = Boolean(profile?.ready)
+}, { deep: true })
+
+watch(() => ({
+  schoolId: props.school?.school_id || props.school?.id,
+  ready: activeProfile.value?.ready,
+  total: personalisedTotal.value,
+  summary: profileSummary.value,
+  preferenceText: estimatePreferenceText.value,
+}), ({ schoolId, ready, total, summary, preferenceText }) => {
+  if (!schoolId) return
+  if (!ready || total === null) {
+    setPersonalisedIncentive(schoolId, null)
+    if (props.school?.id && String(props.school.id) !== String(schoolId)) {
+      setPersonalisedIncentive(props.school.id, null)
+    }
+    return
+  }
+  const payload = {
+    total,
+    summary,
+    preferenceText,
+    profile: { ...activeProfile.value },
+  }
+  setPersonalisedIncentive(schoolId, payload)
+  if (props.school?.id && String(props.school.id) !== String(schoolId)) {
+    setPersonalisedIncentive(props.school.id, payload)
+  }
+}, { immediate: true })
 </script>
 
 <style scoped>
@@ -269,8 +364,22 @@ watch(() => props.school?.school_id || props.school?.id, () => {
 .estimate-prefs span { font-weight:700; color:var(--ink3); }
 .estimate-prefs strong { font-weight:900; color:var(--green-d); }
 .no-inc-msg { font-size:0.8rem; color:var(--ink3); margin:0; }
-.est-placeholder { padding:2px 0; }
-.est-ph-body { margin:0; font-size:0.84rem; font-weight:400; color:var(--ink2); line-height:1.5; }
+.est-placeholder { display:flex; align-items:center; gap:12px; padding:4px 0; }
+.est-ph-icon {
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  background:var(--green-s);
+  color:var(--green-d);
+  font-weight:900;
+  font-size:1rem;
+}
+.est-ph-title { margin:0 0 2px; font-size:0.86rem; font-weight:900; color:var(--ink); }
+.est-ph-body { margin:0; font-size:0.76rem; font-weight:600; color:var(--ink2); line-height:1.45; }
 
 /* ── INCENTIVE CALCULATOR ── */
 .school-calculator { margin-bottom: 4px; }

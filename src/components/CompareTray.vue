@@ -5,6 +5,7 @@
       <div class="tray-items">
         <div v-for="id in cmpList" :key="id" class="tray-item">
           <span class="tray-name">{{ shortName(id) }}</span>
+          <span v-if="personalisedAmount(id)" class="tray-est">{{ personalisedAmount(id) }}</span>
           <button class="tray-x" @click="$emit('remove', id)" title="Remove">✕</button>
         </div>
         <div v-for="i in (4 - cmpList.length)" :key="'slot-'+i" class="tray-slot">+ add</div>
@@ -18,8 +19,10 @@
 <script setup>
 import { computed } from 'vue'
 import { useExplorer } from '../composables/useExplorer.js'
+import { usePersonalisedIncentives } from '../composables/usePersonalisedIncentives.js'
 
 const { compareSchools } = useExplorer()
+const { getPersonalisedIncentive } = usePersonalisedIncentives()
 
 const props = defineProps({ cmpList: Array })
 defineEmits(['remove', 'clear', 'open-compare'])
@@ -33,6 +36,12 @@ const byId = computed(() => {
 function shortName(id) {
   const l = byId.value.get(String(id))
   return l ? l.name.split(' ').slice(0, 3).join(' ') : '—'
+}
+
+function personalisedAmount(id) {
+  const estimate = getPersonalisedIncentive(id)
+  const total = Number(estimate?.total || 0)
+  return total > 0 ? `$${Math.round(total).toLocaleString()}/yr` : ''
 }
 </script>
 
@@ -50,6 +59,14 @@ function shortName(id) {
   font-weight: 600;
 }
 .tray-name {
+  white-space: nowrap;
+}
+.tray-est {
+  border-left: 1px solid rgba(31,111,235,0.22);
+  padding-left: 6px;
+  color: var(--green-d, #15803d);
+  font-size: 0.68rem;
+  font-weight: 800;
   white-space: nowrap;
 }
 .tray-x {
