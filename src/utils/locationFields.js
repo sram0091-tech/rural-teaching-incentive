@@ -58,6 +58,22 @@ export function normalizeLocationRecord(raw) {
   const id = raw.location_id ?? raw.locationId ?? raw.id
   const schoolId = raw.school_id ?? raw.schoolId ?? id
   const rid = raw.remoteness_id ?? raw.remoteness_category_id ?? raw.remotenessCategoryId
+  const personalisedAnnual =
+    raw.personalised_annual_total ??
+    raw.personalisedAnnualTotal ??
+    raw.personalised_annual_amount ??
+    raw.personalisedAnnualAmount ??
+    raw.personalized_annual_total ??
+    raw.personalizedAnnualTotal ??
+    raw.personalized_annual_amount ??
+    raw.personalizedAnnualAmount
+  const maxAnnual =
+    raw.max_annual_amount ??
+    raw.maxAnnualAmount ??
+    raw.max_annual_incentive ??
+    raw.maxAnnualIncentive ??
+    raw.annual_incentive ??
+    raw.annualIncentive
 
   return {
     ...raw,
@@ -73,11 +89,13 @@ export function normalizeLocationRecord(raw) {
     type: raw.location_type_name || raw.locationTypeName || raw.type || '—',
     lat: raw.latitude != null ? toNum(raw.latitude, NaN) : raw.lat != null ? toNum(raw.lat, NaN) : null,
     lng: raw.longitude != null ? toNum(raw.longitude, NaN) : raw.lng != null ? toNum(raw.lng, NaN) : null,
-    annual_incentive: toNum(raw.annual_incentive ?? raw.annualIncentive, 0),
+    annual_incentive: toNum(personalisedAnnual ?? raw.annual_incentive ?? raw.annualIncentive, 0),
+    max_annual_incentive: toNum(maxAnnual, 0),
+    personalised_annual_total: toNum(personalisedAnnual, 0),
     has_incentive_data:
       raw.has_incentive_data ??
       raw.hasIncentiveData ??
-      toNum(raw.annual_incentive ?? raw.annualIncentive, 0) > 0,
+      toNum(personalisedAnnual ?? raw.annual_incentive ?? raw.annualIncentive, 0) > 0,
     healthcare_count: toNum(raw.healthcare_count ?? raw.healthcareCount, 0),
     distance_to_city: toNum(raw.distance_to_city ?? raw.distanceToCity, 0),
     nearest_city: (() => {

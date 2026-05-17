@@ -21,7 +21,7 @@
         </div>
       </article>
     </div>
-    <div v-else class="empty">No incentive breakdown available for this school</div>
+    <div v-else class="empty">{{ emptyMessage }}</div>
   </section>
 </template>
 
@@ -37,6 +37,13 @@ const props = defineProps({
 const loading = ref(false)
 const breakdown = ref(null)
 const estimate = ref(null)
+
+const emptyMessage = computed(() => {
+  if (props.profile?.employmentType === 'public_service_officer') {
+    return 'No recorded incentive breakdown is available for Public Service Officer eligibility at this school.'
+  }
+  return 'No incentive breakdown available for this school'
+})
 
 const groups = computed(() => {
   const estimateRows = rowsFromEstimate(estimate.value)
@@ -95,6 +102,9 @@ async function load() {
             school_id: schoolId,
             employment_type: props.profile.employmentType,
             years_experience: Number(props.profile.yearsExperience || 0),
+            years_of_experience: Number(props.profile.yearsExperience || 0),
+            experience_years: Number(props.profile.yearsExperience || 0),
+            years_experience_band: yearsExperienceBand(Number(props.profile.yearsExperience || 0)),
             has_dependants: Boolean(props.profile.hasDependants),
           }).catch(() => null)
         : Promise.resolve(null),
@@ -120,9 +130,18 @@ function groupRows(rows) {
 }
 
 function rowsFromEstimate(payload) {
-  const rows = payload?.breakdown || payload?.rows || payload?.incentives
+  const rows = payload?.breakdown || payload?.rows || payload?.incentives || payload?.eligible_incentives || payload?.eligibleIncentives
   if (!Array.isArray(rows)) return []
-  return rows.filter(isEligibleEstimateRow).map((row) => ({
+  return rows.flatMap((row) => {
+    const nested = row?.rows || row?.incentives || row?.variants
+    if (Array.isArray(nested)) {
+      return nested.map((nestedRow) => ({
+        ...nestedRow,
+        category: nestedRow.category || row.category || row.name || row.allowance_type || row.allowanceType || 'Incentive',
+      }))
+    }
+    return row
+  }).filter(isEligibleEstimateRow).map((row) => ({
     ...row,
     category: row.category || row.allowance_type || row.allowanceType || 'Incentive',
     amount: row.amount ?? row.annual_amount ?? row.annualAmount ?? 0,
@@ -137,6 +156,28 @@ function isEligibleEstimateRow(row) {
 }
 
 function displayName(row, group) {
+  const combined = [
+    row.display_name,
+    row.displayName,
+    row.incentive_name,
+    row.incentiveName,
+    row.allowance_name,
+    row.allowanceName,
+    row.name,
+    row.category,
+    group.category,
+    row.allowance_type,
+    row.allowanceType,
+  ].filter(Boolean).join(' ').toLowerCase()
+
+  if (props.school?.state_id === '1' && combined.includes('locality allowance')) {
+    return 'QLD Locality Allowance'
+  }
+
+  if (combined.includes('rental subsidy')) {
+    return 'Rental Subsidy'
+  }
+
   return (
     row.display_name ||
     row.displayName ||
@@ -167,7 +208,7 @@ function disambiguateCards(list) {
     const key = card.category.trim().toLowerCase()
     if ((counts.get(key) || 0) < 2) return card
 
-    const explicit = duplicateQualifier(card.row)
+    const explicit = duplicateQualifier(card.row, card)
     if (explicit) return { ...card, category: `${card.category} — ${explicit}` }
 
     const current = (duplicateIndexes.get(key) || 0) + 1
@@ -176,7 +217,7 @@ function disambiguateCards(list) {
   })
 }
 
-function duplicateQualifier(row) {
+function duplicateQualifier(row, card = null) {
   const value =
     row.rate_type ||
     row.rateType ||
@@ -189,18 +230,33 @@ function duplicateQualifier(row) {
     row.condition ||
     row.eligibility_condition ||
     row.eligibilityCondition
-  if (value && String(value).trim()) return String(value).trim()
 
-  const name = String(row.name || row.incentive_name || row.allowance_name || '').toLowerCase()
+  const name = [
+    row.name,
+    row.incentive_name,
+    row.incentiveName,
+    row.allowance_name,
+    row.allowanceName,
+    row.category,
+    row.allowance_type,
+    row.allowanceType,
+    card?.rawCategory,
+    card?.category,
+  ].filter(Boolean).join(' ').toLowerCase()
+
   if (props.school?.state_id === '1' && name.includes('locality allowance')) {
+    const explicit = String(value || '').trim()
+    if (explicit && !/^component\s*\d+$/i.test(explicit)) return explicit
     const amount = numericAmount(row)
-    if (amount >= 8000) return 'additional rate'
-    if (amount > 0) return 'base rate'
+    if (amount >= 8000) return 'dependant/full-rate allowance'
+    if (amount > 0) return 'base/no-dependant allowance'
   }
+  if (value && String(value).trim()) return String(value).trim()
   return ''
 }
 
 function amount(row) {
+  if (isRentalSubsidy(row) && numericAmount(row) <= 0) return '90% of rent'
   if (isVariable(row)) return 'Variable'
   const n = numericAmount(row)
   return n > 0 ? `$${Math.round(n).toLocaleString()}` : '—'
@@ -212,7 +268,30 @@ function numericAmount(row) {
 
 function isVariable(row) {
   const value = row.amount ?? row.annual_amount
-  return Boolean(row.is_variable_amount || row.variable || String(value).trim() === '—')
+  if (isRentalSubsidy(row) && numericAmount(row) <= 0) return false
+  return Boolean(row.is_variable_amount || row.variable || ['—', '-'].includes(String(value).trim()))
+}
+
+function isRentalSubsidy(row) {
+  const text = [
+    row.name,
+    row.display_name,
+    row.displayName,
+    row.incentive_name,
+    row.incentiveName,
+    row.allowance_name,
+    row.allowanceName,
+    row.category,
+    row.allowance_type,
+    row.allowanceType,
+  ].filter(Boolean).join(' ').toLowerCase()
+  return text.includes('rental subsidy')
+}
+
+function yearsExperienceBand(years) {
+  if (years < 2) return '0-1'
+  if (years < 5) return '2-4'
+  return '5+'
 }
 
 function employeeTypes(row) {

@@ -102,6 +102,7 @@ const props = defineProps({
   subtitle: { type: String, default: 'Personalise the package for your role and experience.' },
   actionLabel: { type: String, default: 'Check my eligibility' },
   readyLabel: { type: String, default: 'Estimate ready' },
+  showDependants: { type: Boolean, default: false },
 })
 const emit = defineEmits(['result-change', 'profile-change', 'profile-submit'])
 
@@ -115,7 +116,7 @@ const loading = ref(false)
 const result = ref(null)
 const apiError = ref('')
 const applied = ref(false)
-const isQld = computed(() => props.school?.state_id === '1')
+const isQld = computed(() => props.showDependants || props.school?.state_id === '1')
 const hasRole = computed(() => Boolean(form.employmentType))
 const hasExperience = computed(() => form.yearsExperience !== '' && Number(form.yearsExperience) >= 0 && Number(form.yearsExperience) <= 40)
 const profileReady = computed(() => hasRole.value && hasExperience.value)
@@ -176,6 +177,9 @@ async function submit() {
       school_id: props.school.school_id || props.school.id,
       employment_type: form.employmentType,
       years_experience: Number(form.yearsExperience),
+      years_of_experience: Number(form.yearsExperience),
+      experience_years: Number(form.yearsExperience),
+      years_experience_band: yearsExperienceBand(Number(form.yearsExperience)),
       has_dependants: isQld.value ? Boolean(form.hasDependants) : false,
     })
   } catch (e) {
@@ -186,6 +190,12 @@ async function submit() {
     applied.value = true
     emit('result-change', Boolean(result.value))
   }
+}
+
+function yearsExperienceBand(years) {
+  if (years < 2) return '0-1'
+  if (years < 5) return '2-4'
+  return '5+'
 }
 
 function provisionalResult() {

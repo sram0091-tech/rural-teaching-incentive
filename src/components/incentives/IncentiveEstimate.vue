@@ -69,6 +69,9 @@ async function load() {
         school_id: schoolId,
         employment_type: props.form.employmentType,
         years_experience: Number(props.form.yearsExperience || 0),
+        years_of_experience: Number(props.form.yearsExperience || 0),
+        experience_years: Number(props.form.yearsExperience || 0),
+        years_experience_band: yearsExperienceBand(Number(props.form.yearsExperience || 0)),
         has_dependants: Boolean(props.form.hasDependants),
       }).catch(() => null),
       fetchIncentiveBreakdown(schoolId).catch(() => null),
@@ -81,6 +84,12 @@ async function load() {
   } finally {
     loading.value = false
   }
+}
+
+function yearsExperienceBand(years) {
+  if (years < 2) return '0-1'
+  if (years < 5) return '2-4'
+  return '5+'
 }
 
 function rowsFromBreakdown(payload) {
