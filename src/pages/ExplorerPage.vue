@@ -51,12 +51,12 @@
                   <div v-if="compareIncentiveSubtext(s)" class="cmp-cell-note">{{ compareIncentiveSubtext(s) }}</div>
                 </td>
               </tr>
-              <tr class="cmp-sec"><td :colspan="compareSchools.length + 1">Apply</td></tr>
+              <tr class="cmp-sec"><td :colspan="compareSchools.length + 1">Job Site</td></tr>
               <tr>
-                <td>Apply for position</td>
+                <td>Link to job site</td>
                 <td v-for="s in compareSchools" :key="s.id">
                   <a :href="cmpApplyUrl(s)" target="_blank" rel="noopener noreferrer" class="cmp-apply-btn">
-                    Apply →
+                    Link to job site →
                   </a>
                 </td>
               </tr>
@@ -65,7 +65,7 @@
         </div>
         <div class="cmp-lifestyle-row">
           <p>Want to compare lifestyle metrics too?</p>
-          <button class="cmp-lifestyle-btn" @click="$emit('navigate', 'insights')">View Lifestyle Insights →</button>
+          <button class="cmp-lifestyle-btn" @click="$emit('navigate', 'insights')">View Know the Place →</button>
         </div>
       </div>
     </div>

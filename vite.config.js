@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [vue()],
     server: {
+      port: 5173,
       // Only proxy when the app uses relative `/api` (no VITE_API_BASE_URL).
       ...(useRemoteApi
         ? {}

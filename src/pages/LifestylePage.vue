@@ -1,7 +1,7 @@
 <template>
   <div class="page active">
     <div class="page-topbar">
-      <div class="page-title">Lifestyle Insights</div>
+      <div class="page-title">Know the Place</div>
       <div class="page-sub">Real lifestyle data for every school — housing costs, healthcare, education, and nature.</div>
     </div>
 
@@ -61,185 +61,210 @@
     <div class="ins-body">
       <!-- Empty state -->
       <div v-if="!insSchool && !sbsMode" class="ins-empty">
-
-        <!-- Hero -->
         <div class="ies-hero">
-          <h2 class="ies-h">What's life actually like near a school?</h2>
-          <p class="ies-sub">Check rent, healthcare, safety, and nature before you decide.</p>
+          <h2 class="ies-h">What's life like near a school?</h2>
+          <p class="ies-sub">Find out before you commit.</p>
+          <div class="ies-steps-row">
+            <div class="ies-step-item" style="animation-delay: 0.05s">
+              <div class="ies-step-num">1</div>
+              <div class="ies-step-info">
+                <div class="ies-step-title">Search a school</div>
+                <div class="ies-step-desc">Search by name above or pick one from the Explorer</div>
+              </div>
+            </div>
+            <div class="ies-step-arrow">→</div>
+            <div class="ies-step-item" style="animation-delay: 0.15s">
+              <div class="ies-step-num">2</div>
+              <div class="ies-step-info">
+                <div class="ies-step-title">Read the scorecard</div>
+                <div class="ies-step-desc">Rent, healthcare, safety &amp; nature at a glance</div>
+              </div>
+            </div>
+            <div class="ies-step-arrow">→</div>
+            <div class="ies-step-item" style="animation-delay: 0.25s">
+              <div class="ies-step-num">3</div>
+              <div class="ies-step-info">
+                <div class="ies-step-title">Compare schools</div>
+                <div class="ies-step-desc">Add up to 4 schools and compare side by side</div>
+              </div>
+            </div>
+          </div>
           <div class="ies-actions">
             <button class="ies-btn-primary" @click="focusSearch">Search a school</button>
             <button class="ies-btn-secondary" @click="emit('navigate', 'explorer')">Browse Explorer →</button>
           </div>
         </div>
-
-        <!-- Goal cards -->
-        <div class="ies-goals">
-          <div class="ies-goal-card" @click="goExplorerSort('inc')">
-            <span class="ies-goal-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </span>
-            <div class="ies-goal-label">Highest incentive</div>
-            <div class="ies-goal-sub">Sort schools by annual bonus on top of base salary</div>
-          </div>
-          <div class="ies-goal-card" @click="goExplorerSort('hc')">
-            <span class="ies-goal-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            </span>
-            <div class="ies-goal-label">Best healthcare</div>
-            <div class="ies-goal-sub">Sort schools by nearby healthcare facilities</div>
-          </div>
-          <div class="ies-goal-card" @click="goExplorerSort('dist')">
-            <span class="ies-goal-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            </span>
-            <div class="ies-goal-label">Closest to city</div>
-            <div class="ies-goal-sub">Sort schools by distance to nearest city</div>
-          </div>
-          <div class="ies-goal-card" @click="goExplorerSort('az')">
-            <span class="ies-goal-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            </span>
-            <div class="ies-goal-label">Browse all schools</div>
-            <div class="ies-goal-sub">Alphabetical list — explore at your own pace</div>
-          </div>
-        </div>
-
-        <!-- How it works -->
-        <div class="ies-how">
-          <div class="ies-how-title">How it works</div>
-          <div class="ies-steps">
-            <div class="ies-step">
-              <div class="ies-step-n">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              </div>
-              <div class="ies-step-text">Search a school above, or pick one from the Explorer</div>
-            </div>
-            <div class="ies-step-arrow">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </div>
-            <div class="ies-step">
-              <div class="ies-step-n">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-              </div>
-              <div class="ies-step-text">Read its scorecard — rent, healthcare, safety, nature</div>
-            </div>
-            <div class="ies-step-arrow">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </div>
-            <div class="ies-step">
-              <div class="ies-step-n">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="6" height="18" rx="1"/><rect x="16" y="3" width="6" height="18" rx="1"/><line x1="10" y1="7" x2="14" y2="7"/><line x1="10" y1="12" x2="14" y2="12"/><line x1="10" y1="17" x2="14" y2="17"/></svg>
-              </div>
-              <div class="ies-step-text">Add multiple schools to compare them side by side</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Scorecard preview -->
-        <div class="ies-preview">
-          <div class="ies-preview-label">What you'll see</div>
-          <div class="ies-preview-cards">
-            <div class="ies-preview-card">
-              <div class="ies-pc-title">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                Location &amp; Cost
-              </div>
-              <div class="ies-pc-row"><span class="ies-pc-k">Nearest city</span><span class="ies-skel ies-skel--md"></span></div>
-              <div class="ies-pc-row"><span class="ies-pc-k">Median rent</span><span class="ies-skel ies-skel--sm"></span></div>
-            </div>
-            <div class="ies-preview-card">
-              <div class="ies-pc-title">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                Healthcare &amp; Safety
-              </div>
-              <div class="ies-pc-row"><span class="ies-pc-k">Healthcare grade</span><span class="ies-skel ies-skel--sm"></span></div>
-              <div class="ies-pc-row"><span class="ies-pc-k">Crime rank</span><span class="ies-skel ies-skel--md"></span></div>
-            </div>
-            <div class="ies-preview-card">
-              <div class="ies-pc-title">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 0 3-3h7z"/></svg>
-                Education &amp; Nature
-              </div>
-              <div class="ies-pc-row"><span class="ies-pc-k">Education grade</span><span class="ies-skel ies-skel--sm"></span></div>
-              <div class="ies-pc-row"><span class="ies-pc-k">National parks</span><span class="ies-skel ies-skel--md"></span></div>
-            </div>
-          </div>
-          <div class="ies-preview-cta">Search a school above to fill this in</div>
-        </div>
-
       </div>
 
       <!-- Single school view -->
       <template v-else-if="insSchool && !sbsMode">
         <div class="ins-school-hdr anim-fadeup">
-          <div>
-            <div class="ish-name">{{ insSchool.name }}</div>
+          <div class="ish-left">
+            <div class="ish-suburb">{{ insSchool.suburb }}</div>
             <div class="ish-meta">
-              <span>{{ insSchool.suburb }}</span>
               <span class="chip" :class="insSchool.state_id === '1' ? 'cq' : 'cn'">{{ insSchool.state_id === '1' ? 'QLD' : 'NSW' }}</span>
               <span class="chip" :class="RC[String(insSchool.remoteness_id)] || 'c3'">{{ insSchool.remoteness || '—' }}</span>
-              <span style="color:var(--ink3)">{{ insSchool.type }}·{{ insSchool.sector }}</span>
+              <span class="ish-school-name">{{ insSchool.name }}</span>
             </div>
+          </div>
+          <div v-if="insSchool.annual_incentive > 0" class="ish-incentive">
+            <span class="ish-inc-amount">+${{ Number(insSchool.annual_incentive).toLocaleString() }}/yr</span>
+            <span class="ish-inc-label">incentive on top of base salary</span>
           </div>
           <div class="ish-acts">
             <button class="btn btn-sm" :class="isCmp(insSchool.id) ? 'btn-g' : 'btn-gh'" @click="toggleCmp(insSchool.id)">
               {{ isCmp(insSchool.id) ? '✓ In Compare' : '+ Compare' }}
             </button>
             <a :href="applyUrl(insSchool)" target="_blank" rel="noopener noreferrer" class="ls-apply-btn">
-              Apply for this position →
+              Link to job site →
             </a>
           </div>
         </div>
 
+        <div class="section-source-row anim-fadeup" style="animation-delay:0.03s">
+          <button class="source-badge source-badge--data" @click="goDataSources" title="Where does the data come from?">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Verified data
+          </button>
+        </div>
+
         <div class="life-grid anim-fadeup" style="animation-delay:0.05s">
           <div class="life-card">
-            <div class="lc-title">📍 Location & Cost</div>
+            <div class="lc-title">Location & Cost</div>
             <div class="lr"><span class="lrk">Nearest city</span><span class="lrv">{{ metricVal(insSchool, 'nearest_city_name') || insSchool.nearest_city || '—' }} <span style="color:var(--ink3);font-size:0.7rem">({{ Math.round(n(insSchool.distance_to_city)) }} km)</span></span></div>
-            <div class="lr"><span class="lrk">Median rent</span><span class="lrv" :class="n(metricVal(insSchool, 'median_rent_weekly')) < 250 ? 'good' : n(metricVal(insSchool, 'median_rent_weekly')) > 450 ? 'warn' : ''">${{ n(metricVal(insSchool, 'median_rent_weekly')) }}/wk</span></div>
-          </div>
-          <div class="life-card">
-            <div class="lc-title">🏥 Healthcare & Safety</div>
-            <div class="lr"><span class="lrk">Healthcare grade</span><span class="lrv"><span class="gbadge" :class="GC[insSchool.healthcare_grade] || 'gd'">{{ insSchool.healthcare_grade || '—' }}</span> <span style="color:var(--ink3);font-size:0.72rem;margin-left:2px">{{ n(metricVal(insSchool, 'healthcare_count')) }} facilities</span></span></div>
-            <div class="lr"><span class="lrk">Crime rank <span style="font-weight:400;color:var(--ink3);font-size:0.62rem">(lower = safer)</span></span><span class="lrv" :class="crimeClass(n(insSchool.crime_rank))">{{ n(metricVal(insSchool, 'crime_rank')) > 0 ? n(metricVal(insSchool, 'crime_rank')) + ' / 130' : 'No data' }}</span></div>
-            <div class="grade-legend">
-              <span class="gl-row" v-for="g in healthcareScale" :key="g.grade"><span class="gbadge" :class="GC[g.grade] || 'gd'">{{ g.grade }}</span> {{ g.label }}</span>
+            <div class="lr">
+              <span class="lrk">Median rent</span>
+              <span class="lrv" style="display:inline-flex;align-items:center;gap:6px">
+                <span :class="n(metricVal(insSchool, 'median_rent_weekly')) < 250 ? 'good' : n(metricVal(insSchool, 'median_rent_weekly')) > 450 ? 'warn' : ''">${{ n(metricVal(insSchool, 'median_rent_weekly')) }}/wk</span>
+                <span v-if="rentDiff" class="rent-trend" :class="rentDiff.cls">{{ rentDiff.arrow }} {{ rentDiff.pct }}% vs {{ rentDiff.label }}</span>
+              </span>
             </div>
           </div>
           <div class="life-card">
-            <div class="lc-title">🎓 Education & Nature</div>
-            <div class="lr"><span class="lrk">Education grade</span><span class="lrv"><span class="gbadge" :class="GC[insSchool.education_grade] || 'gd'">{{ insSchool.education_grade || '—' }}</span> <span style="color:var(--ink3);font-size:0.72rem;margin-left:2px">{{ n(metricVal(insSchool, 'education_count')) }} schools nearby</span></span></div>
+            <div class="lc-title">Healthcare & Safety</div>
+            <div class="lr">
+              <span class="lrk">Healthcare grade</span>
+              <span class="lrv">
+                <span class="grade-tip-wrap">
+                <span class="gbadge" :class="GC[insSchool.healthcare_grade] || 'gd'">{{ insSchool.healthcare_grade || '—' }}</span>
+                <div class="grade-tip">
+                  <div v-for="g in healthcareScale" :key="g.grade" class="grade-tip-row">
+                    <span class="gbadge" :class="GC[g.grade] || 'gd'">{{ g.grade }}</span>
+                    <span>{{ g.label }}</span>
+                  </div>
+                </div>
+              </span>
+                <span style="color:var(--ink3);font-size:0.72rem;margin-left:4px">{{ n(metricVal(insSchool, 'healthcare_count')) }} facilities</span>
+              </span>
+            </div>
+            <div class="lr"><span class="lrk">Crime rank <span style="font-weight:400;color:var(--ink3);font-size:0.62rem">(lower = safer)</span></span><span class="lrv" :class="crimeClass(n(insSchool.crime_rank))">{{ n(metricVal(insSchool, 'crime_rank')) > 0 ? n(metricVal(insSchool, 'crime_rank')) + ' / 130' : 'No data' }}</span></div>
+          </div>
+          <div class="life-card">
+            <div class="lc-title">Education & Nature</div>
+            <div class="lr">
+              <span class="lrk">Education grade</span>
+              <span class="lrv">
+                <span class="grade-tip-wrap">
+                <span class="gbadge" :class="GC[insSchool.education_grade] || 'gd'">{{ insSchool.education_grade || '—' }}</span>
+                <div class="grade-tip">
+                  <div v-for="g in educationScale" :key="g.grade" class="grade-tip-row">
+                    <span class="gbadge" :class="GC[g.grade] || 'gd'">{{ g.grade }}</span>
+                    <span>{{ g.label }}</span>
+                  </div>
+                </div>
+              </span>
+                <span style="color:var(--ink3);font-size:0.72rem;margin-left:4px">{{ n(metricVal(insSchool, 'education_count')) }} schools nearby</span>
+              </span>
+            </div>
             <div class="lr"><span class="lrk">National parks</span><span class="lrv" :class="n(metricVal(insSchool, 'national_parks_count')) > 3 ? 'good' : ''">{{ n(metricVal(insSchool, 'national_parks_count')) }} parks</span></div>
             <div class="lr"><span class="lrk">Nature reserves</span><span class="lrv">{{ n(metricVal(insSchool, 'nature_reserves_count')) }} reserves</span></div>
-            <div class="grade-legend">
-              <span class="gl-row" v-for="g in educationScale" :key="g.grade"><span class="gbadge" :class="GC[g.grade] || 'gd'">{{ g.grade }}</span> {{ g.label }}</span>
-            </div>
           </div>
         </div>
 
-        <!-- Trade-offs -->
+        <!-- Map -->
+        <SchoolMap :school="insSchool" class="anim-fadeup" style="animation-delay:0.08s" />
+
+        <!-- AI Trade-offs Summary -->
         <div class="editorial anim-fadeup" style="animation-delay:0.1s">
-          <div class="editorial-title">The honest trade-offs.</div>
-          <div class="editorial-sub">Neither column wins — these are differences. You decide what matters more.</div>
-          <div class="tradeoffs"><div class="to-cols">
-            <div class="to-col reg">
-              <div class="to-col-lbl">🌿 Regional & Remote</div>
-              <div class="to-item"><span class="au">↑</span>Higher incentives on top of your base salary</div>
-              <div class="to-item"><span class="au">↑</span>Lower cost of living</div>
-              <div class="to-item"><span class="au">↑</span>Stronger community bonds</div>
-              <div class="to-item"><span class="au">↑</span>Faster-developing skills</div>
-              <div class="to-item"><span class="ad">↓</span>Fewer healthcare services</div>
-              <div class="to-item"><span class="ad">↓</span>Further from nearest city amenities</div>
+          <div class="editorial-title">
+            Life in {{ insSchool.suburb }}
+            <span class="source-badge source-badge--ai">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 0 2h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1 0-2h1a7 7 0 0 1 7-7h1V5.73A2 2 0 0 1 10 4a2 2 0 0 1 2-2z"/></svg>
+              AI-generated
+            </span>
+          </div>
+          <div v-if="aiLoading" class="ai-skeleton">
+            <div class="ai-skel-cols">
+              <div class="ai-skel-col">
+                <div class="ai-skel-bar ai-skel-bar--label"></div>
+                <div class="ai-skel-bar"></div>
+                <div class="ai-skel-bar ai-skel-bar--sm"></div>
+                <div class="ai-skel-bar"></div>
+              </div>
+              <div class="ai-skel-col">
+                <div class="ai-skel-bar ai-skel-bar--label"></div>
+                <div class="ai-skel-bar ai-skel-bar--sm"></div>
+                <div class="ai-skel-bar"></div>
+                <div class="ai-skel-bar ai-skel-bar--sm"></div>
+              </div>
             </div>
-            <div class="to-col city">
-              <div class="to-col-lbl">🏙️ City & Inner Regional</div>
-              <div class="to-item"><span class="au">↑</span>Excellent hospital access</div>
-              <div class="to-item"><span class="au">↑</span>Rich cultural and social life</div>
-              <div class="to-item"><span class="au">↑</span>Larger professional networks</div>
-              <div class="to-item"><span class="au">↑</span>More specialist opportunities</div>
-              <div class="to-item"><span class="ad">↓</span>Higher housing costs</div>
-              <div class="to-item"><span class="ad">↓</span>Lower incentive packages</div>
+            <div class="ai-skel-divider"></div>
+            <div class="ai-skel-sentences">
+              <div class="ai-skel-bar ai-skel-bar--full"></div>
+              <div class="ai-skel-bar ai-skel-bar--lg"></div>
+              <div class="ai-skel-bar ai-skel-bar--full"></div>
+              <div class="ai-skel-bar ai-skel-bar--md"></div>
             </div>
-          </div></div>
+            <div class="ai-skel-fact"></div>
+          </div>
+          <div v-else-if="aiSummary" class="ai-summary-wrap">
+            <div class="ai-cols">
+              <div class="ai-col ai-col--neg">
+                <div class="ai-col-label">
+                  <span class="ai-col-icon">↓</span> Challenges
+                </div>
+                <div
+                  v-for="(pt, i) in aiSummary.negative" :key="pt"
+                  class="ai-point ai-point--neg"
+                  :style="{ animationDelay: `${i * 0.1}s` }"
+                  v-html="boldify(pt)"
+                ></div>
+              </div>
+              <div class="ai-col ai-col--pos">
+                <div class="ai-col-label">
+                  <span class="ai-col-icon">↑</span> Upsides
+                </div>
+                <div
+                  v-for="(pt, i) in aiSummary.positive" :key="pt"
+                  class="ai-point ai-point--pos"
+                  :style="{ animationDelay: `${i * 0.1 + 0.15}s` }"
+                  v-html="boldify(pt)"
+                ></div>
+              </div>
+            </div>
+            <div class="ai-suburb">
+              <div v-if="aiSummary.social" class="ai-suburb-row" style="animation-delay: 0.45s">
+                <span class="ai-row-tag ai-row-tag--social">Social</span>
+                <span v-html="boldify(aiSummary.social)"></span>
+              </div>
+              <div v-if="aiSummary.spending" class="ai-suburb-row" style="animation-delay: 0.55s">
+                <span class="ai-row-tag ai-row-tag--spend">Spending</span>
+                <span v-html="boldify(aiSummary.spending)"></span>
+              </div>
+              <div v-if="aiSummary.sports" class="ai-suburb-row" style="animation-delay: 0.65s">
+                <span class="ai-row-tag ai-row-tag--sport">Sport</span>
+                <span v-html="boldify(aiSummary.sports)"></span>
+              </div>
+              <div v-if="aiSummary.students" class="ai-suburb-row" style="animation-delay: 0.75s">
+                <span class="ai-row-tag ai-row-tag--students">Students</span>
+                <span v-html="boldify(aiSummary.students)"></span>
+              </div>
+              <div v-if="aiSummary.funFact" class="ai-fun-fact" style="animation-delay: 0.85s">
+                <span>{{ aiSummary.funFact }}</span>
+              </div>
+            </div>
+          </div>
+          <p v-else class="ai-summary-muted">No summary available for this school.</p>
         </div>
       </template>
 
@@ -290,12 +315,12 @@
                 <td>Nature reserves</td>
                 <td v-for="(s, i) in cmpSchools" :key="s.id" :class="bestIdx(cmpSchools.map(x => n(metricVal(x, 'nature_reserves_count'))), true) === i ? 'sbs-best' : 'sbs-lo'">{{ n(metricVal(s, 'nature_reserves_count')) }} reserves</td>
               </tr>
-              <tr class="sbs-sec"><td :colspan="cmpSchools.length + 1">Apply</td></tr>
+              <tr class="sbs-sec"><td :colspan="cmpSchools.length + 1">Job Site</td></tr>
               <tr>
-                <td>Apply for position</td>
+                <td>Link to job site</td>
                 <td v-for="s in cmpSchools" :key="s.id">
                   <a :href="applyUrl(s)" target="_blank" rel="noopener noreferrer" class="ls-apply-btn ls-apply-btn--sm">
-                    Apply →
+                    Link to job site →
                   </a>
                 </td>
               </tr>
@@ -309,10 +334,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useExplorer } from '../composables/useExplorer.js'
 import { RC, GC } from '../data/db.js'
 import { toNum, stateLabelFromRecord } from '../utils/locationFields.js'
+import SchoolMap from '../components/lifestyle/SchoolMap.vue'
 
 function n(v) {
   // Handle nested metric objects like {value: "2.0", unit: "rank"}
@@ -349,6 +375,11 @@ const {
   launchSort,
 } = useExplorer()
 
+function goDataSources() {
+  sessionStorage.setItem('about_scroll', 'data-sources')
+  emit('navigate', 'about')
+}
+
 function goExplorerSort(sort) {
   launchSort.value = sort
   launchView.value = 'search'
@@ -360,6 +391,91 @@ const insResults = ref([])
 const insHighlight = ref(0)
 const searchInputEl = ref(null)
 let insSearchTimer
+
+const aiSummary = ref(null)
+const aiLoading = ref(false)
+
+function aiCacheGet(id) {
+  try { const v = localStorage.getItem(`ai_summary_v2_${id}`); return v ? JSON.parse(v) : null } catch { return null }
+}
+function aiCacheSet(id, val) {
+  try { localStorage.setItem(`ai_summary_v2_${id}`, JSON.stringify(val)) } catch {}
+}
+
+async function generateAISummary(school, retry = 0) {
+  const key = import.meta.env.VITE_OPENAI_API_KEY
+  if (!school || retry > 2) return
+  const cacheKey = school.id
+  const cached = aiCacheGet(cacheKey)
+  if (cached) { aiSummary.value = cached; return }
+  aiLoading.value = true
+  aiSummary.value = null
+  try {
+    const prompt = `You are writing a hyperlocal lifestyle brief for a teacher considering a placement in ${school.suburb}, ${school.state_id === '1' ? 'QLD' : 'NSW'}. Every point MUST use real, specific proper nouns — actual facility names, reserve names, club names, waterway names, street names, events. Never write a generic phrase like "local clinic", "nearby reserve", "community club", "limited facilities", or "few parks". If you know the name, use it. If you are not confident of a specific name, use the closest real landmark or institution you do know for that region.
+
+Return ONLY valid JSON:
+
+- "positive": array of exactly 3 short phrases (under 8 words each). Each must name something real and specific. Always wrap the key proper noun or place name in **double asterisks**. Use digits for all numbers, not words (e.g. "2 km", "3 mins", not "two kilometres"). Examples: "Fishing the **Tully River** for barramundi", "**Ayr Bowls Club** 2 mins away", "**Atherton Tablelands** trail network on doorstep". No generic phrases.
+
+- "negative": array of exactly 3 short phrases (under 8 words each). Each must name something real and specific. Always wrap the key proper noun or place name in **double asterisks**. Use digits for all numbers. Examples: "Nearest hospital: **Atherton Hospital**, 42 km", "No Woolworths — **IGA Ravenshoe** only", "**Eungella NP** the only nearby reserve". Reflect the actual data: healthcare grade ${school.healthcare_grade || '—'} with ${n(metricVal(school, 'healthcare_count'))} facilities, ${n(metricVal(school, 'national_parks_count'))} national parks, ${n(metricVal(school, 'nature_reserves_count'))} nature reserves nearby.
+
+- "social": one sentence about the actual social scene in ${school.suburb} — name a real venue, club, event, or gathering spot locals use (e.g. "Locals gather at the **Ravenshoe Hotel** most Friday evenings"). Bold the venue/club name. Under 20 words. No generic phrases.
+
+- "spending": one sentence estimating realistic weekly spending for a single person. Start from rent $${n(metricVal(school, 'median_rent_weekly'))}/wk, add groceries/transport/utilities for a town of this remoteness. Bold the total range using **double asterisks**. Under 20 words.
+
+- "sports": one sentence naming the actual sports clubs or events in or near ${school.suburb} — use real club names, competitions, or events (e.g. "The **Ingham Leprechauns** dominate local rugby league on Friday nights"). Bold the club/event name. Under 18 words.
+
+- "students": one sentence describing the typical student background at ${school.name} — the likely family occupations, cultural mix, or socioeconomic context (e.g. "Most students come from **sugarcane and cattle farming** families across the Burdekin district"). Bold the key descriptor. Under 20 words.
+
+- "funFact": one surprising real fact about ${school.suburb} or its immediate region — history, ecology, industry, record, or quirk. Must be verifiable. Under 20 words. No bold.
+
+- "rentTrend": { "arrow": "↓" or "↑", "pct": integer, "label": e.g. "QLD median" } comparing $${n(metricVal(school, 'median_rent_weekly'))}/wk to the ${school.state_id === '1' ? 'QLD' : 'NSW'} state-wide median rent.
+
+School data:
+- ${school.name}, ${school.suburb} (${school.state_id === '1' ? 'QLD' : 'NSW'}, ${school.remoteness})
+- Incentive: $${school.annual_incentive || 0}/yr
+- Distance to ${metricVal(school, 'nearest_city_name') || school.nearest_city || 'nearest city'}: ${Math.round(n(school.distance_to_city))} km
+- Median rent: $${n(metricVal(school, 'median_rent_weekly'))}/wk
+- Healthcare: grade ${school.healthcare_grade || '—'}, ${n(metricVal(school, 'healthcare_count'))} facilities
+- Crime rank: ${n(metricVal(school, 'crime_rank')) || 'unknown'} / 130
+- National parks: ${n(metricVal(school, 'national_parks_count'))}, Nature reserves: ${n(metricVal(school, 'nature_reserves_count'))}
+
+Return format: {"positive":["...","...","..."],"negative":["...","...","..."],"social":"...","spending":"...","sports":"...","students":"...","funFact":"...","rentTrend":{"arrow":"↓","pct":45,"label":"QLD median"}}`
+
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 800,
+        temperature: 0.2
+      })
+    })
+    const data = await res.json()
+    if (res.status === 429) {
+      await new Promise(r => setTimeout(r, 15000))
+      return generateAISummary(school, retry + 1)
+    }
+    const raw = data.choices?.[0]?.message?.content?.trim() || ''
+    const jsonMatch = raw.match(/\{[\s\S]*\}/)
+    const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : null
+    if (parsed) aiCacheSet(cacheKey, parsed)
+    aiSummary.value = parsed
+  } catch (e) {
+    console.warn('AI summary error:', e)
+    aiSummary.value = null
+  } finally {
+    aiLoading.value = false
+  }
+}
+
+let aiDebounceTimer = null
+watch(insSchool, (school) => {
+  clearTimeout(aiDebounceTimer)
+  if (!school) { aiSummary.value = null; return }
+  aiDebounceTimer = setTimeout(() => generateAISummary(school), 800)
+}, { immediate: true })
 
 function focusSearch() {
   searchInputEl.value?.focus()
@@ -432,6 +548,22 @@ function bestIdx(vals, hi) {
   const ns = vals.map(v => parseFloat(v) || 0)
   const best = hi ? Math.max(...ns) : Math.min(...ns.filter(n => n > 0).concat([0]))
   return ns.indexOf(best)
+}
+
+const rentDiff = computed(() => {
+  const t = aiSummary.value?.rentTrend
+  if (!t?.arrow || !t?.pct || !t?.label) return null
+  const correctState = insSchool.value?.state_id === '1' ? 'QLD' : 'NSW'
+  const wrongState   = correctState === 'QLD' ? 'NSW' : 'QLD'
+  const label = t.label.replace(wrongState, correctState)
+  return { ...t, label, cls: t.arrow === '↓' ? 'rent-trend--good' : 'rent-trend--warn' }
+})
+
+function boldify(text) {
+  return text
+    .replace(/\+\+(.+?)\+\+/g, '<strong class="ai-pos">$1</strong>')
+    .replace(/--(.+?)--/g, '<strong class="ai-neg">$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<em class="ai-neu">$1</em>')
 }
 
 function applyUrl(school) {
@@ -549,6 +681,7 @@ function applyUrl(school) {
 /* Hero */
 .ies-hero {
   text-align: center;
+  animation: ies-fadein 0.5s ease both;
 }
 .ies-h {
   font-family: 'Playfair Display', serif;
@@ -556,12 +689,79 @@ function applyUrl(school) {
   font-weight: 900;
   color: var(--ink);
   line-height: 1.15;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .ies-sub {
-  font-size: 1.05rem;
-  color: var(--ink2);
-  margin-bottom: 20px;
+  font-size: 1rem;
+  color: var(--ink3);
+  margin-bottom: 32px;
+}
+@keyframes ies-fadein {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ies-steps-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.ies-step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--s);
+  border: 1px solid var(--b);
+  border-radius: 14px;
+  padding: 14px 18px;
+  min-width: 190px;
+  opacity: 0;
+  animation: ies-fadein 0.45s ease forwards;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.ies-step-item:hover {
+  border-color: var(--blue);
+  box-shadow: 0 4px 16px rgba(31,111,235,0.10);
+  transform: translateY(-2px);
+}
+.ies-step-num {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ies-step-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+.ies-step-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ies-step-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.76rem;
+  color: var(--ink3);
+  line-height: 1.4;
+}
+.ies-step-arrow {
+  font-size: 1.1rem;
+  color: var(--b2);
+  flex-shrink: 0;
 }
 .ies-actions {
   display: flex;
@@ -596,179 +796,60 @@ function applyUrl(school) {
 }
 .ies-btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
 
-/* Goal cards */
-.ies-goals {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-.ies-goal-card {
-  background: var(--s);
-  border: 1px solid var(--b);
-  border-radius: 14px;
-  padding: 18px 14px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.16s, box-shadow 0.16s, transform 0.16s;
-}
-.ies-goal-card:hover {
-  border-color: var(--blue);
-  box-shadow: 0 6px 20px rgba(31,111,235,0.10);
-  transform: translateY(-2px);
-}
-.ies-goal-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--blue-s);
-  color: var(--blue);
-  margin: 0 auto 10px;
-}
-.ies-goal-label { font-size: 0.94rem; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
-.ies-goal-sub { font-size: 0.82rem; color: var(--ink3); line-height: 1.4; }
-
-/* How it works */
-.ies-how {
-  background: var(--s);
-  border: 1px solid var(--b);
-  border-radius: 14px;
-  padding: 22px 24px;
-}
-.ies-how-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--ink3);
-  margin-bottom: 16px;
-}
-.ies-steps {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.ies-step {
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-.ies-step-n {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--blue-s);
-  color: var(--blue);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.ies-step-text {
-  font-size: 0.88rem;
-  color: var(--ink2);
-  line-height: 1.5;
-  padding-top: 3px;
-}
-.ies-step-arrow {
-  color: var(--b2);
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-/* Scorecard preview */
-.ies-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.ies-preview-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--ink3);
-}
-.ies-preview-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-.ies-preview-card {
-  background: var(--s);
-  border: 1px solid var(--b);
-  border-radius: var(--r);
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  opacity: 0.7;
-}
-.ies-pc-title {
-  font-size: 0.86rem;
-  font-weight: 700;
-  color: var(--ink);
-  margin-bottom: 2px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.ies-pc-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-.ies-pc-k {
-  font-size: 0.82rem;
-  color: var(--ink3);
-}
-.ies-pc-v {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-.ies-skel {
-  display: inline-block;
-  height: 10px;
-  border-radius: 6px;
-  background: var(--b2);
-  opacity: 0.5;
-}
-.ies-skel--sm { width: 52px; }
-.ies-skel--md { width: 80px; }
-.ies-preview-cta {
-  text-align: center;
-  font-size: 0.84rem;
-  color: var(--ink3);
-  font-style: italic;
-}
-
 @media (max-width: 700px) {
-  .ies-goals { grid-template-columns: repeat(2, 1fr); }
-  .ies-preview-cards { grid-template-columns: 1fr; }
-  .ies-steps { flex-direction: column; }
-  .ies-step-arrow { transform: rotate(90deg); }
   .ies-h { font-size: 1.75rem; }
+  .ins-school-hdr { margin: -12px 0 20px; padding: 16px 16px 20px; top: 116px; }
+  .ai-skel-cols { grid-template-columns: 1fr; }
 }
 
-.grade-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 10px;
+.lc-scale {
   margin-top: 10px;
   padding-top: 8px;
   border-top: 1px solid var(--b);
-}
-.gl-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   color: var(--ink3);
+}
+.grade-tip-wrap {
+  position: relative;
+  display: inline-flex;
+  cursor: default;
+}
+.grade-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid var(--b);
+  border-radius: 10px;
+  padding: 8px 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  min-width: 170px;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.grade-tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--b);
+}
+.grade-tip-wrap:hover .grade-tip { opacity: 1; }
+.grade-tip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: var(--ink2);
 }
 
 .sbs-legend {
@@ -805,17 +886,77 @@ function applyUrl(school) {
 }
 
 .ins-school-hdr {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   gap: 16px;
-  flex-wrap: wrap;
-  padding: 0 0 16px;
+  position: sticky;
+  top: 117px;
+  z-index: 90;
+  background: var(--s);
+  margin: -20px 0 20px;
+  padding: 16px 20px 20px;
+  border: 1px solid var(--b);
+  border-top: 3px solid var(--blue);
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10);
 }
+.ish-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ish-suburb {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.ish-school-name {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: var(--ink3);
+  font-weight: 400;
+}
+.ish-incentive {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: center;
+  padding: 6px 16px 6px 12px;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.ish-inc-amount {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #15803d;
+  letter-spacing: -0.01em;
+}
+.ish-inc-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  color: #166534;
+  font-weight: 500;
+}
+.rent-trend {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+.rent-trend--good { background: #f0fdf4; color: #15803d; }
+.rent-trend--warn { background: #fef2f2; color: #b91c1c; }
 
 .ish-acts {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
   flex-shrink: 0;
@@ -840,4 +981,205 @@ function applyUrl(school) {
   font-size: 0.78rem;
 }
 
+.section-source-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 99px;
+}
+.source-badge--data {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s;
+}
+.source-badge--data:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+.source-badge--ai {
+  background: #f5f3ff;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.editorial {
+  background: #fff;
+  border: 1px solid var(--b);
+  border-radius: var(--r);
+  padding: 20px 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.editorial-title {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+.ai-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+.ai-col {
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ai-col--neg { background: #fef2f2; border: 1px solid #fecaca; }
+.ai-col--pos { background: #f0fdf4; border: 1px solid #bbf7d0; }
+.ai-col-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 2px;
+}
+.ai-col--neg .ai-col-label { color: #b91c1c; }
+.ai-col--pos .ai-col-label { color: #15803d; }
+.ai-col-icon { font-size: 0.8rem; }
+.ai-point {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  opacity: 0;
+  animation: ai-slidein 0.4s ease forwards;
+  padding-left: 2px;
+}
+.ai-point--neg { color: #7f1d1d; }
+.ai-point--pos { color: #14532d; }
+.ai-suburb {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--b);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ai-suburb-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--ink2);
+  opacity: 0;
+  animation: ai-slidein 0.4s ease forwards;
+}
+.ai-row-tag {
+  flex-shrink: 0;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+.ai-row-tag--social   { background: #ede9fe; color: #6d28d9; }
+.ai-row-tag--spend    { background: #fef9c3; color: #92400e; }
+.ai-row-tag--sport    { background: #dcfce7; color: #15803d; }
+.ai-row-tag--students { background: #dbeafe; color: #1d4ed8; }
+.ai-suburb-row :deep(em.ai-neu) { font-style: italic; font-weight: 600; color: var(--ink); }
+:deep(em.ai-neu) { font-style: italic; font-weight: 600; color: var(--ink); }
+.ai-fun-fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 9px 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  color: #78350f;
+  line-height: 1.55;
+  opacity: 0;
+  animation: ai-slidein 0.4s ease forwards;
+}
+.ai-fun-fact::before {
+  content: '★';
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #d97706;
+}
+.ai-summary-muted { font-size: 0.82rem; color: var(--ink3); font-style: italic; }
+@keyframes ai-slidein {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Skeleton loader */
+.ai-skeleton { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.ai-skel-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ai-skel-col {
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #f9fafb;
+  border: 1px solid var(--b);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ai-skel-bar {
+  height: 10px;
+  border-radius: 6px;
+  width: 85%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: ai-shimmer 1.6s ease-in-out infinite;
+}
+.ai-skel-bar--label { width: 45%; height: 8px; }
+.ai-skel-bar--sm    { width: 60%; }
+.ai-skel-bar--md    { width: 75%; }
+.ai-skel-bar--lg    { width: 90%; }
+.ai-skel-bar--full  { width: 100%; }
+.ai-skel-divider {
+  height: 1px;
+  background: var(--b);
+  margin: 2px 0;
+}
+.ai-skel-sentences {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 14px;
+}
+.ai-skel-fact {
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #fef9ec 25%, #fdf3d0 50%, #fef9ec 75%);
+  background-size: 200% 100%;
+  animation: ai-shimmer 1.6s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+@keyframes ai-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
 </style>
