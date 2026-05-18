@@ -8,12 +8,12 @@
       <div v-if="!compact" class="profile-status" :class="{ ready: profileReady }">{{ profileReady ? readyLabel : 'In progress' }}</div>
     </div>
 
-    <div class="profile-steps" aria-label="Incentive profile progress">
+    <div class="profile-steps" :class="{ 'profile-steps--3': isQld }" aria-label="Incentive profile progress">
       <div
         v-for="(step, index) in steps"
         :key="step.key"
         class="profile-step"
-        :class="{ complete: step.complete, active: step.active }"
+        :class="[{ complete: step.complete, active: step.active }, `step--${step.key}`]"
       >
         <div class="step-dot">
           <span v-if="step.complete">✓</span>
@@ -23,22 +23,19 @@
           <span>{{ step.label }}</span>
           <small v-if="!compact">{{ step.hint }}</small>
         </div>
-        <label v-if="compact && step.key === 'role'" class="step-control">
-          <select v-model="form.employmentType" :disabled="loading">
-            <option value="">Select employment type</option>
-            <option value="permanent">Permanent</option>
-            <option value="temporary">Temporary</option>
-            <option value="public_service_officer">Public Service Officer</option>
-          </select>
-          <small v-if="errors.employmentType">{{ errors.employmentType }}</small>
-        </label>
-        <label v-else-if="compact && step.key === 'experience'" class="step-control">
+        <label v-if="compact && step.key === 'experience'" class="step-control">
           <div class="exp-input-wrap">
             <input v-model="form.yearsExperience" type="number" min="0" max="40" step="1" placeholder="0" :disabled="loading" />
             <span class="exp-suffix">years taught</span>
           </div>
           <small v-if="errors.yearsExperience">{{ errors.yearsExperience }}</small>
         </label>
+        <div v-else-if="compact && step.key === 'dependants'" class="step-control">
+          <div class="dep-toggle-wrap">
+            <button type="button" class="dep-btn" :class="{ 'dep-btn--active': !form.hasDependants }" @click="form.hasDependants = false" :disabled="loading">No</button>
+            <button type="button" class="dep-btn" :class="{ 'dep-btn--active': form.hasDependants }" @click="form.hasDependants = true" :disabled="loading">Yes</button>
+          </div>
+        </div>
         <button v-else-if="compact && step.key === 'estimate'" class="step-action" :class="{ 'step-action--done': estimateComplete }" type="submit" :disabled="loading">
           <span v-if="loading" class="spinner"></span>
           {{ loading ? 'Updating...' : compactEstimateLabel }}
@@ -46,32 +43,20 @@
       </div>
     </div>
 
-    <label v-if="compact && isQld" class="dependant-toggle compact-dependant">
-      <input v-model="form.hasDependants" type="checkbox" :disabled="loading" />
-      <span>I have a dependent spouse or child <em>(used for QLD full-rate allowance)</em></span>
-    </label>
-
     <div v-if="!compact" class="checker-title form-title">Check your eligibility</div>
     <div v-if="!compact" class="checker-grid">
-      <label class="field">
-        <span>Employment type</span>
-        <select v-model="form.employmentType" :disabled="loading">
-          <option value="">Select employment type</option>
-          <option value="permanent">Permanent</option>
-          <option value="temporary">Temporary</option>
-          <option value="public_service_officer">Public Service Officer</option>
-        </select>
-        <small v-if="errors.employmentType">{{ errors.employmentType }}</small>
-      </label>
       <label class="field">
         <span>Years of experience</span>
         <input v-model="form.yearsExperience" type="number" min="0" max="40" step="1" :disabled="loading" />
         <small v-if="errors.yearsExperience">{{ errors.yearsExperience }}</small>
       </label>
-      <label v-if="isQld" class="toggle-field">
-        <input v-model="form.hasDependants" type="checkbox" :disabled="loading" />
-        <span>Do you have a dependent spouse or child?</span>
-      </label>
+      <div v-if="isQld" class="field">
+        <span class="field-label">Dependent spouse or child?</span>
+        <div class="dep-toggle-wrap dep-toggle-wrap--sm">
+          <button type="button" class="dep-btn" :class="{ 'dep-btn--active': !form.hasDependants }" @click="form.hasDependants = false" :disabled="loading">No</button>
+          <button type="button" class="dep-btn" :class="{ 'dep-btn--active': form.hasDependants }" @click="form.hasDependants = true" :disabled="loading">Yes</button>
+        </div>
+      </div>
     </div>
     <button v-if="!compact" class="check-btn" type="submit" :disabled="loading">
       <span v-if="loading" class="spinner"></span>
@@ -107,7 +92,6 @@ const props = defineProps({
 const emit = defineEmits(['result-change', 'profile-change', 'profile-submit'])
 
 const form = reactive({
-  employmentType: props.initialProfile?.employmentType || '',
   yearsExperience: props.initialProfile?.yearsExperience ?? '',
   hasDependants: Boolean(props.initialProfile?.hasDependants),
 })
@@ -117,39 +101,41 @@ const result = ref(null)
 const apiError = ref('')
 const applied = ref(false)
 const isQld = computed(() => props.showDependants || props.school?.state_id === '1')
-const hasRole = computed(() => Boolean(form.employmentType))
 const hasExperience = computed(() => form.yearsExperience !== '' && Number(form.yearsExperience) >= 0 && Number(form.yearsExperience) <= 40)
-const profileReady = computed(() => hasRole.value && hasExperience.value)
+const profileReady = computed(() => hasExperience.value)
 const estimateComplete = computed(() => props.compact ? applied.value && profileReady.value : Boolean(result.value))
 const compactEstimateLabel = computed(() => estimateComplete.value ? 'Ready' : props.actionLabel)
-const steps = computed(() => [
-  {
-    key: 'role',
-    label: 'Role',
-    hint: hasRole.value ? employmentLabel(form.employmentType) : 'Select employment type',
-    complete: hasRole.value,
-    active: !hasRole.value,
-  },
-  {
-    key: 'experience',
-    label: 'Experience',
-    hint: hasExperience.value ? `${Number(form.yearsExperience)} years added` : 'Add years taught',
-    complete: hasExperience.value,
-    active: hasRole.value && !hasExperience.value,
-  },
-  {
+const steps = computed(() => {
+  const base = [
+    {
+      key: 'experience',
+      label: 'Experience',
+      hint: hasExperience.value ? `${Number(form.yearsExperience)} years added` : 'Add years taught',
+      complete: hasExperience.value,
+      active: !hasExperience.value,
+    },
+  ]
+  if (isQld.value) {
+    base.push({
+      key: 'dependants',
+      label: 'Dependants',
+      hint: form.hasDependants ? 'With dependants' : 'No dependants',
+      complete: true,
+      active: false,
+    })
+  }
+  base.push({
     key: 'estimate',
     label: 'Estimate',
     hint: estimateComplete.value ? 'Personalised result ready' : 'Check to calculate',
     complete: estimateComplete.value,
-    active: hasRole.value && hasExperience.value && !estimateComplete.value,
-  },
-])
+    active: hasExperience.value && !estimateComplete.value,
+  })
+  return base
+})
 
 function validate() {
-  errors.employmentType = ''
   errors.yearsExperience = ''
-  if (!form.employmentType) errors.employmentType = 'Employment type is required'
   if (form.yearsExperience === '' || form.yearsExperience === null) {
     errors.yearsExperience = 'Years of experience is required'
   } else if (Number(form.yearsExperience) < 0) {
@@ -157,7 +143,7 @@ function validate() {
   } else if (Number(form.yearsExperience) > 40) {
     errors.yearsExperience = 'Years of experience must be 40 or less'
   }
-  return !errors.employmentType && !errors.yearsExperience
+  return !errors.yearsExperience
 }
 
 async function submit() {
@@ -175,7 +161,6 @@ async function submit() {
   try {
     result.value = await checkEligibility({
       school_id: props.school.school_id || props.school.id,
-      employment_type: form.employmentType,
       years_experience: Number(form.yearsExperience),
       years_of_experience: Number(form.yearsExperience),
       experience_years: Number(form.yearsExperience),
@@ -201,8 +186,8 @@ function yearsExperienceBand(years) {
 function provisionalResult() {
   const hasIncentive = Number(props.school?.annual_incentive || 0) > 0
   return {
-    eligible: hasIncentive && form.employmentType !== 'public_service_officer',
-    status: hasIncentive && form.employmentType !== 'public_service_officer' ? 'eligible' : 'ineligible',
+    eligible: hasIncentive,
+    status: hasIncentive ? 'eligible' : 'ineligible',
     incentive_count: hasIncentive ? 1 : 0,
     reason: hasIncentive ? '' : 'No incentive data is currently linked to this school.',
   }
@@ -210,23 +195,14 @@ function provisionalResult() {
 
 function profilePayload() {
   return {
-    employmentType: form.employmentType,
     yearsExperience: form.yearsExperience === '' ? '' : Number(form.yearsExperience),
     hasDependants: Boolean(form.hasDependants),
     ready: profileReady.value,
   }
 }
 
-function employmentLabel(value) {
-  return {
-    permanent: 'Permanent',
-    temporary: 'Temporary',
-    public_service_officer: 'Public Service Officer',
-  }[value] || 'Role selected'
-}
-
 watch(
-  () => [form.employmentType, form.yearsExperience, form.hasDependants],
+  () => [form.yearsExperience, form.hasDependants],
   () => {
     result.value = null
     applied.value = false
@@ -239,14 +215,12 @@ watch(
   () => props.initialProfile,
   (profile) => {
     if (!profile) {
-      form.employmentType = ''
       form.yearsExperience = ''
       form.hasDependants = false
       applied.value = false
       result.value = null
       return
     }
-    form.employmentType = profile.employmentType || ''
     form.yearsExperience = profile.yearsExperience ?? ''
     form.hasDependants = Boolean(profile.hasDependants)
   },
@@ -258,7 +232,6 @@ watch(
 .elig-checker { margin:0; padding:0; }
 .elig-checker.compact { display:grid; grid-template-columns:1fr; gap:12px; }
 .elig-checker.compact .checker-head { justify-content:center; margin:0 auto; max-width:760px; text-align:center; }
-.elig-checker.compact .toggle-field { grid-column:auto; min-height:34px; padding:6px 10px; }
 .checker-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
 .checker-title { font-size:0.9rem; font-weight:900; color:var(--ink); line-height:1.25; letter-spacing:0; }
 .checker-sub { margin-top:2px; font-size:0.68rem; color:var(--ink3); line-height:1.35; }
@@ -266,15 +239,16 @@ watch(
 .elig-checker.compact .checker-sub { font-size:0.74rem; max-width:38rem; color:var(--ink2); margin-top:4px; font-weight:400; }
 .profile-status { flex-shrink:0; border:1px solid var(--b); border-radius:99px; padding:4px 9px; font-size:0.62rem; font-weight:800; color:var(--ink3); background:#fbfaf8; }
 .profile-status.ready { color:var(--green-d); background:var(--green-s); border-color:rgba(30,158,86,0.28); }
-.profile-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
-.elig-checker.compact .profile-steps { grid-column:auto; margin:0; grid-template-columns:repeat(3,minmax(0,1fr)); }
+.profile-steps { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
+.elig-checker.compact .profile-steps { grid-column:auto; margin:0; grid-template-columns:repeat(2,minmax(0,1fr)); }
+.elig-checker.compact .profile-steps--3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .profile-step { position:relative; display:flex; align-items:center; gap:10px; min-width:0; padding:10px 11px; border:1px solid rgba(217,211,202,0.72); border-radius:var(--r2); background:rgba(255,255,255,0.74); }
 .profile-step.active { background:var(--blue-s); }
 .profile-step.complete { background:var(--green-s); }
 .elig-checker.compact .profile-step { display:grid; grid-template-columns:auto 1fr; grid-template-rows:42px auto; align-items:start; min-height:auto; background:linear-gradient(150deg,#f2efe9 0%,#fff 70%); border-top:2.5px solid var(--b2); box-shadow:0 2px 8px rgba(13,31,60,0.05); padding:12px 14px; }
-.elig-checker.compact .profile-step:nth-child(1) { background:linear-gradient(150deg,#eef4fd 0%,#fff 70%); border-top-color:#93bef5; }
-.elig-checker.compact .profile-step:nth-child(2) { background:linear-gradient(150deg,#fef8e8 0%,#fff 70%); border-top-color:#f0c84a; }
-.elig-checker.compact .profile-step:nth-child(3) { background:linear-gradient(150deg,#ebf8f2 0%,#fff 70%); border-top-color:#72d4a2; }
+.elig-checker.compact .step--experience { background:linear-gradient(150deg,#fef8e8 0%,#fff 70%); border-top-color:#f0c84a; }
+.elig-checker.compact .step--dependants { background:linear-gradient(150deg,#eef4fd 0%,#fff 70%); border-top-color:#93bef5; }
+.elig-checker.compact .step--estimate { background:linear-gradient(150deg,#ebf8f2 0%,#fff 70%); border-top-color:#72d4a2; }
 .elig-checker.compact .profile-step.active { background:var(--green-s); border-top-color:var(--green); border-color:rgba(30,158,86,0.3); }
 .elig-checker.compact .profile-step.complete { background:var(--green-s); border-top-color:var(--green); border-color:rgba(30,158,86,0.26); }
 .step-dot { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:28px; height:28px; border-radius:50%; border:1px solid var(--b2); background:var(--s); color:var(--ink2); font-size:0.68rem; font-weight:900; }
@@ -295,10 +269,13 @@ watch(
 .exp-input-wrap input:focus { outline:none; }
 .exp-suffix { flex:1; padding:0 10px 0 4px; font-size:0.78rem; color:var(--ink3); font-weight:600; white-space:nowrap; border-left:1px solid rgba(217,211,202,0.6); padding-left:10px; }
 .step-control small { font-size:0.62rem; color:var(--red); }
-.dependant-toggle { display:flex; align-items:center; gap:7px; margin-top:7px; color:var(--ink2); font-size:0.68rem; font-weight:700; line-height:1.25; }
-.compact-dependant { margin:2px 0 0; padding:10px 12px; border:1px solid rgba(30,158,86,0.24); border-radius:var(--r2); background:var(--green-s); }
-.dependant-toggle input { width:14px; height:14px; accent-color:var(--blue); flex-shrink:0; }
-.dependant-toggle em { color:var(--ink3); font-style:normal; font-weight:600; }
+.dep-toggle-wrap { display:flex; border:1px solid rgba(217,211,202,0.9); border-radius:var(--r2); background:rgba(255,255,255,0.88); overflow:hidden; }
+.dep-btn { flex:1; min-height:42px; border:none; background:transparent; font:inherit; font-size:0.84rem; font-weight:700; color:var(--ink2); cursor:pointer; padding:8px 10px; transition:background 0.15s, color 0.15s; }
+.dep-btn + .dep-btn { border-left:1px solid rgba(217,211,202,0.6); }
+.dep-btn--active { background:var(--blue); color:#fff; }
+.dep-btn:disabled { opacity:0.7; cursor:default; }
+.dep-toggle-wrap--sm .dep-btn { min-height:34px; font-size:0.76rem; }
+.field-label { font-size:0.66rem; font-weight:700; color:var(--ink2); }
 .step-action { width:100%; min-height:42px; justify-content:center; display:inline-flex; align-items:center; gap:7px; border:0; border-radius:var(--r2); background:var(--blue); color:#fff; padding:10px 14px; font:inherit; font-size:0.86rem; font-weight:900; cursor:pointer; box-shadow:none; transition:background 0.22s ease; }
 .step-action--done { background:var(--green); }
 .step-action:disabled { opacity:0.7; cursor:wait; }
@@ -328,7 +305,8 @@ watch(
 }
 
 @media (max-width:900px) {
-  .elig-checker.compact .profile-steps { grid-template-columns:1fr; }
+  .elig-checker.compact .profile-steps,
+  .elig-checker.compact .profile-steps--3 { grid-template-columns:1fr; }
   .elig-checker.compact .profile-step { min-height:auto; }
 }
 </style>

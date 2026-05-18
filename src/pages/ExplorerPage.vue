@@ -473,7 +473,7 @@ let qldLayer      = null
 let nswLayer      = null
 
 const mapSchools = ref([])
-const { getPersonalisedIncentive } = usePersonalisedIncentives()
+const { getPersonalisedIncentive, estimatesBySchool } = usePersonalisedIncentives()
 
 function loadSearchWithProfile(text = searchQ.value) {
   return loadSearchLocations(text, activeIncentiveProfile.value?.ready ? activeIncentiveProfile.value : null)
@@ -486,14 +486,8 @@ function loadGuideWithProfile() {
 const explorerProfileSummary = computed(() => {
   const p = activeIncentiveProfile.value
   if (!p?.ready) return 'No preferences applied'
-  const roleMap = {
-    permanent: 'Permanent',
-    temporary: 'Temporary',
-    public_service_officer: 'Public Service Officer',
-  }
   const yrs = Number(p.yearsExperience)
   const parts = [
-    roleMap[p.employmentType] || p.employmentType || 'Selected role',
     `${Number.isNaN(yrs) ? 0 : yrs} year${yrs === 1 ? '' : 's'} experience`,
     p.hasDependants ? 'with QLD dependants' : 'no QLD dependants',
   ]
@@ -506,6 +500,7 @@ function applyExplorerProfile(profile) {
   currentPage.value = 1
   guidePage.value = 1
   openRow.value = null
+  loadMapSchools()
   if (view.value === 'guide') loadGuideWithProfile()
   else if (view.value === 'search') loadSearchWithProfile()
 }
@@ -521,19 +516,51 @@ function employeeTypeForApi(value) {
   }[String(value || '').toLowerCase()] || value
 }
 
+function mapProfileParams(state) {
+  const profile = activeIncentiveProfile.value
+  if (!profile?.ready) return {}
+  const years = Number(profile.yearsExperience || 0)
+  if (state === 'qld') {
+    return {
+      employee_type: 'temp',
+      has_dependants: Boolean(profile.hasDependants),
+    }
+  }
+  if (state === 'nsw') {
+    return {
+      employee_type: 'perm',
+      years_experience: years,
+      years_of_experience: years,
+      experience_years: years,
+      years_experience_band: yearsExperienceBand(years),
+    }
+  }
+  return {}
+}
+
+function yearsExperienceBand(years) {
+  if (years < 2) return '0-1'
+  if (years < 5) return '2-4'
+  return '5+'
+}
+
 async function loadMapSchools() {
   try {
     const stateList = fState.value === 'both' ? ['qld', 'nsw'] : [fState.value]
     const remoteness_ids = [...fRem].sort().join(',')
     const employee_type = fEmp.value !== 'both' ? employeeTypeForApi(fEmp.value) : ''
-    const responses = await Promise.all(stateList.map((state) => fetchExplorerLocations({
-      page: 1,
-      page_size: 200,
-      state,
-      sort: 'inc',
-      employee_type,
-      remoteness_ids,
-    })))
+    const responses = await Promise.all(stateList.map((state) => {
+      const profileParams = mapProfileParams(state)
+      return fetchExplorerLocations({
+        page: 1,
+        page_size: 200,
+        state,
+        sort: 'inc',
+        remoteness_ids,
+        ...profileParams,
+        employee_type: employee_type || profileParams.employee_type || '',
+      })
+    }))
     const all = responses.flatMap((r) => normalizeLocationList(r.items)).filter(s => s.annual_incentive > 0)
     mapSchools.value = all
   } catch (e) {
@@ -601,16 +628,17 @@ const visibleGuideListItems = computed(() => {
   return guideListItems.value.filter(s => String(s.id) === openRow.value)
 })
 
-function onSelState(v)  { selState(v);  loadSearchWithProfile() }
-function onSelEmp(v)    { selEmp(v);    loadSearchWithProfile() }
-function onToggleRem(v) { toggleRem(v); loadSearchWithProfile() }
-function onSetSort(v)   { setSort(v);   loadSearchWithProfile() }
+function onSelState(v)  { selState(v);  openRow.value = null; loadSearchWithProfile() }
+function onSelEmp(v)    { selEmp(v);    openRow.value = null; loadSearchWithProfile() }
+function onToggleRem(v) { toggleRem(v); openRow.value = null; loadSearchWithProfile() }
+function onSetSort(v)   { setSort(v);   openRow.value = null; loadSearchWithProfile() }
 
 let searchDebounce = null
 function onSearchInput() {
   clearTimeout(searchDebounce)
   searchDebounce = setTimeout(() => {
     currentPage.value = 1
+    openRow.value = null
     loadSearchWithProfile()
   }, 300)
 }
@@ -659,6 +687,7 @@ function resetFilters() {
 }
 
 watch(view, (v) => {
+  openRow.value = null
   if (v === 'search') {
     resetFilters()
     if (launchRem.value)  { toggleRem(launchRem.value);   launchRem.value  = null }
@@ -694,6 +723,8 @@ onUnmounted(() => {
 })
 
 watch(mapSchools, (v) => { if (v.length && mapInstance) { plotMarkers() } })
+watch(activeIncentiveProfile, () => { if (mapInstance) plotMarkers() }, { deep: true })
+watch(estimatesBySchool, () => { if (mapInstance) plotMarkers() }, { deep: true })
 
 const INC_MIN = 4232, INC_MAX = 30000
 function lerp(a, b, t) { return a + (b - a) * t }
@@ -759,20 +790,35 @@ function plotMarkers() {
 
   const schools = mapSchools.value.length ? mapSchools.value : heroTop.value
 
+  const profile = activeIncentiveProfile.value
+  const profileReady = profile?.ready
+
+  function isKnownZero() {
+    return false
+  }
+
   schools.forEach((s, i) => {
     if (!s.lat || !s.lng) return
-    const isQld   = s.state_id === '1'
-    const color   = incentiveColor(s.annual_incentive || 0, isQld)
-    const radius  = 7
-    const layer   = isQld ? qldLayer : nswLayer
-    const inc     = Math.round(s.annual_incentive || 0).toLocaleString()
-    const escSub  = (s.suburb || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')
+    const isQld       = s.state_id === '1'
+    const personalised = getPersonalisedIncentive(s.school_id || s.id)
+    const rowPersonalised = profileReady && Number(s.personalised_annual_total || 0) > 0
+
+    if (isKnownZero(s)) return
+    if (personalised && personalised.total === 0) return
+
+    const incValue    = personalised ? personalised.total : (rowPersonalised ? s.personalised_annual_total : (s.annual_incentive || 0))
+    const color       = incentiveColor(incValue, isQld)
+    const radius      = 7
+    const layer       = isQld ? qldLayer : nswLayer
+    const inc         = Math.round(incValue).toLocaleString()
+    const incLabel    = personalised || rowPersonalised ? 'personalised estimate' : 'incentive package'
+    const escSub      = (s.suburb || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')
 
     const tooltip = `
       <div style="font-family:'DM Sans',sans-serif;min-width:160px">
         <div style="font-weight:700;font-size:0.8rem;margin-bottom:2px">${s.name}</div>
         <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:5px">${s.suburb} · ${isQld ? 'QLD' : 'NSW'} · ${s.remoteness}</div>
-        <div style="font-size:0.88rem;font-weight:800;color:${color}">Up to $${inc}/yr max package</div>
+        <div style="font-size:0.88rem;font-weight:800;color:${color}">$${inc}/yr <span style="font-weight:500;font-size:0.75rem;opacity:0.85">${incLabel}</span></div>
       </div>`
 
     const popupHtml = `
@@ -780,7 +826,7 @@ function plotMarkers() {
         <div class="sp-tag ${isQld ? 'sp-qld' : 'sp-nsw'}">${isQld ? 'QLD' : 'NSW'} · ${s.remoteness || ''}</div>
         <div class="sp-name">${s.name}</div>
         <div class="sp-suburb">${s.suburb || ''}</div>
-        <div class="sp-inc"><span class="sp-inc-num">Up to $${inc}</span><span class="sp-inc-lbl">/yr max package</span></div>
+        <div class="sp-inc"><span class="sp-inc-num">$${inc}</span><span class="sp-inc-lbl">/yr ${incLabel}</span></div>
         <button class="sp-cta" onclick="window.__mapSchoolSearch('${escSub}')">Search ${s.suburb} schools →</button>
       </div>`
 

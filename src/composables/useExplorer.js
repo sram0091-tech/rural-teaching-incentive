@@ -27,7 +27,6 @@ const DEFAULT_REMOTENESS_OPTS = [
   { v: '4', icon: '🟠', label: 'Remote' },
   { v: '3', icon: '🟡', label: 'Outer Regional' },
   { v: '2', icon: '🟢', label: 'Inner Regional' },
-  { v: '1', icon: '🔵', label: 'Major Cities' },
 ]
 
 /**
@@ -65,7 +64,7 @@ function mapFiltersPayload(json) {
         v: String(r.id ?? r.remoteness_category_id ?? r.value ?? r.v ?? ''),
         icon: r.icon ?? '📍',
         label: String(r.label ?? r.name ?? r.title ?? ''),
-      }))
+      })).filter((r) => r.v !== '1')
     : DEFAULT_REMOTENESS_OPTS
 
   return { stateOpts, empOpts, remotenessOpts }
@@ -175,26 +174,29 @@ function buildLocationQuery({ page, searchText, incentiveProfile = null, include
   const params = {
     page,
     page_size: PAGE_SIZE,
-    state: fState.value,
     sort: sortParamForApi(fSort.value),
+  }
+
+  if (fState.value && fState.value !== 'both') {
+    params.state = fState.value
   }
 
   if (fEmp.value && fEmp.value !== 'both') {
     params.employee_type = employeeTypeForApi(fEmp.value)
   }
 
-  if (profileReady && includeProfileEmployee) {
-    params.employee_type = employeeTypeForApi(incentiveProfile.employmentType)
-  }
-
   if (profileReady) {
     const years = Number(incentiveProfile.yearsExperience || 0)
-    params.employment_type = incentiveProfile.employmentType
-    params.years_experience = years
-    params.years_of_experience = years
-    params.experience_years = years
-    params.years_experience_band = yearsExperienceBand(years)
-    params.has_dependants = Boolean(incentiveProfile.hasDependants)
+    const stateFilter = fState.value
+
+    if (stateFilter === 'nsw') {
+      params.years_experience = years
+      params.years_of_experience = years
+      params.experience_years = years
+      params.years_experience_band = yearsExperienceBand(years)
+    } else if (stateFilter === 'qld') {
+      params.has_dependants = Boolean(incentiveProfile.hasDependants)
+    }
   }
 
   if (remoteness_ids) {
@@ -271,6 +273,11 @@ async function loadSearchLocations(searchText, incentiveProfile = null) {
         buildLocationQuery({ page: currentPage.value, searchText, incentiveProfile, includeProfileEmployee: false })
       ))
     }
+    if (incentiveProfile?.ready && total === 0) {
+      ;({ items, total } = await fetchExplorerLocations(
+        buildLocationQuery({ page: currentPage.value, searchText, incentiveProfile: null })
+      ))
+    }
     searchListItems.value = normalizeLocationList(items)
     searchTotal.value = total
   } catch (e) {
@@ -294,6 +301,11 @@ async function loadGuideLocations(incentiveProfile = null) {
     if (incentiveProfile?.ready && total === 0) {
       ;({ items, total } = await fetchExplorerLocations(
         buildLocationQuery({ page: guidePage.value, searchText: '', incentiveProfile, includeProfileEmployee: false })
+      ))
+    }
+    if (incentiveProfile?.ready && total === 0) {
+      ;({ items, total } = await fetchExplorerLocations(
+        buildLocationQuery({ page: guidePage.value, searchText: '', incentiveProfile: null })
       ))
     }
     guideListItems.value = normalizeLocationList(items)

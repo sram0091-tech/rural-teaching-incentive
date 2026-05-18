@@ -91,7 +91,20 @@ export async function fetchIncentiveBreakdown(schoolId) {
   return r.json()
 }
 
+function validateIncentivePayload(payload, label) {
+  const { school_id, years_experience } = payload
+
+  if (!school_id || school_id === 'undefined' || school_id === 'null') {
+    throw new Error(`[${label}] missing school_id`)
+  }
+  const yrs = Number(years_experience)
+  if (!Number.isFinite(yrs) || yrs < 0 || yrs > 40) {
+    throw new Error(`[${label}] invalid years_experience: ${years_experience}`)
+  }
+}
+
 export async function checkEligibility(payload) {
+  validateIncentivePayload(payload, 'checkEligibility')
   const r = await fetch(`${API_BASE}/api/eligibility/check`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -102,6 +115,7 @@ export async function checkEligibility(payload) {
 }
 
 export async function fetchIncentiveEstimate(payload) {
+  validateIncentivePayload(payload, 'fetchIncentiveEstimate')
   const r = await fetch(`${API_BASE}/api/incentives/estimate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
