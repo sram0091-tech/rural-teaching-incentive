@@ -64,7 +64,7 @@
         </div>
         <div class="cmp-lifestyle-row">
           <p>Want to compare lifestyle metrics too?</p>
-          <button class="cmp-lifestyle-btn" @click="$emit('navigate', 'insights')">View Know the Place →</button>
+          <button class="cmp-lifestyle-btn" @click="$emit('navigate', 'insights')">View Neighbourhood →</button>
         </div>
       </div>
     </div>

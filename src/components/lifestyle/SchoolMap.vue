@@ -195,9 +195,6 @@ function buildPopup(el, cat, lat, lng) {
   const website = t.website || t['contact:website'] || ''
   const hours = t.opening_hours || ''
 
-  const osmUrl = `https://www.openstreetmap.org/${el.type}/${el.id}`
-  const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
-
   const f = (icon, text) => text
     ? `<div style="display:flex;gap:6px;align-items:flex-start;margin-top:5px">
         <span style="flex-shrink:0;color:#6b7280;margin-top:1px">${icon}</span>
@@ -213,16 +210,6 @@ function buildPopup(el, cat, lat, lng) {
       ${f('📞', phone ? `<a href="tel:${phone}" style="color:#1F6FEB;text-decoration:none">${phone}</a>` : '')}
       ${f('🕐', hours)}
       ${website ? f('🌐', `<a href="${website}" target="_blank" rel="noopener" style="color:#1F6FEB;text-decoration:none;word-break:break-all">${website.replace(/^https?:\/\//, '')}</a>`) : ''}
-      <div style="display:flex;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid #e5e7eb">
-        <a href="${gmapsUrl}" target="_blank" rel="noopener"
-           style="flex:1;text-align:center;padding:5px 0;background:#1F6FEB;color:#fff;border-radius:6px;font-size:0.72rem;font-weight:700;text-decoration:none">
-          Directions
-        </a>
-        <a href="${osmUrl}" target="_blank" rel="noopener"
-           style="flex:1;text-align:center;padding:5px 0;background:#f3f4f6;color:#374151;border-radius:6px;font-size:0.72rem;font-weight:600;text-decoration:none">
-          OpenStreetMap
-        </a>
-      </div>
     </div>`
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div class="page active">
     <div class="page-topbar">
-      <div class="page-title">Know the Place</div>
+      <div class="page-title">Neighbourhood</div>
       <div class="page-sub">Real lifestyle data for every school — housing costs, healthcare, education, and nature.</div>
     </div>
 
@@ -291,7 +291,12 @@
               </tr>
               <tr>
                 <td>Median rent</td>
-                <td v-for="(s, i) in cmpSchools" :key="s.id" :class="bestIdx(cmpSchools.map(x => n(metricVal(x, 'median_rent_weekly'))), false) === i ? 'sbs-best' : 'sbs-lo'">${{ n(metricVal(s, 'median_rent_weekly')) }}/wk</td>
+                <td v-for="(s, i) in cmpSchools" :key="s.id" :class="bestIdx(cmpSchools.map(x => n(metricVal(x, 'median_rent_weekly'))), false) === i ? 'sbs-best' : 'sbs-lo'">
+                  ${{ n(metricVal(s, 'median_rent_weekly')) }}/wk
+                  <span v-if="schoolRentTrend(s)" class="rent-trend" :class="schoolRentTrend(s).cls" style="margin-left:6px">
+                    {{ schoolRentTrend(s).arrow }} {{ schoolRentTrend(s).pct }}% vs {{ schoolRentTrend(s).label }}
+                  </span>
+                </td>
               </tr>
               <tr class="sbs-sec"><td :colspan="cmpSchools.length + 1">🏥 Healthcare & Safety</td></tr>
               <tr>
@@ -315,9 +320,8 @@
                 <td>Nature reserves</td>
                 <td v-for="(s, i) in cmpSchools" :key="s.id" :class="bestIdx(cmpSchools.map(x => n(metricVal(x, 'nature_reserves_count'))), true) === i ? 'sbs-best' : 'sbs-lo'">{{ n(metricVal(s, 'nature_reserves_count')) }} reserves</td>
               </tr>
-              <tr class="sbs-sec"><td :colspan="cmpSchools.length + 1">Job Site</td></tr>
               <tr>
-                <td>Link to job site</td>
+                <td></td>
                 <td v-for="s in cmpSchools" :key="s.id">
                   <a :href="applyUrl(s)" target="_blank" rel="noopener noreferrer" class="ls-apply-btn ls-apply-btn--sm">
                     Link to job site →
@@ -558,6 +562,17 @@ const rentDiff = computed(() => {
   const label = t.label.replace(wrongState, correctState)
   return { ...t, label, cls: t.arrow === '↓' ? 'rent-trend--good' : 'rent-trend--warn' }
 })
+
+function schoolRentTrend(school) {
+  const rent = n(metricVal(school, 'median_rent_weekly'))
+  if (!rent) return null
+  // ABS 2023 median weekly rent: QLD ~$450, NSW ~$500
+  const median = school.state_id === '1' ? 450 : 500
+  const pct = Math.round(Math.abs((rent - median) / median * 100))
+  const arrow = rent <= median ? '↓' : '↑'
+  const label = school.state_id === '1' ? 'QLD median' : 'NSW median'
+  return { arrow, pct, label, cls: arrow === '↓' ? 'rent-trend--good' : 'rent-trend--warn' }
+}
 
 function boldify(text) {
   return text
@@ -816,16 +831,16 @@ function applyUrl(school) {
 }
 .grade-tip {
   position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  left: calc(100% + 10px);
+  transform: translateY(-50%);
   background: #fff;
   border: 1px solid var(--b);
   border-radius: 10px;
   padding: 8px 12px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.12);
   min-width: 170px;
-  z-index: 200;
+  z-index: 999;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease;
@@ -836,11 +851,11 @@ function applyUrl(school) {
 .grade-tip::after {
   content: '';
   position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
   border: 5px solid transparent;
-  border-top-color: var(--b);
+  border-right-color: var(--b);
 }
 .grade-tip-wrap:hover .grade-tip { opacity: 1; }
 .grade-tip-row {
@@ -965,17 +980,29 @@ function applyUrl(school) {
 .ls-apply-btn {
   display: inline-flex;
   align-items: center;
-  padding: 9px 18px;
-  border-radius: 8px;
-  background: var(--blue);
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: 99px;
+  background: linear-gradient(135deg, #1F6FEB 0%, #1558c0 100%);
   color: #fff;
-  font-size: 0.84rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 800;
   text-decoration: none;
-  transition: background 0.15s;
   white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(31,111,235,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+  letter-spacing: 0.01em;
 }
-.ls-apply-btn:hover { background: var(--blue-d); }
+.ls-apply-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(31,111,235,0.45);
+}
+.sbs-apply-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
 .ls-apply-btn--sm {
   padding: 6px 14px;
   font-size: 0.78rem;
