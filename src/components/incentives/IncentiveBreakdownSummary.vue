@@ -4,6 +4,7 @@
       <h3>{{ profile?.ready ? 'Personalised eligible incentives' : 'Included incentives' }}</h3>
       <span v-if="!loading && cards.length" class="summary-count">{{ cards.length }}</span>
     </div>
+    <p v-if="employmentBasisNote" class="summary-note">{{ employmentBasisNote }}</p>
     <div v-if="loading" class="summary-skeleton">
       <div class="skel" v-for="i in 3" :key="i"></div>
     </div>
@@ -12,7 +13,7 @@
         <div class="card-top">
           <div class="card-label-wrap">
             <h4>{{ card.category }}</h4>
-            <div class="card-meta">{{ card.frequency }}</div>
+            <div v-if="card.employeeTypes" class="card-emp-types">Applies to: {{ card.employeeTypes }}</div>
           </div>
           <div class="amount-pill" :class="{ variable: card.isVariable }">
             <span v-if="card.isVariable">Verify amount</span>
@@ -38,29 +39,59 @@ const loading = ref(false)
 const breakdown = ref(null)
 const estimate = ref(null)
 
-const emptyMessage = computed(() => {
-  if (props.profile?.employmentType === 'public_service_officer') {
-    return 'No recorded incentive breakdown is available for Public Service Officer eligibility at this school.'
-  }
-  return 'No incentive breakdown available for this school'
+const emptyMessage = computed(() => 'No incentive breakdown available for this school')
+const employmentBasisNote = computed(() => {
+  if (!props.profile?.ready) return ''
+  return props.school?.state_id === '1'
+    ? 'Only applicable to Public Service Officers and Temporary employees.'
+    : 'Only applicable to Permanent teachers.'
 })
 
 const groups = computed(() => {
   const estimateRows = rowsFromEstimate(estimate.value)
   if (props.profile?.ready && estimateRows.length) {
-    return groupRows(estimateRows)
+    const grouped = groupRows(estimateRows)
+    if (props.school?.state_id === '1') {
+      return grouped.map((g) => {
+        if ((g.category || '').toLowerCase().includes('locality allowance')) {
+          return { ...g, rows: filterQldLocalityRows(g.rows) }
+        }
+        return g
+      }).filter((g) => g.rows.length)
+    }
+    return grouped
   }
 
   const rawGroups = breakdown.value?.groups || breakdown.value?.categories
   if (Array.isArray(rawGroups) && rawGroups.length) {
-    return rawGroups.map((g) => ({
+    let mapped = rawGroups.map((g) => ({
       category: g.category || g.name || g.allowance_type || 'Allowance',
       rows: g.rows || g.incentives || g.variants || [],
     })).filter((g) => g.rows.length)
+    if (props.profile?.ready && props.school?.state_id === '1') {
+      mapped = mapped.map((g) => {
+        if ((g.category || '').toLowerCase().includes('locality allowance')) {
+          return { ...g, rows: filterQldLocalityRows(g.rows) }
+        }
+        return g
+      }).filter((g) => g.rows.length)
+    }
+    return mapped
   }
 
   const rows = breakdown.value?.rows || breakdown.value?.incentives || breakdown.value?.variants
-  if (Array.isArray(rows) && rows.length) return groupRows(rows)
+  if (Array.isArray(rows) && rows.length) {
+    const grouped = groupRows(rows)
+    if (props.profile?.ready && props.school?.state_id === '1') {
+      return grouped.map((g) => {
+        if ((g.category || '').toLowerCase().includes('locality allowance')) {
+          return { ...g, rows: filterQldLocalityRows(g.rows) }
+        }
+        return g
+      }).filter((g) => g.rows.length)
+    }
+    return grouped
+  }
 
   const fallback = Number(props.school?.annual_incentive || 0)
   if (fallback <= 0) return []
@@ -87,6 +118,7 @@ const cards = computed(() => disambiguateCards(groups.value.flatMap((group) =>
     amountValue: numericAmount(row),
     isVariable: isVariable(row),
     frequency: row.frequency || 'annual',
+    employeeTypes: employeeTypesLabel(row),
   }))
 )))
 
@@ -100,7 +132,7 @@ async function load() {
       props.profile?.ready
         ? fetchIncentiveEstimate({
             school_id: schoolId,
-            employment_type: props.profile.employmentType,
+            employment_type: props.profile.employmentType || defaultEmploymentType(props.school),
             years_experience: Number(props.profile.yearsExperience || 0),
             years_of_experience: Number(props.profile.yearsExperience || 0),
             experience_years: Number(props.profile.yearsExperience || 0),
@@ -133,7 +165,7 @@ function rowsFromEstimate(payload) {
   const rows = payload?.breakdown || payload?.rows || payload?.incentives || payload?.eligible_incentives || payload?.eligibleIncentives
   if (!Array.isArray(rows)) return []
   return rows.flatMap((row) => {
-    const nested = row?.rows || row?.incentives || row?.variants
+    const nested = row?.rows || row?.incentives
     if (Array.isArray(nested)) {
       return nested.map((nestedRow) => ({
         ...nestedRow,
@@ -196,6 +228,12 @@ function displayName(row, group) {
   )
 }
 
+function filterQldLocalityRows(rows) {
+  if (rows.length < 2) return rows
+  const sorted = [...rows].sort((a, b) => numericAmount(b) - numericAmount(a))
+  return props.profile?.hasDependants ? [sorted[0]] : [sorted[sorted.length - 1]]
+}
+
 function disambiguateCards(list) {
   const counts = list.reduce((acc, card) => {
     const key = card.category.trim().toLowerCase()
@@ -247,9 +285,6 @@ function duplicateQualifier(row, card = null) {
   if (props.school?.state_id === '1' && name.includes('locality allowance')) {
     const explicit = String(value || '').trim()
     if (explicit && !/^component\s*\d+$/i.test(explicit)) return explicit
-    const amount = numericAmount(row)
-    if (amount >= 8000) return 'dependant/full-rate allowance'
-    if (amount > 0) return 'base/no-dependant allowance'
   }
   if (value && String(value).trim()) return String(value).trim()
   return ''
@@ -294,26 +329,43 @@ function yearsExperienceBand(years) {
   return '5+'
 }
 
-function employeeTypes(row) {
-  const value = row.employee_types || row.employeeTypes || row.employee_type || row.employeeType
-  if (Array.isArray(value)) return value.join(', ')
-  return value || 'Permanent, Temporary'
+const EMP_LABELS = {
+  permanent: 'Permanent',
+  permanent_employee: 'Permanent',
+  temporary: 'Temporary',
+  temporary_employee: 'Temporary',
+  public_service_officer: 'Public Service Officer',
+  pso: 'Public Service Officer',
 }
 
-function employeeMatchesProfile(row) {
-  const selected = props.profile?.employmentType
-  if (!selected || selected === 'both') return true
-  const available = employeeTypes(row).toLowerCase()
-  if (selected === 'permanent') return available.includes('permanent')
-  if (selected === 'temporary') return available.includes('temporary')
-  if (selected === 'public_service_officer') return available.includes('public service') || available.includes('pso')
+function formatEmpType(v) {
+  return EMP_LABELS[String(v).toLowerCase().trim()] || v
+}
+
+function defaultEmploymentType(school) {
+  const types = Array.isArray(school?.employee_types)
+    ? school.employee_types.map((v) => String(v).toLowerCase())
+    : []
+  if (types.some((v) => v.includes('permanent'))) return 'permanent'
+  if (types.some((v) => v.includes('temporary') || v === 'temp')) return 'temporary'
+  if (types.some((v) => v.includes('public_service') || v.includes('public service') || v === 'pso')) return 'public_service_officer'
+  return 'temporary'
+}
+
+function employeeTypesLabel(row) {
+  const value = row.employee_types || row.employeeTypes || row.employee_type || row.employeeType
+  if (Array.isArray(value)) return value.map(formatEmpType).join(', ')
+  if (typeof value === 'string' && value) return formatEmpType(value)
+  return ''
+}
+
+function employeeMatchesProfile() {
   return true
 }
 
 onMounted(load)
 watch(() => [
   props.school?.school_id || props.school?.id,
-  props.profile?.employmentType,
   props.profile?.yearsExperience,
   props.profile?.hasDependants,
   props.profile?.ready,
@@ -325,6 +377,7 @@ watch(() => [
 .summary-head { display:flex; align-items:center; gap:8px; justify-content:flex-start; margin-bottom:10px; text-align:left; }
 .summary h3 { font-size:0.68rem; color:var(--ink3); line-height:1.2; letter-spacing:0.09em; text-transform:uppercase; font-weight:800; }
 .summary-count { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; border-radius:99px; background:var(--green-s); color:var(--green-d); font-size:0.65rem; font-weight:900; padding:0 5px; }
+.summary-note { margin:-4px 0 10px; font-size:0.68rem; color:var(--ink3); font-weight:700; line-height:1.35; }
 .cards { display:flex; flex-direction:column; gap:6px; width:100%; }
 .allowance-card { width:100%; background:#fbfaf8; border:1px solid var(--b); border-radius:var(--r2); padding:10px 14px; transition:border-color 0.14s, box-shadow 0.14s; }
 .allowance-card:hover { border-color:rgba(30,158,86,0.28); box-shadow:0 4px 12px rgba(26,23,20,0.04); }
@@ -333,6 +386,7 @@ watch(() => [
 .card-label-wrap { min-width:0; flex:1; }
 .card-top h4 { font-size:0.82rem; line-height:1.3; color:var(--ink); margin:0 0 2px; }
 .card-meta { font-size:0.64rem; color:var(--ink3); font-weight:700; text-transform:capitalize; }
+.card-emp-types { font-size:0.62rem; color:var(--ink3); font-weight:600; margin-top:2px; }
 .amount-pill { flex-shrink:0; border-radius:99px; padding:4px 10px; background:var(--green-s); color:var(--green-d); font-size:0.74rem; font-weight:900; white-space:nowrap; }
 .amount-pill.variable { background:#fef9ec; color:#92400e; font-size:0.66rem; font-weight:700; border:1px solid #fde68a; }
 .empty { font-size:0.72rem; color:var(--ink3); padding:8px 0; }

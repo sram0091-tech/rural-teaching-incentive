@@ -22,6 +22,9 @@
           <strong>{{ estimatePreferenceText }}</strong>
         </div>
       </template>
+      <template v-else-if="submitted && estimate?._zero">
+        <p class="no-inc-msg">{{ estimate._reason }}</p>
+      </template>
       <template v-else-if="submitted && !hasIncentive">
         <p class="no-inc-msg">No incentive data linked to this school.</p>
       </template>
@@ -29,7 +32,7 @@
         <div class="est-ph-icon" aria-hidden="true">$</div>
         <div>
           <p class="est-ph-title">Personalise this package</p>
-          <p class="est-ph-body">{{ showCalculator ? 'Enter your role, experience, and dependant status to see the incentive amount that applies to you.' : 'Use the Explorer incentive preferences above to see the amount that applies to you.' }}</p>
+          <p class="est-ph-body">{{ showCalculator ? 'Enter your experience and dependant status to see the incentive amount that applies to you.' : 'Use the Explorer incentive preferences above to see the amount that applies to you.' }}</p>
         </div>
       </div>
     </div>
@@ -119,7 +122,7 @@ const estimate = ref(null)
 const calculatorOpen = ref(true)
 const submitted = ref(Boolean(props.profile?.ready))
 const localProfile = ref({
-  employmentType: props.profile?.employmentType || '',
+  employmentType: props.profile?.employmentType || defaultEmploymentType(props.school),
   yearsExperience: props.profile?.yearsExperience ?? '',
   hasDependants: Boolean(props.profile?.hasDependants),
   ready: Boolean(props.profile?.ready),
@@ -127,12 +130,18 @@ const localProfile = ref({
 
 const isQld = computed(() => props.school?.state_id === '1')
 const genericTotal = computed(() => Number(props.school?.annual_incentive || 0))
-const personalisedBreakdownTotal = computed(() => eligibleRowsTotal(rowsFromEstimate(estimate.value)))
+const activeProfile = computed(() => localProfile.value?.ready ? localProfile.value : null)
+const personalisedBreakdownTotal = computed(() => {
+  let rows = rowsFromEstimate(estimate.value)
+  if (isQld.value && activeProfile.value?.ready) {
+    rows = filterQldLocalityRows(rows, activeProfile.value.hasDependants)
+  }
+  return eligibleRowsTotal(rows)
+})
 const personalisedTotal = computed(() => {
   if (personalisedBreakdownTotal.value !== null) return personalisedBreakdownTotal.value
   return estimateTotal(estimate.value)
 })
-const activeProfile = computed(() => localProfile.value?.ready ? localProfile.value : null)
 const displayTotal = computed(() =>
   activeProfile.value?.ready && personalisedTotal.value !== null
     ? personalisedTotal.value
@@ -144,9 +153,7 @@ const policyOwner = computed(() => isQld.value ? 'Teach Queensland' : 'Teach.NSW
 const profileSummary = computed(() => {
   const p = activeProfile.value
   if (!p?.ready) return ''
-  const roleMap = { permanent: 'Permanent', temporary: 'Temporary', public_service_officer: 'PSO' }
   const parts = []
-  if (p.employmentType) parts.push(roleMap[p.employmentType] || p.employmentType)
   const yrs = Number(p.yearsExperience)
   if (!isNaN(yrs)) parts.push(`${yrs} yr${yrs !== 1 ? 's' : ''}`)
   if (p.hasDependants && isQld.value) parts.push('+ dependant')
@@ -156,14 +163,8 @@ const profileSummary = computed(() => {
 const estimatePreferenceText = computed(() => {
   const p = activeProfile.value
   if (!p?.ready) return ''
-  const roleMap = {
-    permanent: 'Permanent',
-    temporary: 'Temporary',
-    public_service_officer: 'Public Service Officer',
-  }
   const yrs = Number(p.yearsExperience)
   const parts = [
-    roleMap[p.employmentType] || p.employmentType || 'Selected role',
     `${Number.isNaN(yrs) ? 0 : yrs} year${yrs === 1 ? '' : 's'} experience`,
   ]
   if (isQld.value) {
@@ -175,7 +176,7 @@ const estimatePreferenceText = computed(() => {
 const calculatorDescription = computed(() => (
   activeProfile.value?.ready
     ? `Currently using: ${estimatePreferenceText.value}.`
-    : 'Enter your role and experience to personalise this school.'
+    : 'Enter your experience to personalise this school.'
 ))
 
 function money(value) {
@@ -189,6 +190,7 @@ function estimateTotal(payload) {
     payload.personalized_total ??
     payload.personalised_annual_total ??
     payload.personalized_annual_total ??
+    payload.total_estimate ??
     payload.annual_total ??
     payload.annualTotal ??
     payload.total
@@ -228,18 +230,35 @@ function eligibleRowsTotal(rows) {
   return total > 0 ? total : null
 }
 
+function filterQldLocalityRows(rows, hasDependants) {
+  const locality = rows.filter((r) => {
+    const text = [r.category, r.allowance_type, r.allowanceType, r.name, r.incentive_name, r.incentiveName]
+      .filter(Boolean).join(' ').toLowerCase()
+    return text.includes('locality allowance')
+  })
+  if (locality.length < 2) return rows
+  const sorted = [...locality].sort((a, b) => {
+    const an = numericRowAmount(a) ?? 0
+    const bn = numericRowAmount(b) ?? 0
+    return bn - an
+  })
+  const keep = hasDependants ? sorted[0] : sorted[sorted.length - 1]
+  return rows.filter((r) => !locality.includes(r) || r === keep)
+}
+
 async function loadEstimate() {
   const schoolId = props.school?.school_id || props.school?.id
   if (!schoolId || !activeProfile.value?.ready) { estimate.value = null; return }
+
   try {
     estimate.value = await fetchIncentiveEstimate({
       school_id: schoolId,
-      employment_type: activeProfile.value.employmentType,
+      employment_type: activeProfile.value.employmentType || defaultEmploymentType(props.school),
       years_experience: Number(activeProfile.value.yearsExperience || 0),
       years_of_experience: Number(activeProfile.value.yearsExperience || 0),
       experience_years: Number(activeProfile.value.yearsExperience || 0),
       years_experience_band: yearsExperienceBand(Number(activeProfile.value.yearsExperience || 0)),
-      has_dependants: Boolean(activeProfile.value.hasDependants),
+      has_dependants: isQld.value ? Boolean(activeProfile.value.hasDependants) : false,
     })
   } catch (e) {
     estimate.value = null
@@ -252,8 +271,21 @@ function yearsExperienceBand(years) {
   return '5+'
 }
 
+function defaultEmploymentType(school) {
+  const types = Array.isArray(school?.employee_types)
+    ? school.employee_types.map((v) => String(v).toLowerCase())
+    : []
+  if (types.some((v) => v.includes('permanent'))) return 'permanent'
+  if (types.some((v) => v.includes('temporary') || v === 'temp')) return 'temporary'
+  if (types.some((v) => v.includes('public_service') || v.includes('public service') || v === 'pso')) return 'public_service_officer'
+  return 'temporary'
+}
+
 function applyLocalProfile(profile) {
-  localProfile.value = { ...profile }
+  localProfile.value = {
+    ...profile,
+    employmentType: profile.employmentType || localProfile.value.employmentType || defaultEmploymentType(props.school),
+  }
   submitted.value = true
   calculatorOpen.value = false
 }
@@ -271,7 +303,7 @@ watch(() => props.school?.school_id || props.school?.id, () => {
   submitted.value = Boolean(props.profile?.ready)
   calculatorOpen.value = true
   localProfile.value = {
-    employmentType: props.profile?.employmentType || '',
+    employmentType: props.profile?.employmentType || defaultEmploymentType(props.school),
     yearsExperience: props.profile?.yearsExperience ?? '',
     hasDependants: Boolean(props.profile?.hasDependants),
     ready: Boolean(props.profile?.ready),
@@ -281,7 +313,7 @@ watch(() => props.school?.school_id || props.school?.id, () => {
 
 watch(() => props.profile, (profile) => {
   localProfile.value = {
-    employmentType: profile?.employmentType || '',
+    employmentType: profile?.employmentType || localProfile.value.employmentType || defaultEmploymentType(props.school),
     yearsExperience: profile?.yearsExperience ?? '',
     hasDependants: Boolean(profile?.hasDependants),
     ready: Boolean(profile?.ready),
@@ -292,6 +324,7 @@ watch(() => props.profile, (profile) => {
 watch(() => ({
   schoolId: props.school?.school_id || props.school?.id,
   ready: activeProfile.value?.ready,
+  employmentType: activeProfile.value?.employmentType,
   total: personalisedTotal.value,
   summary: profileSummary.value,
   preferenceText: estimatePreferenceText.value,

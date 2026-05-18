@@ -67,7 +67,6 @@ async function load() {
     const [estimatePayload, breakdownPayload] = await Promise.all([
       fetchIncentiveEstimate({
         school_id: schoolId,
-        employment_type: props.form.employmentType,
         years_experience: Number(props.form.yearsExperience || 0),
         years_of_experience: Number(props.form.yearsExperience || 0),
         experience_years: Number(props.form.yearsExperience || 0),
@@ -130,7 +129,6 @@ function isEligibleEstimateRow(row) {
 function shouldUseBreakdownRows(estimateRows, breakdownRows) {
   if (!breakdownRows.length) return false
   if (!estimateRows.length) return true
-  if (breakdownRows.length > estimateRows.length) return true
   return nonVariableTotal(estimateRows) < total.value && nonVariableTotal(breakdownRows) >= total.value
 }
 
@@ -147,7 +145,7 @@ function money(value) {
 }
 
 onMounted(load)
-watch(() => [props.school?.school_id || props.school?.id, props.form.employmentType, props.form.yearsExperience, props.form.hasDependants], load)
+watch(() => [props.school?.school_id || props.school?.id, props.form.yearsExperience, props.form.hasDependants], load)
 watch(eligibleCount, (count) => emit('eligible-count', count), { immediate: true })
 </script>
 
