@@ -53,6 +53,80 @@
 
     </section>
 
+    <!-- REGIONAL BENEFITS -->
+    <section class="regional-section">
+      <div class="how-inner">
+        <div class="section-header centered">
+          <div class="section-eyebrow">What regional can offer</div>
+          <h2>Look beyond the incentive figure.</h2>
+        </div>
+        <div class="proof-card-grid">
+          <button class="proof-card" type="button" @click="openModal('financial')">
+            <div class="proof-card-icon proof-icon-green">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="proof-card-cat cat-green">Financial</div>
+            <div class="proof-card-title">A real pay difference</div>
+            <div class="proof-card-link">See the breakdown →</div>
+          </button>
+          <button class="proof-card" type="button" @click="openModal('cost')">
+            <div class="proof-card-icon proof-icon-blue">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="proof-card-cat cat-blue">Cost of Living</div>
+            <div class="proof-card-title">Your salary stretches further</div>
+            <div class="proof-card-link">What the data shows →</div>
+          </button>
+          <button class="proof-card" type="button" @click="openModal('career')">
+            <div class="proof-card-icon proof-icon-amber">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div class="proof-card-cat cat-amber">Career Pace</div>
+            <div class="proof-card-title">Smaller schools, broader role</div>
+            <div class="proof-card-link">How careers progress →</div>
+          </button>
+          <button class="proof-card" type="button" @click="openModal('community')">
+            <div class="proof-card-icon proof-icon-purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="proof-card-cat cat-purple">Community</div>
+            <div class="proof-card-title">You are not anonymous</div>
+            <div class="proof-card-link">What this means in practice →</div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEACHER STORY -->
+    <div class="story-plain-wrap fade-section">
+      <div class="story-plain-card">
+      <div class="story-plain-split">
+        <div class="story-plain-player">
+          <div class="story-video-card">
+            <iframe
+              ref="storyFrameEl"
+              class="story-plain-frame"
+              allowfullscreen
+              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+              scrolling="no"
+              frameborder="0"
+            ></iframe>
+          </div>
+        </div>
+        <div class="story-plain-text">
+          <div class="section-eyebrow story-title-blue story-eyebrow-centered">Why Teachers Stay</div>
+          <p class="story-plain-context">Many teachers who move regional report stronger career growth, community connection, and better work-life balance.</p>
+          <h2 class="story-plain-h">Meet Katie.</h2>
+          <p class="story-plain-desc">Katie moved from the city to teach at a remote school in <strong>Cooktown, Cape York Peninsula, Far North Queensland</strong>. It changed everything.</p>
+          <ul class="story-plain-points">
+            <li>Landed a <strong>Head of Department role in her 20s</strong>, career opportunities she never would have seen staying in the city</li>
+            <li>Six years in, she's found a community and lifestyle that makes <strong>going back feel unimaginable</strong></li>
+          </ul>
+        </div>
+      </div>
+      </div>
+    </div>
+
     <!-- STATE SPLIT -->
     <section class="state-split-section">
       <div class="state-split-header">
@@ -104,50 +178,6 @@
       </div>
     </section>
 
-    <!-- REGIONAL BENEFITS -->
-    <section class="regional-section">
-      <div class="how-inner">
-        <div class="section-header centered">
-          <div class="section-eyebrow">What regional can offer</div>
-          <h2>Look beyond the incentive figure.</h2>
-        </div>
-        <div class="proof-card-grid">
-          <button class="proof-card" type="button" @click="openModal('financial')">
-            <div class="proof-card-icon proof-icon-green">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-            <div class="proof-card-cat cat-green">Financial</div>
-            <div class="proof-card-title">A real pay difference</div>
-            <div class="proof-card-link">See the breakdown →</div>
-          </button>
-          <button class="proof-card" type="button" @click="openModal('cost')">
-            <div class="proof-card-icon proof-icon-blue">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            <div class="proof-card-cat cat-blue">Cost of Living</div>
-            <div class="proof-card-title">Your salary stretches further</div>
-            <div class="proof-card-link">What the data shows →</div>
-          </button>
-          <button class="proof-card" type="button" @click="openModal('career')">
-            <div class="proof-card-icon proof-icon-amber">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            </div>
-            <div class="proof-card-cat cat-amber">Career Pace</div>
-            <div class="proof-card-title">Smaller schools, broader role</div>
-            <div class="proof-card-link">How careers progress →</div>
-          </button>
-          <button class="proof-card" type="button" @click="openModal('community')">
-            <div class="proof-card-icon proof-icon-purple">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div class="proof-card-cat cat-purple">Community</div>
-            <div class="proof-card-title">You are not anonymous</div>
-            <div class="proof-card-link">What this means in practice →</div>
-          </button>
-        </div>
-      </div>
-    </section>
-
     <!-- HOW IT WORKS -->
     <section class="how-section">
       <div class="how-inner">
@@ -188,36 +218,6 @@
         </div>
       </div>
     </section>
-
-    <!-- TEACHER STORY -->
-    <div class="story-plain-wrap fade-section">
-      <div class="story-plain-card">
-      <div class="story-plain-split">
-        <div class="story-plain-player">
-          <div class="story-video-card">
-            <iframe
-              ref="storyFrameEl"
-              class="story-plain-frame"
-              allowfullscreen
-              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-              scrolling="no"
-              frameborder="0"
-            ></iframe>
-          </div>
-        </div>
-        <div class="story-plain-text">
-          <div class="section-eyebrow story-title-blue story-eyebrow-centered">Why Teachers Stay</div>
-          <p class="story-plain-context">Many teachers who move regional report stronger career growth, community connection, and better work-life balance.</p>
-          <h2 class="story-plain-h">Meet Katie.</h2>
-          <p class="story-plain-desc">Katie moved from the city to teach at a remote school in <strong>Cooktown, Cape York Peninsula, Far North Queensland</strong>. It changed everything.</p>
-          <ul class="story-plain-points">
-            <li>Landed a <strong>Head of Department role in her 20s</strong>, career opportunities she never would have seen staying in the city</li>
-            <li>Six years in, she's found a community and lifestyle that makes <strong>going back feel unimaginable</strong></li>
-          </ul>
-        </div>
-      </div>
-      </div>
-    </div>
 
     <!-- READY TO EXPLORE CTA -->
     <section class="final-cta">
@@ -1517,10 +1517,26 @@ onUnmounted(() => {
 
 /* MOBILE */
 @media (max-width: 900px) {
-  .cin-section { height: 100vh; min-height: 480px; }
+  .cin-section { height: auto; min-height: calc(100svh - 60px); padding: 72px 16px 0; }
+  .cin-content { padding: 0; }
   .cin-hero-h1 { font-size: 2.6rem; }
   .cin-eyebrow { font-size: 0.78rem; letter-spacing: 0.1em; padding: 7px 12px; }
   .cin-hero-sub { font-size: 0.95rem; }
+  .hero-trust-strip {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin: 44px -16px 0;
+    padding: 18px 16px;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .hero-trust-strip .trust-item {
+    flex: 1 1 42%;
+    min-width: 132px;
+  }
+  .hero-trust-div { display: none; }
   .cin-stats-bar { padding: 16px 20px; flex-wrap: wrap; gap: 12px; }
   .hstat { min-width: 90px; }
   .hstat-sep { display: none; }
@@ -1584,8 +1600,12 @@ onUnmounted(() => {
 @media (max-width: 540px) {
   .proof-card-grid { grid-template-columns: 1fr; }
   .cin-hero-h1 { font-size: 2.1rem; }
+  .cin-hero-sub { font-size:0.9rem; }
   .btn-hero-p, .btn-hero-s { width: 100%; display: block; text-align: center; }
   .cin-hero-acts { flex-direction: column; }
+  .hero-trust-strip .trust-item { flex-basis: 100%; }
+  .state-stats { flex-direction: column; align-items:flex-start; gap:12px; }
+  .state-stat-div { width:100%; height:1px; }
   .story-plain-wrap { padding: 28px 16px 36px; }
   .story-plain-split { flex-direction: column; gap: 20px; }
   .story-plain-h { font-size: 1.8rem; }
