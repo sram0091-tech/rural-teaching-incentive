@@ -27,7 +27,7 @@
           <div class="foot-links">
             <a @click="$emit('navigate', 'home')">Home</a>
             <a @click="$emit('navigate', 'explorer')">Explorer</a>
-            <a @click="$emit('navigate', 'insights')">Know the Place</a>
+            <a @click="$emit('navigate', 'insights')">Neighbourhood</a>
             <a @click="$emit('navigate', 'about')">About</a>
           </div>
         </div>

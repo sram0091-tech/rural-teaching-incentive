@@ -31,7 +31,7 @@ const mobileOpen = ref(false)
 const links = [
   { id: 'home', label: 'Home' },
   { id: 'explorer', label: 'Explorer' },
-  { id: 'insights', label: 'Know the Place' },
+  { id: 'insights', label: 'Neighbourhood' },
   { id: 'about', label: 'About' },
 ]
 function navigate(id) { mobileOpen.value = false; emit('navigate', id) }

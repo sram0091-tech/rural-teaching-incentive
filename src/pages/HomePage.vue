@@ -17,7 +17,7 @@
           <p class="cin-hero-sub">Find schools, compare incentives, and understand the lifestyle before you decide.</p>
           <div class="cin-hero-acts">
             <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find your school</button>
-            <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Know the Place</button>
+            <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Neighbourhood</button>
           </div>
         </div>
 
@@ -171,7 +171,7 @@
             <div class="how-card-body">
               <div class="how-card-num">02</div>
               <div class="how-card-title">Explore the lifestyle</div>
-              <p class="how-card-text">Every school links to its Know the Place profile: healthcare, rent, distance to city, and nature access.</p>
+              <p class="how-card-text">Every school links to its Neighbourhood profile: healthcare, rent, distance to city, and nature access.</p>
               <span class="how-card-learn">See what's measured ↗</span>
             </div>
           </div>
@@ -227,7 +227,7 @@
         <p>Browse 645 schools across QLD and NSW. Filter by pay, remoteness, and lifestyle then decide.</p>
         <div class="final-cta-btns">
           <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find your school</button>
-          <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Know the Place</button>
+          <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Neighbourhood</button>
         </div>
       </div>
     </section>
@@ -296,7 +296,7 @@ const modals = {
   },
   rural: {
     image: 'https://images.pexels.com/photos/1687093/pexels-photo-1687093.jpeg?auto=compress&cs=tinysrgb&w=900',
-    tag: 'Step 02 · Know the Place',
+    tag: 'Step 02 · Neighbourhood',
     title: 'What the lifestyle metrics measure',
     items: [
       'Healthcare nearby. Clinics and hospitals within your area.',
@@ -305,7 +305,7 @@ const modals = {
       'Nature access: parks and reserves on your doorstep',
     ],
     source: 'ABS Census 2021 · ACARA My School 2025',
-    cta: { label: 'View Know the Place', nav: 'insights' },
+    cta: { label: 'View Neighbourhood', nav: 'insights' },
   },
   compare: {
     image: 'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=900',
