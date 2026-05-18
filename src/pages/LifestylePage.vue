@@ -7,7 +7,7 @@
 
     <!-- Search bar -->
     <div class="ins-search-bar">
-      <div style="position:relative;flex:1;max-width:360px">
+      <div class="ins-search-wrap">
         <div class="ins-sw">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink3);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input
@@ -251,6 +251,40 @@
                 <span class="ai-row-tag ai-row-tag--spend">Spending</span>
                 <span v-html="boldify(aiSummary.spending)"></span>
               </div>
+              <div v-if="showAiSpendingInput" class="spending-planner" style="animation-delay: 0.6s">
+                <div class="spending-planner-head">
+                  <div>
+                    <span class="spending-planner-kicker">Your current weekly spend</span>
+                    <strong>Compare your budget with {{ insSchool.suburb }}</strong>
+                  </div>
+                  <div class="spending-local-total">
+                    ${{ localWeeklyEstimate.toLocaleString() }}<span>/wk estimate</span>
+                  </div>
+                </div>
+                <div class="spending-input-grid">
+                  <label>
+                    <span>Rent</span>
+                    <input v-model.number="spendingForm.rent" type="number" min="0" inputmode="numeric" placeholder="Current weekly rent" />
+                  </label>
+                  <label>
+                    <span>Groceries</span>
+                    <input v-model.number="spendingForm.groceries" type="number" min="0" inputmode="numeric" placeholder="Weekly groceries" />
+                  </label>
+                  <label>
+                    <span>Transport</span>
+                    <input v-model.number="spendingForm.transport" type="number" min="0" inputmode="numeric" placeholder="Weekly transport" />
+                  </label>
+                  <label>
+                    <span>Utilities</span>
+                    <input v-model.number="spendingForm.utilities" type="number" min="0" inputmode="numeric" placeholder="Weekly utilities" />
+                  </label>
+                </div>
+                <div v-if="hasSpendingInput" class="spending-result" :class="{ saving: weeklySavings > 0, extra: weeklySavings < 0 }">
+                  <span>{{ spendingResultLabel }}</span>
+                  <strong>{{ spendingResultAmount }}</strong>
+                </div>
+                <p class="spending-note">Uses local median rent plus remoteness-adjusted groceries, transport, and utilities as an indicative comparison.</p>
+              </div>
               <div v-if="aiSummary.sports" class="ai-suburb-row" style="animation-delay: 0.65s">
                 <span class="ai-row-tag ai-row-tag--sport">Sport</span>
                 <span v-html="boldify(aiSummary.sports)"></span>
@@ -398,6 +432,44 @@ let insSearchTimer
 
 const aiSummary = ref(null)
 const aiLoading = ref(false)
+const showAiSpendingInput = import.meta.env.VITE_AI_SPENDING_INPUT !== 'false'
+const spendingForm = ref({
+  rent: null,
+  groceries: null,
+  transport: null,
+  utilities: null,
+})
+
+const hasSpendingInput = computed(() =>
+  ['rent', 'groceries', 'transport', 'utilities'].some((key) => Number(spendingForm.value[key]) > 0)
+)
+
+const currentWeeklySpend = computed(() =>
+  ['rent', 'groceries', 'transport', 'utilities'].reduce((sum, key) => sum + Number(spendingForm.value[key] || 0), 0)
+)
+
+const localWeeklyEstimate = computed(() => {
+  const rent = n(metricVal(insSchool.value, 'median_rent_weekly'))
+  const profile = remotenessSpendProfile(insSchool.value?.remoteness)
+  return Math.round(rent + profile.groceries + profile.transport + profile.utilities)
+})
+
+const weeklySavings = computed(() => Math.round(currentWeeklySpend.value - localWeeklyEstimate.value))
+const spendingResultLabel = computed(() => weeklySavings.value >= 0 ? 'Potential saving' : 'Potential extra cost')
+const spendingResultAmount = computed(() => {
+  const weekly = Math.abs(weeklySavings.value)
+  const annual = weekly * 52
+  return `$${weekly.toLocaleString()}/wk · $${annual.toLocaleString()}/yr`
+})
+
+function remotenessSpendProfile(remoteness = '') {
+  const text = String(remoteness).toLowerCase()
+  if (text.includes('very remote')) return { groceries: 145, transport: 95, utilities: 55 }
+  if (text.includes('remote')) return { groceries: 130, transport: 80, utilities: 52 }
+  if (text.includes('outer')) return { groceries: 120, transport: 65, utilities: 48 }
+  if (text.includes('inner')) return { groceries: 110, transport: 55, utilities: 45 }
+  return { groceries: 105, transport: 50, utilities: 45 }
+}
 
 function aiCacheGet(id) {
   try { const v = localStorage.getItem(`ai_summary_v2_${id}`); return v ? JSON.parse(v) : null } catch { return null }
@@ -686,6 +758,13 @@ function applyUrl(school) {
 }
 .ins-back-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-s); }
 
+.ins-search-wrap {
+  position: relative;
+  flex: 1 1 320px;
+  max-width: 360px;
+  min-width: 0;
+}
+
 .ins-empty {
   padding: 40px 0 60px;
   display: flex;
@@ -813,8 +892,93 @@ function applyUrl(school) {
 
 @media (max-width: 700px) {
   .ies-h { font-size: 1.75rem; }
-  .ins-school-hdr { margin: -12px 0 20px; padding: 16px 16px 20px; top: 116px; }
+  .ins-search-bar {
+    align-items: stretch;
+    top: 60px;
+  }
+  .ins-search-wrap {
+    flex-basis: 100%;
+    max-width: none;
+    width: 100%;
+  }
+  .ins-clear {
+    width: auto;
+    align-self: center;
+  }
+  .ins-back-btn {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+    min-height: 42px;
+  }
+  .ins-school-hdr {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin: -12px 0 20px;
+    padding: 16px;
+    top: 116px;
+    gap: 12px;
+  }
+  .ish-left,
+  .ish-incentive,
+  .ish-acts {
+    width: 100%;
+    min-width: 0;
+  }
+  .ish-suburb {
+    font-size: 1.2rem;
+    overflow-wrap: anywhere;
+  }
+  .ish-meta {
+    gap: 7px;
+  }
+  .ish-incentive {
+    justify-content: center;
+    flex-wrap: wrap;
+    border-radius: 12px;
+    text-align: center;
+    white-space: normal;
+  }
+  .ish-acts {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .ish-acts .btn,
+  .ls-apply-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .lr {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .lrv {
+    width: 100%;
+    overflow-wrap: anywhere;
+  }
   .ai-skel-cols { grid-template-columns: 1fr; }
+  .page-topbar { padding: 40px 16px 30px; }
+  .page-title { font-size: 1.7rem; }
+  .page-sub { font-size: 0.88rem; }
+  .editorial { padding: 16px; }
+  .editorial-title { flex-wrap: wrap; gap: 8px; }
+  .source-badge--ai { margin-left: 0; }
+  .ai-cols { grid-template-columns: 1fr; }
+  .ai-suburb-row { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .spending-planner-head,
+  .spending-result {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .spending-local-total { text-align: left; }
+  .spending-input-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 460px) {
+  .spending-input-grid { grid-template-columns: 1fr; }
 }
 
 .lc-scale {
@@ -1133,6 +1297,105 @@ function applyUrl(school) {
 .ai-row-tag--students { background: #dbeafe; color: #1d4ed8; }
 .ai-suburb-row :deep(em.ai-neu) { font-style: italic; font-weight: 600; color: var(--ink); }
 :deep(em.ai-neu) { font-style: italic; font-weight: 600; color: var(--ink); }
+.spending-planner {
+  opacity: 0;
+  animation: ai-slidein 0.4s ease forwards;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #fde68a;
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 72%);
+}
+.spending-planner-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.spending-planner-head strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.88rem;
+  line-height: 1.3;
+}
+.spending-planner-kicker {
+  display: block;
+  color: #92400e;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.spending-local-total {
+  flex-shrink: 0;
+  color: var(--green-d);
+  font-size: 1.05rem;
+  font-weight: 900;
+  text-align: right;
+}
+.spending-local-total span {
+  display: block;
+  color: var(--ink3);
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+.spending-input-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.spending-input-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.spending-input-grid span {
+  color: var(--ink2);
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+.spending-input-grid input {
+  width: 100%;
+  border: 1px solid var(--b);
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.78rem;
+  background: #fff;
+}
+.spending-input-grid input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(31,111,235,0.12);
+}
+.spending-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.spending-result.saving {
+  background: #dcfce7;
+  color: #166534;
+}
+.spending-result.extra {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.spending-result strong { font-size: 0.86rem; }
+.spending-note {
+  margin: 8px 0 0;
+  color: var(--ink3);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
 .ai-fun-fact {
   display: flex;
   align-items: flex-start;
