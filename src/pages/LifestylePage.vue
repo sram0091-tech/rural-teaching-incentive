@@ -41,21 +41,22 @@
 
     <!-- Tray pills -->
     <div v-if="cmpList.length" class="ins-tray-bar show">
-      <span class="itp-lbl">From your compare tray:</span>
+      <span class="itp-lbl">From your saved schools:</span>
       <span
-        v-for="id in cmpList" :key="id"
+        v-for="(id, idx) in cmpList" :key="id"
         class="itp-pill"
-        :class="{ active: !sbsMode && insSchool && insSchool.id === id }"
+        :class="{ active: !sbsMode && insSchool && insSchool.id === id, 'coach-pulse': !tourDismissed && idx === 0 }"
       >
         <span @click="selectIns(id)" style="cursor:pointer">{{ shortName(id) }}</span>
         <button class="itp-pill-x" @click.stop="toggleCmp(id)" title="Remove">✕</button>
       </span>
       <button v-if="cmpList.length >= 2"
         class="sbs-toggle-btn"
-        :class="{ active: sbsMode }"
+        :class="{ active: sbsMode, 'coach-pulse': !tourDismissed }"
         @click="toggleSbs"
       >⊞ {{ sbsMode ? 'Exit comparison' : 'Compare side by side' }}</button>
     </div>
+
 
     <!-- Body -->
     <div class="ins-body">
@@ -107,9 +108,9 @@
               <span class="ish-school-name">{{ insSchool.name }}</span>
             </div>
           </div>
-          <div v-if="insSchool.annual_incentive > 0" class="ish-incentive">
-            <span class="ish-inc-amount">+${{ Number(insSchool.annual_incentive).toLocaleString() }}/yr</span>
-            <span class="ish-inc-label">incentive on top of base salary</span>
+          <div v-if="insPersonalisedIncentive || insSchool.annual_incentive > 0" class="ish-incentive">
+            <span class="ish-inc-amount">+${{ Math.round(insPersonalisedIncentive?.total || insSchool.annual_incentive).toLocaleString() }}/yr</span>
+            <span class="ish-inc-label">{{ insPersonalisedIncentive ? 'personalised estimate · on top of base salary' : 'up to · incentive on top of base salary' }}</span>
           </div>
           <div class="ish-acts">
             <button class="btn btn-sm" :class="isCmp(insSchool.id) ? 'btn-g' : 'btn-gh'" @click="toggleCmp(insSchool.id)">
@@ -251,30 +252,20 @@
                 <span class="ai-row-tag ai-row-tag--spend">Spending</span>
                 <span v-html="boldify(aiSummary.spending)"></span>
               </div>
-              <div v-if="showAiSpendingInput" class="spending-planner" :class="{ open: spendingPlannerOpen }" style="animation-delay: 0.6s">
-                <button class="spending-planner-toggle" type="button" @click="spendingPlannerOpen = !spendingPlannerOpen">
-                  <div>
-                    <span>Cost check</span>
-                    <strong>Compare your weekly spend</strong>
-                  </div>
-                  <div class="spending-local-total">
-                    ${{ localWeeklyEstimate.toLocaleString() }}<span>/wk estimate</span>
-                  </div>
-                  <span class="spending-toggle-icon">{{ spendingPlannerOpen ? '−' : '+' }}</span>
-                </button>
-                <div v-if="spendingPlannerOpen" class="spending-planner-body">
-                  <div class="spending-simple-row">
-                    <label>
-                      <span>What do you spend per week now?</span>
-                      <input v-model.number="spendingForm.weeklyTotal" type="number" min="0" inputmode="numeric" placeholder="e.g. 650" />
-                    </label>
-                    <div v-if="hasSpendingInput" class="spending-result" :class="{ saving: weeklySavings > 0, extra: weeklySavings < 0 }">
-                      <span>{{ spendingResultLabel }}</span>
-                      <strong>{{ spendingResultAmount }}</strong>
-                    </div>
-                  </div>
-                  <p class="spending-note">Estimate includes local median rent plus typical groceries, transport, and utilities.</p>
-                </div>
+              <div v-if="showAiSpendingInput" class="spending-inline" style="animation-delay: 0.6s">
+                <span class="ai-row-tag ai-row-tag--cost">Cost</span>
+                <span class="spending-inline-text">
+                  Weekly living costs around <strong>${{ localWeeklyEstimate.toLocaleString() }}</strong> locally.
+                  Your weekly budget:
+                  <input
+                    v-model.number="spendingForm.weeklyTotal"
+                    class="spending-inline-input"
+                    type="number" min="0" inputmode="numeric" placeholder="e.g. 650"
+                  />
+                  <span v-if="hasSpendingInput" class="spending-inline-result" :class="{ saving: weeklySavings > 0, extra: weeklySavings < 0 }">
+                    {{ weeklySavings > 0 ? '↓' : '↑' }} {{ spendingResultAmount }} {{ weeklySavings > 0 ? 'saving' : 'extra' }}
+                  </span>
+                </span>
               </div>
               <div v-if="aiSummary.sports" class="ai-suburb-row" style="animation-delay: 0.65s">
                 <span class="ai-row-tag ai-row-tag--sport">Sport</span>
@@ -326,7 +317,18 @@
               <tr class="sbs-sec"><td :colspan="cmpSchools.length + 1">🏥 Healthcare & Safety</td></tr>
               <tr>
                 <td>Healthcare grade</td>
-                <td v-for="s in cmpSchools" :key="s.id"><span class="gbadge" :class="GC[s.healthcare_grade] || 'gd'">{{ s.healthcare_grade }}</span> <span style="color:var(--ink3);font-size:0.7rem">{{ n(metricVal(s, 'healthcare_count')) }} facilities</span></td>
+                <td v-for="s in cmpSchools" :key="s.id">
+                  <span class="grade-tip-wrap">
+                    <span class="gbadge" :class="GC[s.healthcare_grade] || 'gd'">{{ s.healthcare_grade }}</span>
+                    <div class="grade-tip">
+                      <div v-for="g in healthcareScale" :key="g.grade" class="grade-tip-row">
+                        <span class="gbadge" :class="GC[g.grade] || 'gd'">{{ g.grade }}</span>
+                        <span>{{ g.label }}</span>
+                      </div>
+                    </div>
+                  </span>
+                  <span style="color:var(--ink3);font-size:0.7rem;margin-left:4px">{{ n(metricVal(s, 'healthcare_count')) }} facilities</span>
+                </td>
               </tr>
               <tr>
                 <td>Crime rank (lower=safer)</td>
@@ -335,7 +337,18 @@
               <tr class="sbs-sec"><td :colspan="cmpSchools.length + 1">🎓 Education & Nature</td></tr>
               <tr>
                 <td>Education grade</td>
-                <td v-for="s in cmpSchools" :key="s.id"><span class="gbadge" :class="GC[s.education_grade] || 'gd'">{{ s.education_grade }}</span> <span style="color:var(--ink3);font-size:0.7rem">{{ n(metricVal(s, 'education_count')) }} schools</span></td>
+                <td v-for="s in cmpSchools" :key="s.id">
+                  <span class="grade-tip-wrap">
+                    <span class="gbadge" :class="GC[s.education_grade] || 'gd'">{{ s.education_grade }}</span>
+                    <div class="grade-tip">
+                      <div v-for="g in educationScale" :key="g.grade" class="grade-tip-row">
+                        <span class="gbadge" :class="GC[g.grade] || 'gd'">{{ g.grade }}</span>
+                        <span>{{ g.label }}</span>
+                      </div>
+                    </div>
+                  </span>
+                  <span style="color:var(--ink3);font-size:0.7rem;margin-left:4px">{{ n(metricVal(s, 'education_count')) }} schools</span>
+                </td>
               </tr>
               <tr>
                 <td>National parks</td>
@@ -365,6 +378,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useExplorer } from '../composables/useExplorer.js'
+import { usePersonalisedIncentives } from '../composables/usePersonalisedIncentives.js'
+import { fetchIncentiveEstimate } from '../api/explorerApi.js'
+import { yearsExperienceBand, estimateTotalFromResult } from '../utils/incentiveEstimate.js'
 import { RC, GC } from '../data/db.js'
 import { toNum, stateLabelFromRecord } from '../utils/locationFields.js'
 import SchoolMap from '../components/lifestyle/SchoolMap.vue'
@@ -404,6 +420,39 @@ const {
   launchSort,
 } = useExplorer()
 
+const {
+  activeProfile: insActiveProfile,
+  getPersonalisedIncentive: insGetEstimate,
+  setPersonalisedIncentive: insSetEstimate,
+} = usePersonalisedIncentives()
+
+const insPersonalisedIncentive = computed(() => {
+  if (!insActiveProfile.value?.ready || !insSchool.value) return null
+  return insGetEstimate(insSchool.value.school_id || insSchool.value.id)
+})
+
+watch(insSchool, async (school) => {
+  if (!school || !insActiveProfile.value?.ready) return
+  const key = school.school_id || school.id
+  if (insGetEstimate(key)) return
+  const profile = insActiveProfile.value
+  const isQld = school.state_id === '1'
+  const years = Number(profile.yearsExperience || 0)
+  try {
+    const result = await fetchIncentiveEstimate({
+      school_id: key,
+      employment_type: isQld ? 'temporary' : 'permanent',
+      years_experience: years,
+      years_of_experience: years,
+      experience_years: years,
+      years_experience_band: yearsExperienceBand(years),
+      has_dependants: isQld ? Boolean(profile.hasDependants) : false,
+    })
+    const total = estimateTotalFromResult(result, isQld, Boolean(profile.hasDependants))
+    if (total > 0) insSetEstimate(key, { total, profile: { ...profile } })
+  } catch {}
+})
+
 function goDataSources() {
   sessionStorage.setItem('about_scroll', 'data-sources')
   emit('navigate', 'about')
@@ -414,6 +463,15 @@ function goExplorerSort(sort) {
   launchView.value = 'search'
   emit('navigate', 'explorer')
 }
+
+const tourDismissed = ref(sessionStorage.getItem('nbhd_tour_dismissed') === '1')
+function dismissTour() { tourDismissed.value = true; sessionStorage.setItem('nbhd_tour_dismissed', '1') }
+let tourTimer = null
+watch(cmpList, (list) => {
+  if (list.length >= 2 && !tourDismissed.value && !tourTimer) {
+    tourTimer = setTimeout(dismissTour, 10000)
+  }
+}, { immediate: true })
 
 const insQ = ref('')
 const insResults = ref([])
@@ -648,6 +706,57 @@ function applyUrl(school) {
 </script>
 
 <style scoped>
+/* ── Coach mark pulse ── */
+.coach-pulse {
+  animation: coach-ring 1.4s ease-out 7;
+}
+@keyframes coach-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(31,111,235,0.75); }
+  50%  { box-shadow: 0 0 0 14px rgba(31,111,235,0.2); }
+  100% { box-shadow: 0 0 0 18px rgba(31,111,235,0); }
+}
+
+/* ── Inline spending row ── */
+.spending-inline {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: ai-slidein 0.4s ease forwards;
+}
+.spending-inline-text {
+  font-size: 0.84rem;
+  color: var(--ink2);
+  line-height: 1.6;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.spending-inline-input {
+  width: 80px;
+  border: none;
+  border-bottom: 1.5px solid var(--b);
+  background: transparent;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--ink);
+  padding: 1px 4px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.spending-inline-input:focus { border-color: var(--blue); }
+.spending-inline-input::placeholder { color: var(--ink3); }
+.spending-inline-result {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+.spending-inline-result.saving { background: #dcfce7; color: #166534; }
+.spending-inline-result.extra  { background: #fee2e2; color: #991b1b; }
+
 .page-topbar {
   width: 100%;
   padding: 56px 20px 40px;
@@ -1276,6 +1385,7 @@ function applyUrl(school) {
 }
 .ai-row-tag--social   { background: #ede9fe; color: #6d28d9; }
 .ai-row-tag--spend    { background: #fef9c3; color: #92400e; }
+.ai-row-tag--cost     { background: #f0fdf4; color: #15803d; }
 .ai-row-tag--sport    { background: #dcfce7; color: #15803d; }
 .ai-row-tag--students { background: #dbeafe; color: #1d4ed8; }
 .ai-suburb-row :deep(em.ai-neu) { font-style: italic; font-weight: 600; color: var(--ink); }

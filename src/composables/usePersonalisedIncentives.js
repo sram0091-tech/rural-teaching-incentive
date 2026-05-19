@@ -1,6 +1,18 @@
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+
+const PROFILE_SESSION_KEY = 'explorer_incentive_profile'
 
 const estimatesBySchool = reactive({})
+
+// Module-level shared profile — persists across tab navigation
+const activeProfile = ref(_loadSessionProfile())
+
+function _loadSessionProfile() {
+  try {
+    const raw = sessionStorage.getItem(PROFILE_SESSION_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
+}
 
 function schoolKey(schoolOrId) {
   if (schoolOrId && typeof schoolOrId === 'object') {
@@ -10,6 +22,14 @@ function schoolKey(schoolOrId) {
 }
 
 export function usePersonalisedIncentives() {
+  function setActiveProfile(profile) {
+    activeProfile.value = profile ? { ...profile } : null
+    try {
+      if (profile) sessionStorage.setItem(PROFILE_SESSION_KEY, JSON.stringify(profile))
+      else sessionStorage.removeItem(PROFILE_SESSION_KEY)
+    } catch {}
+  }
+
   function setPersonalisedIncentive(schoolOrId, payload) {
     const key = schoolKey(schoolOrId)
     if (!key) return
@@ -55,5 +75,7 @@ export function usePersonalisedIncentives() {
     estimatesBySchool,
     setPersonalisedIncentive,
     getPersonalisedIncentive,
+    activeProfile,
+    setActiveProfile,
   }
 }

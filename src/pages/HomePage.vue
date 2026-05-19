@@ -12,12 +12,11 @@
       <div class="cin-content">
 
         <div class="cin-slide cin-slide--active">
-          <div class="cin-eyebrow">For Australian Teachers</div>
+          <div class="cin-eyebrow">for australian teachers</div>
           <h1 class="cin-hero-h1">Rural teaching isn't a compromise.<br>It's an <em>opportunity</em>.</h1>
-          <p class="cin-hero-sub">Find schools, compare incentives, and understand the lifestyle before you decide.</p>
+          <p class="cin-hero-sub">Find schools across <strong style="color:#FFD166">New South Wales</strong> and <strong style="color:#FFD166">Queensland</strong>, compare financial incentives, and understand the Neighbourhood before you decide.</p>
           <div class="cin-hero-acts">
             <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find your school</button>
-            <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Neighbourhood</button>
           </div>
         </div>
 
@@ -211,7 +210,7 @@
             <div class="how-card-body">
               <div class="how-card-num">03</div>
               <div class="how-card-title">Compare side by side</div>
-              <p class="how-card-text">Add up to 4 schools to your compare tray. Incentives and lifestyle in one table.</p>
+              <p class="how-card-text">Save up to 4 schools and compare incentives side by side.</p>
               <span class="how-card-learn">How comparing works ↗</span>
             </div>
           </div>
@@ -227,7 +226,6 @@
         <p>Browse 645 schools across QLD and NSW. Filter by pay, remoteness, and lifestyle then decide.</p>
         <div class="final-cta-btns">
           <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find your school</button>
-          <button class="btn-hero-s" @click="$emit('navigate', 'insights')">Neighbourhood</button>
         </div>
       </div>
     </section>
@@ -325,7 +323,7 @@ const modals = {
   financial: {
     image: 'https://images.pexels.com/photos/4386366/pexels-photo-4386366.jpeg?auto=compress&cs=tinysrgb&w=900',
     tag: 'Financial',
-    title: 'Up to $30k extra. Every year.',
+    title: 'Up to $45k extra. Every year.',
     items: [
       'NSW pays $20k, $25k, or $30k/yr depending on how remote you go',
       'QLD adds up to $11,470/yr on top. Locality allowance, paid fortnightly',
@@ -666,7 +664,7 @@ onUnmounted(() => {
   inset: -8px;
   background-size: cover;
   background-position: center 20%;
-  filter: blur(2px);
+  filter: blur(3px);
   z-index: 0;
 }
 
@@ -678,8 +676,7 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 43%, rgba(13,31,60,0.03) 0%, rgba(13,31,60,0.10) 44%, rgba(8,20,40,0.22) 100%),
-    linear-gradient(to bottom, rgba(8,20,40,0.12) 0%, rgba(8,20,40,0.04) 36%, rgba(8,20,40,0.28) 100%);
+    linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.15) 100%);
 }
 
 .cin-content {

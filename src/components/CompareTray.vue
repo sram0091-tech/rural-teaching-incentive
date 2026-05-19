@@ -1,17 +1,22 @@
 <template>
   <Transition name="tray">
     <div v-if="cmpList.length" class="cmp-tray show">
-      <span class="tray-lbl">Compare:</span>
+      <span class="tray-lbl">Saved schools:</span>
       <div class="tray-items">
         <div v-for="id in cmpList" :key="id" class="tray-item">
           <span class="tray-name">{{ shortName(id) }}</span>
           <span v-if="personalisedAmount(id)" class="tray-est">{{ personalisedAmount(id) }}</span>
           <button class="tray-x" @click="$emit('remove', id)" title="Remove">✕</button>
         </div>
-        <div v-for="i in (4 - cmpList.length)" :key="'slot-'+i" class="tray-slot">+ add</div>
+        <div v-for="i in (4 - cmpList.length)" :key="'slot-'+i" class="tray-slot">+ save</div>
       </div>
-      <button class="tray-go" @click="$emit('open-compare')">Compare →</button>
-      <span class="tray-clear" @click="$emit('clear')">Clear all</span>
+      <button
+        class="tray-go"
+        :class="{ 'tray-go--dim': cmpList.length < 2 }"
+        :title="cmpList.length < 2 ? 'Save at least 2 schools to compare' : ''"
+        @click="cmpList.length >= 2 && $emit('open-compare')"
+      >Explore in Neighbourhood →</button>
+      <span class="tray-clear" @click="$emit('clear')">Clear</span>
     </div>
   </Transition>
 </template>
@@ -89,5 +94,9 @@ function personalisedAmount(id) {
 .tray-x:hover {
   background: #dc2626;
   color: #fff;
+}
+.tray-go--dim {
+  opacity: 0.4;
+  cursor: default;
 }
 </style>

@@ -14,11 +14,14 @@
       </div>
       <div class="srow-metric">
         <template v-if="sort === 'inc'">
-          <div v-if="numInc(school) > 0" class="mv mv-inc">
+          <div v-if="personalisedIncentive" class="mv mv-inc">
+            ${{ Math.round(personalisedIncentive.total).toLocaleString() }}<span style="font-size:0.6rem;font-weight:400">/yr</span>
+          </div>
+          <div v-else-if="numInc(school) > 0" class="mv mv-inc">
             <span style="font-size:0.6rem;font-weight:700;color:var(--ink3);margin-right:3px">Up to</span>${{ Math.round(numInc(school)).toLocaleString() }}<span style="font-size:0.6rem;font-weight:400">/yr</span>
           </div>
           <div v-else class="mv mv-none">No incentive</div>
-          <div class="msub">max package</div>
+          <div class="msub">{{ personalisedIncentive ? 'personalised estimate' : 'max package' }}</div>
         </template>
         <template v-else-if="sort === 'hc'">
           <div class="mv">{{ numHc(school) }}</div>
@@ -38,7 +41,7 @@
           class="btn-cmp"
           :class="{ added: inCmp }"
           @click="$emit('toggle-cmp', school.id)"
-        >{{ inCmp ? '✓' : '+' }} Compare</button>
+        >{{ inCmp ? '✓ Saved' : 'Save school' }}</button>
         <button class="btn-exp" @click="$emit('toggle', school.id)">
           {{ isOpen ? 'Close ↑' : 'Details ↓' }}
         </button>
@@ -54,6 +57,21 @@
           :show-calculator="false"
           @view-lifestyle="$emit('view-lifestyle', school.id)"
         />
+        <div class="srow-next-strip">
+          <span class="sns-label">What would you like to do next?</span>
+          <div class="sns-actions">
+            <button
+              class="sns-btn sns-btn--secondary"
+              :class="{ added: inCmp }"
+              @click.stop="$emit('toggle-cmp', school.id)"
+            >
+              {{ inCmp ? '✓ Saved' : 'Save school' }}
+            </button>
+            <button class="sns-btn sns-btn--primary" @click.stop="$emit('view-lifestyle', school.id)">
+              Explore neighbourhood of {{ school.suburb || 'this area' }} →
+            </button>
+          </div>
+        </div>
       </div>
     </Transition>
 
@@ -81,6 +99,21 @@
                 :show-calculator="false"
                 @view-lifestyle="$emit('view-lifestyle', school.id)"
               />
+              <div class="srow-next-strip">
+                <span class="sns-label">What would you like to do next?</span>
+                <div class="sns-actions">
+                  <button
+                    class="sns-btn sns-btn--secondary"
+                    :class="{ added: inCmp }"
+                    @click.stop="$emit('toggle-cmp', school.id)"
+                  >
+                    {{ inCmp ? '✓ Saved' : 'Save school' }}
+                  </button>
+                  <button class="sns-btn sns-btn--primary" @click.stop="$emit('view-lifestyle', school.id)">
+                    🌿 Explore lifestyle →
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -90,12 +123,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RC } from '../data/db.js'
 import { toNum } from '../utils/locationFields.js'
 import IncentivePanel from './incentives/IncentivePanel.vue'
+import { usePersonalisedIncentives } from '../composables/usePersonalisedIncentives.js'
 
-defineProps({
+const props = defineProps({
   school: Object,
   isOpen: Boolean,
   inCmp: Boolean,
@@ -104,6 +138,12 @@ defineProps({
   incentiveProfile: { type: Object, default: null },
 })
 defineEmits(['toggle', 'toggle-cmp', 'view-lifestyle'])
+
+const { getPersonalisedIncentive } = usePersonalisedIncentives()
+const personalisedIncentive = computed(() => {
+  if (!props.incentiveProfile?.ready) return null
+  return getPersonalisedIncentive(props.school?.school_id || props.school?.id)
+})
 
 const isMobile = ref(false)
 function checkMobile() { isMobile.value = window.innerWidth < 768 }
@@ -116,6 +156,54 @@ function numDist(s){ return toNum(s?.distance_to_city, 0) }
 </script>
 
 <style scoped>
+/* ── What next strip ── */
+.srow-next-strip {
+  padding: 16px 20px;
+  border-top: 1px solid var(--b);
+  background: var(--s);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.sns-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink3);
+  white-space: nowrap;
+}
+.sns-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sns-btn {
+  padding: 9px 18px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, transform 0.15s;
+  white-space: nowrap;
+}
+.sns-btn--secondary {
+  background: var(--b);
+  color: var(--ink2);
+}
+.sns-btn--secondary:hover { background: #e2e8f0; }
+.sns-btn--secondary.added {
+  background: rgba(22,163,74,0.1);
+  color: #15803d;
+}
+.sns-btn--primary {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(31,111,235,0.25);
+}
+.sns-btn--primary:hover { background: #1a56c4; transform: translateX(2px); }
+
 .sheet-backdrop {
   position: fixed;
   inset: 0;
