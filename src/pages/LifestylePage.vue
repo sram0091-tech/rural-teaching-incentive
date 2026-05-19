@@ -251,39 +251,30 @@
                 <span class="ai-row-tag ai-row-tag--spend">Spending</span>
                 <span v-html="boldify(aiSummary.spending)"></span>
               </div>
-              <div v-if="showAiSpendingInput" class="spending-planner" style="animation-delay: 0.6s">
-                <div class="spending-planner-head">
+              <div v-if="showAiSpendingInput" class="spending-planner" :class="{ open: spendingPlannerOpen }" style="animation-delay: 0.6s">
+                <button class="spending-planner-toggle" type="button" @click="spendingPlannerOpen = !spendingPlannerOpen">
                   <div>
-                    <span class="spending-planner-kicker">Your current weekly spend</span>
-                    <strong>Compare your budget with {{ insSchool.suburb }}</strong>
+                    <span>Cost check</span>
+                    <strong>Compare your weekly spend</strong>
                   </div>
                   <div class="spending-local-total">
                     ${{ localWeeklyEstimate.toLocaleString() }}<span>/wk estimate</span>
                   </div>
+                  <span class="spending-toggle-icon">{{ spendingPlannerOpen ? '−' : '+' }}</span>
+                </button>
+                <div v-if="spendingPlannerOpen" class="spending-planner-body">
+                  <div class="spending-simple-row">
+                    <label>
+                      <span>What do you spend per week now?</span>
+                      <input v-model.number="spendingForm.weeklyTotal" type="number" min="0" inputmode="numeric" placeholder="e.g. 650" />
+                    </label>
+                    <div v-if="hasSpendingInput" class="spending-result" :class="{ saving: weeklySavings > 0, extra: weeklySavings < 0 }">
+                      <span>{{ spendingResultLabel }}</span>
+                      <strong>{{ spendingResultAmount }}</strong>
+                    </div>
+                  </div>
+                  <p class="spending-note">Estimate includes local median rent plus typical groceries, transport, and utilities.</p>
                 </div>
-                <div class="spending-input-grid">
-                  <label>
-                    <span>Rent</span>
-                    <input v-model.number="spendingForm.rent" type="number" min="0" inputmode="numeric" placeholder="Current weekly rent" />
-                  </label>
-                  <label>
-                    <span>Groceries</span>
-                    <input v-model.number="spendingForm.groceries" type="number" min="0" inputmode="numeric" placeholder="Weekly groceries" />
-                  </label>
-                  <label>
-                    <span>Transport</span>
-                    <input v-model.number="spendingForm.transport" type="number" min="0" inputmode="numeric" placeholder="Weekly transport" />
-                  </label>
-                  <label>
-                    <span>Utilities</span>
-                    <input v-model.number="spendingForm.utilities" type="number" min="0" inputmode="numeric" placeholder="Weekly utilities" />
-                  </label>
-                </div>
-                <div v-if="hasSpendingInput" class="spending-result" :class="{ saving: weeklySavings > 0, extra: weeklySavings < 0 }">
-                  <span>{{ spendingResultLabel }}</span>
-                  <strong>{{ spendingResultAmount }}</strong>
-                </div>
-                <p class="spending-note">Uses local median rent plus remoteness-adjusted groceries, transport, and utilities as an indicative comparison.</p>
               </div>
               <div v-if="aiSummary.sports" class="ai-suburb-row" style="animation-delay: 0.65s">
                 <span class="ai-row-tag ai-row-tag--sport">Sport</span>
@@ -433,20 +424,14 @@ let insSearchTimer
 const aiSummary = ref(null)
 const aiLoading = ref(false)
 const showAiSpendingInput = import.meta.env.VITE_AI_SPENDING_INPUT !== 'false'
+const spendingPlannerOpen = ref(false)
 const spendingForm = ref({
-  rent: null,
-  groceries: null,
-  transport: null,
-  utilities: null,
+  weeklyTotal: null,
 })
 
-const hasSpendingInput = computed(() =>
-  ['rent', 'groceries', 'transport', 'utilities'].some((key) => Number(spendingForm.value[key]) > 0)
-)
+const hasSpendingInput = computed(() => Number(spendingForm.value.weeklyTotal) > 0)
 
-const currentWeeklySpend = computed(() =>
-  ['rent', 'groceries', 'transport', 'utilities'].reduce((sum, key) => sum + Number(spendingForm.value[key] || 0), 0)
-)
+const currentWeeklySpend = computed(() => Number(spendingForm.value.weeklyTotal || 0))
 
 const localWeeklyEstimate = computed(() => {
   const rent = n(metricVal(insSchool.value, 'median_rent_weekly'))
@@ -459,7 +444,7 @@ const spendingResultLabel = computed(() => weeklySavings.value >= 0 ? 'Potential
 const spendingResultAmount = computed(() => {
   const weekly = Math.abs(weeklySavings.value)
   const annual = weekly * 52
-  return `$${weekly.toLocaleString()}/wk · $${annual.toLocaleString()}/yr`
+  return `$${weekly.toLocaleString()}/wk`
 })
 
 function remotenessSpendProfile(remoteness = '') {
@@ -549,6 +534,8 @@ Return format: {"positive":["...","...","..."],"negative":["...","...","..."],"s
 let aiDebounceTimer = null
 watch(insSchool, (school) => {
   clearTimeout(aiDebounceTimer)
+  spendingPlannerOpen.value = false
+  spendingForm.value.weeklyTotal = null
   if (!school) { aiSummary.value = null; return }
   aiDebounceTimer = setTimeout(() => generateAISummary(school), 800)
 }, { immediate: true })
@@ -968,17 +955,13 @@ function applyUrl(school) {
   .source-badge--ai { margin-left: 0; }
   .ai-cols { grid-template-columns: 1fr; }
   .ai-suburb-row { align-items: flex-start; flex-direction: column; gap: 5px; }
-  .spending-planner-head,
   .spending-result {
     flex-direction: column;
     align-items: stretch;
   }
+  .spending-planner-toggle { grid-template-columns: 1fr auto; }
   .spending-local-total { text-align: left; }
-  .spending-input-grid { grid-template-columns: 1fr 1fr; }
-}
-
-@media (max-width: 460px) {
-  .spending-input-grid { grid-template-columns: 1fr; }
+  .spending-simple-row { grid-template-columns: 1fr; }
 }
 
 .lc-scale {
@@ -1300,28 +1283,39 @@ function applyUrl(school) {
 .spending-planner {
   opacity: 0;
   animation: ai-slidein 0.4s ease forwards;
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid #fde68a;
-  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 72%);
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #fbfaf8;
+  overflow: hidden;
 }
-.spending-planner-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 14px;
-  margin-bottom: 12px;
+.spending-planner.open {
+  border-color: rgba(31,111,235,0.2);
+  background: #fff;
 }
-.spending-planner-head strong {
+.spending-planner-toggle {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.spending-planner-toggle strong {
   display: block;
   color: var(--ink);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   line-height: 1.3;
 }
-.spending-planner-kicker {
+.spending-planner-toggle > div:first-child span {
   display: block;
-  color: #92400e;
-  font-size: 0.62rem;
+  color: var(--ink3);
+  font-size: 0.6rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1329,8 +1323,8 @@ function applyUrl(school) {
 }
 .spending-local-total {
   flex-shrink: 0;
-  color: var(--green-d);
-  font-size: 1.05rem;
+  color: var(--blue-d);
+  font-size: 0.9rem;
   font-weight: 900;
   text-align: right;
 }
@@ -1340,22 +1334,37 @@ function applyUrl(school) {
   font-size: 0.62rem;
   font-weight: 800;
 }
-.spending-input-grid {
+.spending-toggle-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--blue-s);
+  color: var(--blue);
+  font-weight: 900;
+}
+.spending-planner-body {
+  padding: 0 12px 12px;
+}
+.spending-simple-row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: minmax(220px, 1fr) auto;
+  align-items: end;
   gap: 8px;
 }
-.spending-input-grid label {
+.spending-simple-row label {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-.spending-input-grid span {
+.spending-simple-row span {
   color: var(--ink2);
   font-size: 0.66rem;
   font-weight: 800;
 }
-.spending-input-grid input {
+.spending-simple-row input {
   width: 100%;
   border: 1px solid var(--b);
   border-radius: 8px;
@@ -1365,7 +1374,7 @@ function applyUrl(school) {
   font-size: 0.78rem;
   background: #fff;
 }
-.spending-input-grid input:focus {
+.spending-simple-row input:focus {
   outline: none;
   border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(31,111,235,0.12);
@@ -1375,7 +1384,8 @@ function applyUrl(school) {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-top: 10px;
+  min-height: 42px;
+  margin-top: 0;
   padding: 10px 12px;
   border-radius: 10px;
   font-size: 0.8rem;
