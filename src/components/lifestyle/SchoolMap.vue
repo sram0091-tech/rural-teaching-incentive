@@ -218,17 +218,47 @@ async function fetchNearby(lat, lng) {
   for (const cat of categories.value) {
     cat.loading = true
     try {
-      const q = `[out:json][timeout:20];
+      let q
+      if (cat.key === 'rail') {
+        q = `[out:json][timeout:20];
+(
+  node["railway"~"station|halt|subway_entrance|tram_stop"](around:${r},${lat},${lng});
+  way["railway"~"station|halt|subway_entrance|tram_stop"](around:${r},${lat},${lng});
+  way["railway"~"rail|narrow_gauge|light_rail|tram"](around:${r},${lat},${lng});
+);
+out center tags;`
+      } else {
+        q = `[out:json][timeout:20];
 (
   node${cat.tags}(around:${r},${lat},${lng});
   way${cat.tags}(around:${r},${lat},${lng});
 );
 out center;`
+      }
       const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`)
       const data = await res.json()
-      const elements = data.elements || []
-      cat.count = elements.length
+      let elements = data.elements || []
 
+      if (cat.key === 'rail') {
+        const STATION_VALS = new Set(['station', 'halt', 'subway_entrance', 'tram_stop'])
+        const LINE_VALS    = new Set(['rail', 'narrow_gauge', 'light_rail', 'tram'])
+        const stations = elements.filter(el => STATION_VALS.has(el.tags?.railway))
+        const lineWays = elements.filter(el => LINE_VALS.has(el.tags?.railway))
+        // Deduplicate line segments → one representative per named line (or one unnamed fallback)
+        const seenNames = new Set()
+        const uniqueLines = []
+        for (const way of lineWays) {
+          const name = way.tags?.name || way.tags?.ref || null
+          const key = name ?? '_unnamed'
+          if (!seenNames.has(key)) {
+            seenNames.add(key)
+            uniqueLines.push(way)
+          }
+        }
+        elements = [...stations, ...uniqueLines]
+      }
+
+      cat.count = elements.length
       const icon = dotIcon(cat.color, 20)
       for (const el of elements) {
         const elLat = el.lat ?? el.center?.lat

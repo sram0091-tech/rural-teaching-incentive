@@ -12,7 +12,7 @@
         Back to Explorer
       </div>
       <div style="padding:8px 28px 40px;max-width:1060px;margin:0 auto;">
-        <div class="cmp-title">Compare Schools</div>
+        <div class="cmp-title">Compare Saved Schools</div>
         <div class="cmp-sub-txt">Incentive comparison · green = strongest value</div>
         <div v-if="compareLoading" class="loading-state">
           <div class="loading-spinner"></div>
@@ -62,130 +62,177 @@
               </tr>
             </tbody>
           </table>
+          <div class="cmp-breakdown-section">
+            <div class="cmp-sec-row">Incentive Breakdown</div>
+            <div
+              class="cmp-breakdown-grid"
+              :style="{ gridTemplateColumns: `repeat(${compareSchools.length}, 1fr)` }"
+            >
+              <div v-for="s in compareSchools" :key="s.id" class="cmp-breakdown-col">
+                <div class="cmp-breakdown-school-name">{{ s.name }}</div>
+                <IncentiveBreakdownSummary :school="s" :profile="activeIncentiveProfile" />
+              </div>
+            </div>
+          </div>
         </div>
         <div class="cmp-lifestyle-row">
-          <p>Want to compare lifestyle metrics too?</p>
-          <button class="cmp-lifestyle-btn" @click="$emit('navigate', 'insights')">View Neighbourhood →</button>
+          <p>Ready to explore lifestyle and community feel?</p>
+          <button class="cmp-lifestyle-btn" @click="$emit('navigate', 'insights')">Go to Neighbourhood →</button>
         </div>
       </div>
     </div>
 
     <!-- ── Entry ── -->
     <div v-if="!showCmp && view === 'entry'" class="exp-entry anim-fadeup">
-      <div class="exp-entry-h">
-        <h2>How would you like to find a school?</h2>
-        <p>Choose the path that suits you — both lead to the same results</p>
-      </div>
 
-      <div class="explorer-profile-card" :class="{ collapsed: profileCollapsed && activeIncentiveProfile?.ready }">
-        <div class="explorer-profile-inner">
-          <button
-            v-if="profileCollapsed && activeIncentiveProfile?.ready"
-            class="profile-summary-bar"
-            type="button"
-            @click="profileCollapsed = false"
-          >
-            <span class="profile-summary-title">Incentive preferences</span>
-            <span class="profile-summary-divider">·</span>
-            <span class="profile-summary-copy">{{ explorerProfileSummary }}</span>
-            <span class="profile-summary-edit">Edit</span>
-          </button>
-          <template v-else>
+      <!-- Step 1 -->
+      <div class="explorer-flow">
+        <div class="flow-node"></div>
+        <div class="esh-label">Personalise your view</div>
+        <div class="esh-hint">We'll show what you'd actually earn at every school</div>
+
+        <div class="explorer-profile-card" :class="{ collapsed: profileCollapsed && activeIncentiveProfile?.ready }">
+          <div class="explorer-profile-inner">
             <button
-              v-if="activeIncentiveProfile?.ready"
-              class="profile-collapse-btn"
+              v-if="profileCollapsed && activeIncentiveProfile?.ready"
+              class="profile-summary-bar"
               type="button"
-              @click="profileCollapsed = true"
+              @click="profileCollapsed = false"
             >
-              Collapse ↑
+              <span class="profile-summary-title">Incentive preferences</span>
+              <span class="profile-summary-divider">·</span>
+              <span class="profile-summary-copy">{{ explorerProfileSummary }}</span>
+              <span class="profile-summary-edit">Edit</span>
             </button>
-            <EligibilityChecker
-              compact
-              show-dependants
-              :initial-profile="activeIncentiveProfile"
-              :show-result="false"
-              title="Incentive preferences"
-              subtitle="Filter schools by your role, experience, and QLD dependant status before choosing a path."
-              action-label="Apply preferences"
-              @profile-submit="applyExplorerProfile"
+            <template v-else>
+              <button
+                v-if="activeIncentiveProfile?.ready"
+                class="profile-collapse-btn"
+                type="button"
+                @click="profileCollapsed = true"
+              >
+                Collapse ↑
+              </button>
+              <EligibilityChecker
+                compact
+                show-dependants
+                :initial-profile="activeIncentiveProfile"
+                :show-result="false"
+                title="Incentive preferences"
+                subtitle="Tell us your experience and whether you have dependants — we'll show exactly what you'd earn on top of your salary at every school."
+                action-label="Apply preferences"
+                @profile-submit="applyExplorerProfile"
+              />
+              <div v-if="activeIncentiveProfile?.ready" class="profile-applied">
+                ✓ Personalised estimates applied · {{ explorerProfileSummary }}
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="explorer-flow">
+        <div class="flow-node"></div>
+        <div class="esh-label">Explore schools on the map</div>
+
+        <div class="map-flow-trail">
+          <span class="mft-step">Explore the map</span>
+          <span class="mft-arrow">→</span>
+          <span class="mft-step">See incentive details</span>
+          <span class="mft-arrow">→</span>
+          <span class="mft-step">Explore Neighbourhood</span>
+        </div>
+
+        <!-- Map section — search is first in DOM so on mobile it flows above the map naturally -->
+        <div class="exp-map-section">
+          <!-- Search: absolute overlay on desktop, flows above map on mobile -->
+          <div class="map-search-overlay" @keydown.escape="showMapDropdown = false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:rgba(0,0,0,0.45);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input
+              v-model="mapSearchQ"
+              class="map-search-input"
+              placeholder="Search a school or town…"
+              autocomplete="off"
+              @focus="showMapDropdown = true"
+              @blur="onMapSearchBlur"
+              @input="onMapSearchInput"
             />
-            <div v-if="activeIncentiveProfile?.ready" class="profile-applied">
-              Preferences ready for {{ explorerProfileSummary }}
+            <button v-if="mapSearchQ" class="map-search-clear" @mousedown.prevent="clearMapSearch" aria-label="Clear">✕</button>
+            <Transition name="msd">
+              <div v-if="showMapDropdown && mapSearchResults.length" class="map-search-dropdown">
+                <div
+                  v-for="s in mapSearchResults"
+                  :key="s.id"
+                  class="msd-item"
+                  @mousedown.prevent="selectMapSchool(s)"
+                  @mouseover="glitterMarker(s)"
+                  @mouseleave="unglitterMarker(s)"
+                >
+                  <div class="msd-name">{{ s.name }}</div>
+                  <div class="msd-meta">{{ s.suburb }} · {{ s.state_id === '1' ? 'QLD' : 'NSW' }} · {{ s.remoteness }}</div>
+                </div>
+              </div>
+            </Transition>
+          </div>
+
+          <div ref="mapEl" class="exp-map-container"></div>
+
+          <!-- Personalised vs max status chip -->
+          <div class="map-status-chip" :class="activeIncentiveProfile?.ready ? 'msc-personalised' : 'msc-max'">
+            <span v-if="activeIncentiveProfile?.ready">✓ Showing personalised estimates</span>
+            <span v-else>Showing maximum packages</span>
+          </div>
+
+          <div class="map-legend">
+            <div class="ml-title">Incentive amount</div>
+            <div class="ml-gradient-row">
+              <div class="ml-gradient qld-grad"></div>
+              <div class="ml-grad-labels"><span>Low</span><span>High</span></div>
+              <div class="ml-grad-state">QLD</div>
             </div>
-          </template>
+            <div class="ml-gradient-row" style="margin-top:6px">
+              <div class="ml-gradient nsw-grad"></div>
+              <div class="ml-grad-labels"><span>Low</span><span>High</span></div>
+              <div class="ml-grad-state">NSW</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="two-paths">
-        <div class="path-card pc-search" @click="view = 'search'">
-          <div class="pc-icon blue">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          </div>
-          <div class="pc-title">I know what I want</div>
-          <div class="pc-sub">Search by school name or suburb. Filter and sort to find your match.</div>
-          <ul class="pc-features">
-            <li>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
-              Filter by QLD or NSW
-            </li>
-            <li>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-              Filter by remoteness
-            </li>
-            <li>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-              Sort by incentive or healthcare
-            </li>
-          </ul>
-          <div class="pc-btn blue">Search directly →</div>
+      <!-- Step 3 — Guide card -->
+      <div class="explorer-flow explorer-flow--last">
+        <div class="flow-node"></div>
+        <div class="esh-label">Need a hand?</div>
+        <div class="esh-hint">3 quick questions — we'll filter and sort schools to match what you care about most</div>
+
+      <div class="guide-card" @click="startGuide">
+        <div class="gc-icon-wrap">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
         </div>
-        <div class="path-card pc-guide" @click="startGuide">
-          <div class="pc-icon green">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        <div class="gc-body">
+          <div class="gc-title">Not sure where to start?</div>
+          <div class="gc-outcomes">
+            <span class="gc-outcome-chip">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Filtered to your state &amp; remoteness
+            </span>
+            <span class="gc-outcome-chip">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Sorted by your top priority
+            </span>
+            <span class="gc-outcome-chip">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Best matches surfaced first
+            </span>
           </div>
-          <div class="pc-title">Help me find one</div>
-          <div class="pc-sub">Answer 3 quick questions. We'll match schools to your priorities.</div>
-          <ul class="pc-features">
-            <li>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-              3 quick questions
-            </li>
-            <li>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Matched to your priorities
-            </li>
-            <li>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-              Auto-sorted results
-            </li>
-          </ul>
-          <div class="pc-btn green">Guide me →</div>
         </div>
+        <button class="gc-btn" type="button" @click.stop="startGuide">Find my match →</button>
       </div>
 
-      <div class="exp-map-section">
-        <div class="exp-map-header">
-          <div class="exp-map-label">
-            Schools with incentives — QLD &amp; NSW
-          </div>
-          <div class="exp-map-hint">Hover for a preview · click any dot to see school details · use QLD/NSW to focus</div>
-        </div>
-        <div ref="mapEl" class="exp-map-container"></div>
-        <div class="map-legend">
-          <div class="ml-title">Incentive amount</div>
-          <div class="ml-gradient-row">
-            <div class="ml-gradient qld-grad"></div>
-            <div class="ml-grad-labels"><span>Low</span><span>High</span></div>
-            <div class="ml-grad-state">QLD</div>
-          </div>
-          <div class="ml-gradient-row" style="margin-top:6px">
-            <div class="ml-gradient nsw-grad"></div>
-            <div class="ml-grad-labels"><span>Low</span><span>High</span></div>
-            <div class="ml-grad-state">NSW</div>
-          </div>
-        </div>
-      </div>
-    </div>
+      </div><!-- /explorer-flow--last -->
+
+    </div><!-- /exp-entry -->
 
     <!-- ── Search Path ── -->
     <div v-else-if="!showCmp && view === 'search'" class="search-path anim-fadeup">
@@ -194,7 +241,7 @@
         Back to overview
       </div>
 
-      <div class="srch-row">
+      <div v-if="!fromMap" class="srch-row">
         <div class="srch-wrap">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink3);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input ref="searchInput" v-model="searchQ" placeholder="Search by school name or suburb…" @input="onSearchInput" />
@@ -207,7 +254,7 @@
       </div>
 
       <Transition name="fp-slide">
-        <div v-if="filterOpen" class="filter-panel open">
+        <div v-if="!fromMap && filterOpen" class="filter-panel open">
           <div class="fp-inner">
             <div class="fp-sec">
               <div class="fp-lbl">State</div>
@@ -243,7 +290,7 @@
         </div>
       </Transition>
 
-      <div class="sort-row">
+      <div v-if="!fromMap" class="sort-row">
         <span class="sort-lbl">Sort:</span>
         <div v-for="s in sortOpts" :key="s.v" class="sort-pill"
           :class="{ active: fSort === s.v }"
@@ -267,7 +314,7 @@
         </div>
         <div v-else-if="searchError" class="error-state">{{ searchError }}</div>
         <template v-else-if="searchListItems.length">
-          <div class="r-meta">
+          <div v-if="!fromMap" class="r-meta">
             <strong>{{ searchTotal }}</strong> school{{ searchTotal !== 1 ? 's' : '' }} · sorted by {{ sortLabel }}
           </div>
           <div class="school-list">
@@ -432,13 +479,15 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useExplorer } from '../composables/useExplorer.js'
-import { fetchExplorerLocations } from '../api/explorerApi.js'
+import { fetchExplorerLocations, fetchIncentiveEstimate } from '../api/explorerApi.js'
 import { normalizeLocationList } from '../utils/locationFields.js'
 import SchoolRow from '../components/SchoolRow.vue'
 import AppPagination from '../components/AppPagination.vue'
 import CompareTray from '../components/CompareTray.vue'
 import EligibilityChecker from '../components/incentives/EligibilityChecker.vue'
+import IncentiveBreakdownSummary from '../components/incentives/IncentiveBreakdownSummary.vue'
 import { usePersonalisedIncentives } from '../composables/usePersonalisedIncentives.js'
+import { yearsExperienceBand, estimateTotalFromResult } from '../utils/incentiveEstimate.js'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -459,21 +508,129 @@ const {
   toggleCmp, clearCompare, isCmp,
   toggleRow, viewLifestyle,
   heroTop, launchView, launchSort, launchRem,
+  searchSchoolsForDropdown,
 } = useExplorer()
 
 const view        = ref('entry')
 const filterOpen  = ref(false)
+const fromMap     = ref(false)
 const searchQ     = ref('')
 const searchInput = ref(null)
 const mapEl       = ref(null)
-const activeIncentiveProfile = ref(null)
 const profileCollapsed = ref(false)
 let mapInstance   = null
 let qldLayer      = null
 let nswLayer      = null
+let pulseMarker   = null
+let plotGen       = 0   // incremented on every plotMarkers call; stale setTimeout callbacks check this
+
+// Map search
+const mapSearchQ       = ref('')
+const showMapDropdown  = ref(false)
+const mapSearchResults = ref([])
+const mapSearchLoading = ref(false)
+let   mapSearchTimer   = null
+const markerMap        = new Map() // schoolId → Leaflet circleMarker
+
+async function runMapSearch(q) {
+  const t = (q || '').trim()
+  if (!t) { mapSearchResults.value = []; return }
+  mapSearchLoading.value = true
+  try {
+    mapSearchResults.value = await searchSchoolsForDropdown(t)
+  } finally {
+    mapSearchLoading.value = false
+  }
+}
+
+function onMapSearchInput() {
+  clearTimeout(mapSearchTimer)
+  showMapDropdown.value = true
+  if (!mapSearchQ.value.trim()) { mapSearchResults.value = []; return }
+  mapSearchTimer = setTimeout(() => runMapSearch(mapSearchQ.value), 220)
+}
+
+function onMapSearchBlur() {
+  setTimeout(() => { showMapDropdown.value = false }, 150)
+}
+
+function clearMapSearch() {
+  mapSearchQ.value = ''
+  mapSearchResults.value = []
+  showMapDropdown.value = false
+}
+
+function glitterMarker(s) {
+  const key = String(s.school_id || s.id)
+  const marker = markerMap.get(key)
+  if (!marker) return
+  marker.setRadius(12)
+  marker.setStyle({ weight: 3, color: '#3b82f6', fillOpacity: 1 })
+  marker.bringToFront()
+}
+
+function unglitterMarker(s) {
+  const key = String(s.school_id || s.id)
+  const marker = markerMap.get(key)
+  if (!marker) return
+  marker.setRadius(7)
+  marker.setStyle({ weight: 1.5, color: '#fff', fillOpacity: 0.92 })
+}
+
+function selectMapSchool(school) {
+  showMapDropdown.value = false
+  mapSearchQ.value = school.name
+  if (!mapInstance || !school.lat || !school.lng) return
+
+  if (pulseMarker) { mapInstance.removeLayer(pulseMarker); pulseMarker = null }
+
+  mapInstance.flyTo([school.lat, school.lng], 10, { duration: 0.8, easeLinearity: 0.4 })
+
+  pulseMarker = L.marker([school.lat, school.lng], {
+    icon: L.divIcon({ className: 'pulse-ring-icon', iconSize: [48, 48], iconAnchor: [24, 24] }),
+    interactive: false,
+    zIndexOffset: 1000,
+  }).addTo(mapInstance)
+
+  setTimeout(() => {
+    if (pulseMarker) { mapInstance.removeLayer(pulseMarker); pulseMarker = null }
+  }, 3200)
+
+  const isQld = school.state_id === '1'
+  const personalised = getPersonalisedIncentive(school.school_id || school.id)
+  const incValue = personalised ? personalised.total : (school.annual_incentive || 0)
+  const inc = Math.round(incValue).toLocaleString()
+  const incLabel = personalised ? 'personalised estimate' : 'incentive package'
+  const color = incentiveColor(incValue, isQld)
+  const schoolId = school.school_id || school.id
+  const escSub = (school.suburb || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')
+  const escName = (school.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')
+
+  setTimeout(() => {
+    L.popup({ className: 'school-popup', maxWidth: 260, closeButton: true, autoPan: true })
+      .setLatLng([school.lat, school.lng])
+      .setContent(`
+        <div class="sp-wrap">
+          <div class="sp-tag ${isQld ? 'sp-qld' : 'sp-nsw'}">${isQld ? 'QLD' : 'NSW'} · ${school.remoteness || ''}</div>
+          <div class="sp-name">${escName}</div>
+          <div class="sp-suburb">${school.suburb || ''}</div>
+          <div class="sp-inc"><span class="sp-inc-num" style="color:${color}">$${inc}</span><span class="sp-inc-lbl">/yr ${incLabel}</span></div>
+          <button class="sp-cta" onclick="window.__viewSchoolDetail('${schoolId}', '${escSub}')">View details →</button>
+        </div>`)
+      .openOn(mapInstance)
+  }, 420)
+}
 
 const mapSchools = ref([])
-const { getPersonalisedIncentive, estimatesBySchool } = usePersonalisedIncentives()
+const {
+  getPersonalisedIncentive,
+  estimatesBySchool,
+  setPersonalisedIncentive,
+  activeProfile,
+  setActiveProfile,
+} = usePersonalisedIncentives()
+
+const activeIncentiveProfile = activeProfile
 
 function loadSearchWithProfile(text = searchQ.value) {
   return loadSearchLocations(text, activeIncentiveProfile.value?.ready ? activeIncentiveProfile.value : null)
@@ -489,20 +646,60 @@ const explorerProfileSummary = computed(() => {
   const yrs = Number(p.yearsExperience)
   const parts = [
     `${Number.isNaN(yrs) ? 0 : yrs} year${yrs === 1 ? '' : 's'} experience`,
-    p.hasDependants ? 'with QLD dependants' : 'no QLD dependants',
+    p.hasDependants ? 'with dependants' : 'no dependants',
   ]
   return parts.join(' · ')
 })
 
-function applyExplorerProfile(profile) {
-  activeIncentiveProfile.value = { ...profile }
+async function batchLoadEstimates(schools) {
+  const profile = activeIncentiveProfile.value
+  if (!profile?.ready || !schools.length) return
+  const years = Number(profile.yearsExperience || 0)
+  await Promise.allSettled(
+    schools.map(async (school) => {
+      const schoolId = school.school_id || school.id
+      if (!schoolId) return
+      const isQld = school.state_id === '1'
+      try {
+        const result = await fetchIncentiveEstimate({
+          school_id: schoolId,
+          employment_type: isQld ? 'temporary' : 'permanent',
+          years_experience: years,
+          years_of_experience: years,
+          experience_years: years,
+          years_experience_band: yearsExperienceBand(years),
+          has_dependants: isQld ? Boolean(profile.hasDependants) : false,
+        })
+        const total = estimateTotalFromResult(result, isQld, Boolean(profile.hasDependants))
+        if (total > 0 && activeIncentiveProfile.value === profile) {
+          setPersonalisedIncentive(schoolId, { total, profile: { ...profile } })
+        }
+      } catch {
+        // ignore individual failures
+      }
+    })
+  )
+}
+
+async function applyExplorerProfile(profile) {
+  Object.keys(estimatesBySchool).forEach(key => delete estimatesBySchool[key])
+  setActiveProfile({ ...profile })
   profileCollapsed.value = true
   currentPage.value = 1
   guidePage.value = 1
   openRow.value = null
-  loadMapSchools()
-  if (view.value === 'guide') loadGuideWithProfile()
-  else if (view.value === 'search') loadSearchWithProfile()
+  const loads = [loadMapSchools()]
+  if (view.value === 'guide') loads.push(loadGuideWithProfile())
+  else if (view.value === 'search') loads.push(loadSearchWithProfile())
+  await Promise.all(loads)
+  const listSchools = view.value === 'guide' ? guideListItems.value : searchListItems.value
+  const topMapSchools = [...mapSchools.value]
+    .sort((a, b) => (b.annual_incentive || 0) - (a.annual_incentive || 0))
+    .slice(0, 20)
+  const uniqueSchools = [...new Map(
+    [...listSchools, ...topMapSchools].map(s => [String(s.school_id || s.id), s])
+  ).values()]
+  batchLoadEstimates(uniqueSchools)
 }
 
 function employeeTypeForApi(value) {
@@ -538,31 +735,13 @@ function mapProfileParams(state) {
   return {}
 }
 
-function yearsExperienceBand(years) {
-  if (years < 2) return '0-1'
-  if (years < 5) return '2-4'
-  return '5+'
-}
 
 async function loadMapSchools() {
   try {
-    const stateList = fState.value === 'both' ? ['qld', 'nsw'] : [fState.value]
-    const remoteness_ids = [...fRem].sort().join(',')
-    const employee_type = fEmp.value !== 'both' ? employeeTypeForApi(fEmp.value) : ''
-    const responses = await Promise.all(stateList.map((state) => {
-      const profileParams = mapProfileParams(state)
-      return fetchExplorerLocations({
-        page: 1,
-        page_size: 200,
-        state,
-        sort: 'inc',
-        remoteness_ids,
-        ...profileParams,
-        employee_type: employee_type || profileParams.employee_type || '',
-      })
-    }))
-    const all = responses.flatMap((r) => normalizeLocationList(r.items)).filter(s => s.annual_incentive > 0)
-    mapSchools.value = all
+    const responses = await Promise.all(['qld', 'nsw'].map((state) =>
+      fetchExplorerLocations({ page: 1, page_size: 200, state, sort: 'name' })
+    ))
+    mapSchools.value = responses.flatMap((r) => normalizeLocationList(r.items)).filter(s => s.annual_incentive > 0)
   } catch (e) {
     console.warn('loadMapSchools failed:', e)
     mapSchools.value = heroTop.value.filter(s => s.annual_incentive > 0)
@@ -654,7 +833,7 @@ function goGuidePage(p) {
   loadGuideWithProfile()
 }
 
-function openCompare()  { if (cmpList.length) showCmp.value = true }
+function openCompare()  { if (cmpList.length >= 2) emit('navigate', 'insights') }
 function closeCompare() { showCmp.value = false }
 
 function handleToggleRow(id) { toggleRow(id) }
@@ -688,17 +867,23 @@ function resetFilters() {
 
 watch(view, (v) => {
   openRow.value = null
+  if (v !== 'search') fromMap.value = false
   if (v === 'search') {
     resetFilters()
     if (launchRem.value)  { toggleRem(launchRem.value);   launchRem.value  = null }
     if (launchSort.value) { setSort(launchSort.value);    launchSort.value = null }
     nextTick(() => { searchInput.value?.focus(); loadSearchWithProfile() })
   }
-  if (v === 'entry')  nextTick(() => {
-    if (mapInstance) { mapInstance.remove(); mapInstance = null; qldLayer = null; nswLayer = null }
-    initMap()
-    plotMarkers()
-  })
+  if (v === 'entry') {
+    mapSearchQ.value = ''
+    mapSearchResults.value = []
+    showMapDropdown.value = false
+    nextTick(() => {
+      if (mapInstance) { mapInstance.remove(); mapInstance = null; qldLayer = null; nswLayer = null }
+      initMap()
+      plotMarkers()
+    })
+  }
 })
 
 const showBackTop = ref(false)
@@ -706,19 +891,28 @@ function onScroll() {
   showBackTop.value = window.scrollY > 400
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (launchView.value) {
     view.value = launchView.value
     launchView.value = null
     loadSearchWithProfile('')
   }
   nextTick(() => initMap())
-  loadMapSchools()
+  await loadMapSchools()
+  if (activeIncentiveProfile.value?.ready) {
+    profileCollapsed.value = true
+    const topMapSchools = [...mapSchools.value]
+      .sort((a, b) => (b.annual_incentive || 0) - (a.annual_incentive || 0))
+      .slice(0, 20)
+    batchLoadEstimates(topMapSchools)
+  }
   window.addEventListener('scroll', onScroll, { passive: true })
 })
 onUnmounted(() => {
+  if (pulseMarker && mapInstance) { mapInstance.removeLayer(pulseMarker); pulseMarker = null }
   if (mapInstance) { mapInstance.remove(); mapInstance = null; qldLayer = null; nswLayer = null }
   delete window.__mapSchoolSearch
+  delete window.__viewSchoolDetail
   window.removeEventListener('scroll', onScroll)
 })
 
@@ -751,7 +945,7 @@ function initMap() {
   nswLayer = L.layerGroup().addTo(mapInstance)
 
   // State filter control
-  const stateCtrl = L.control({ position: 'topright' })
+  const stateCtrl = L.control({ position: 'topleft' })
   stateCtrl.onAdd = () => {
     const div = L.DomUtil.create('div', 'map-state-ctrl')
     div.innerHTML = `
@@ -780,39 +974,59 @@ function initMap() {
     mapInstance?.closePopup()
   }
 
+  window.__viewSchoolDetail = (schoolId, suburb) => {
+    fromMap.value = true
+    view.value = 'search'
+    searchQ.value = suburb
+    nextTick(() => {
+      loadSearchWithProfile(suburb).then(() => {
+        openRow.value = String(schoolId)
+      })
+    })
+    mapInstance?.closePopup()
+  }
+
   plotMarkers()
+}
+
+function buildPopupHtml(s, inc, color, label, escSub) {
+  const isQld = s.state_id === '1'
+  const sid   = s.school_id || s.id
+  return `
+    <div class="sp-wrap">
+      <div class="sp-tag ${isQld ? 'sp-qld' : 'sp-nsw'}">${isQld ? 'QLD' : 'NSW'} · ${s.remoteness || ''}</div>
+      <div class="sp-name">${s.name}</div>
+      <div class="sp-suburb">${s.suburb || ''}</div>
+      <div class="sp-inc"><span class="sp-inc-num" style="color:${color}">$${inc}</span><span class="sp-inc-lbl">/yr ${label}</span></div>
+      <button class="sp-cta" onclick="window.__viewSchoolDetail('${sid}', '${escSub}')">View details →</button>
+    </div>`
 }
 
 function plotMarkers() {
   if (!mapInstance || !qldLayer || !nswLayer) return
   qldLayer.clearLayers()
   nswLayer.clearLayers()
+  markerMap.clear()
+
+  const gen = ++plotGen  // any stale setTimeout from a previous call will see gen !== plotGen and bail
 
   const schools = mapSchools.value.length ? mapSchools.value : heroTop.value
-
   const profile = activeIncentiveProfile.value
   const profileReady = profile?.ready
 
-  function isKnownZero() {
-    return false
-  }
-
   schools.forEach((s, i) => {
     if (!s.lat || !s.lng) return
-    const isQld       = s.state_id === '1'
+    const isQld      = s.state_id === '1'
     const personalised = getPersonalisedIncentive(s.school_id || s.id)
     const rowPersonalised = profileReady && Number(s.personalised_annual_total || 0) > 0
-
-    if (isKnownZero(s)) return
     if (personalised && personalised.total === 0) return
 
-    const incValue    = personalised ? personalised.total : (rowPersonalised ? s.personalised_annual_total : (s.annual_incentive || 0))
-    const color       = incentiveColor(incValue, isQld)
-    const radius      = 7
-    const layer       = isQld ? qldLayer : nswLayer
-    const inc         = Math.round(incValue).toLocaleString()
-    const incLabel    = personalised || rowPersonalised ? 'personalised estimate' : 'incentive package'
-    const escSub      = (s.suburb || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')
+    const incValue = personalised ? personalised.total : (rowPersonalised ? s.personalised_annual_total : (s.annual_incentive || 0))
+    const color    = incentiveColor(incValue, isQld)
+    const layer    = isQld ? qldLayer : nswLayer
+    const inc      = Math.round(incValue).toLocaleString()
+    const incLabel = personalised || rowPersonalised ? 'personalised estimate' : 'incentive package'
+    const escSub   = (s.suburb || '').replace(/'/g, "\\'").replace(/"/g, '&quot;')
 
     const tooltip = `
       <div style="font-family:'DM Sans',sans-serif;min-width:160px">
@@ -821,19 +1035,14 @@ function plotMarkers() {
         <div style="font-size:0.88rem;font-weight:800;color:${color}">$${inc}/yr <span style="font-weight:500;font-size:0.75rem;opacity:0.85">${incLabel}</span></div>
       </div>`
 
-    const popupHtml = `
-      <div class="sp-wrap">
-        <div class="sp-tag ${isQld ? 'sp-qld' : 'sp-nsw'}">${isQld ? 'QLD' : 'NSW'} · ${s.remoteness || ''}</div>
-        <div class="sp-name">${s.name}</div>
-        <div class="sp-suburb">${s.suburb || ''}</div>
-        <div class="sp-inc"><span class="sp-inc-num">$${inc}</span><span class="sp-inc-lbl">/yr ${incLabel}</span></div>
-        <button class="sp-cta" onclick="window.__mapSchoolSearch('${escSub}')">Search ${s.suburb} schools →</button>
-      </div>`
-
     setTimeout(() => {
+      if (plotGen !== gen) return  // stale — a newer plotMarkers already ran, discard this marker
+
       const marker = L.circleMarker([s.lat, s.lng], {
-        radius, fillColor: color, color: '#fff', weight: 1.5, opacity: 0, fillOpacity: 0,
+        radius: 7, fillColor: color, color: '#fff', weight: 1.5, opacity: 0, fillOpacity: 0,
       }).addTo(layer)
+
+      markerMap.set(String(s.school_id || s.id), marker)
 
       let op = 0
       const fade = setInterval(() => {
@@ -845,12 +1054,46 @@ function plotMarkers() {
       marker.bindTooltip(tooltip, { permanent: false, direction: 'top', offset: [0, -10], opacity: 1, className: 'school-tooltip' })
       marker.on('mouseover', function() { this.setRadius(10); this.setStyle({ weight: 3 }) })
       marker.on('mouseout',  function() { this.setRadius(7);  this.setStyle({ weight: 2 }) })
+
       marker.on('click', () => {
         mapInstance.flyTo([s.lat, s.lng], 9, { duration: 0.7, easeLinearity: 0.4 })
-        L.popup({ className: 'school-popup', maxWidth: 260, closeButton: true, autoPan: true })
+
+        // Use freshest cached estimate at click time (may differ from plotMarkers time)
+        const cached = getPersonalisedIncentive(s.school_id || s.id)
+        const clickInc    = cached ? cached.total : incValue
+        const clickColor  = cached ? incentiveColor(cached.total, isQld) : color
+        const clickLabel  = cached ? 'personalised estimate' : incLabel
+
+        const popup = L.popup({ className: 'school-popup', maxWidth: 260, closeButton: true, autoPan: true })
           .setLatLng([s.lat, s.lng])
-          .setContent(popupHtml)
+          .setContent(buildPopupHtml(s, Math.round(clickInc).toLocaleString(), clickColor, clickLabel, escSub))
           .openOn(mapInstance)
+
+        // On-demand fetch: if profile is active but no estimate cached, fetch and update popup live
+        const prof = activeIncentiveProfile.value
+        if (prof?.ready && !cached) {
+          const sid  = s.school_id || s.id
+          const yrs  = Number(prof.yearsExperience || 0)
+          const hdep = Boolean(prof.hasDependants)
+          fetchIncentiveEstimate({
+            school_id: sid,
+            employment_type: isQld ? 'temporary' : 'permanent',
+            years_experience: yrs,
+            years_of_experience: yrs,
+            experience_years: yrs,
+            years_experience_band: yearsExperienceBand(yrs),
+            has_dependants: isQld ? hdep : false,
+          }).then(result => {
+            const total = estimateTotalFromResult(result, isQld, hdep)
+            if (total > 0) {
+              setPersonalisedIncentive(sid, { total, profile: { ...prof } })
+              if (popup.isOpen?.()) {
+                const nc = incentiveColor(total, isQld)
+                popup.setContent(buildPopupHtml(s, Math.round(total).toLocaleString(), nc, 'personalised estimate', escSub))
+              }
+            }
+          }).catch(() => {})
+        }
       })
     }, i * 6)
   })
@@ -953,6 +1196,24 @@ const q3opts = [
 .msc-btn { padding: 5px 12px; border: none; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600; cursor: pointer; background: transparent; color: #6b7280; transition: all 0.15s; }
 .msc-btn:hover { background: #f3f4f6; color: #1a1714; }
 .msc-btn.msc-active { background: #0D1F3C; color: #fff; }
+
+/* Pulse ring shown on selected school marker */
+.pulse-ring-icon { background: transparent !important; border: none !important; }
+.pulse-ring-icon::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2.5px solid #3b82f6;
+  box-shadow: 0 0 0 0 rgba(59,130,246,0.5);
+  animation: pulse-ring 1.3s cubic-bezier(0.215,0.61,0.355,1) infinite;
+}
+@keyframes pulse-ring {
+  0%   { transform: scale(0.7); opacity: 1; box-shadow: 0 0 0 0 rgba(59,130,246,0.5); }
+  70%  { transform: scale(1.25); opacity: 0.4; box-shadow: 0 0 0 14px rgba(59,130,246,0); }
+  100% { transform: scale(0.7); opacity: 0; box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+}
 </style>
 
 <style scoped>
@@ -1428,21 +1689,271 @@ const q3opts = [
   margin:0 8px;
 }
 
+/* ── Map section (no header, full-bleed) ── */
 .exp-map-section {
-  margin-top:24px;
-  border-radius:18px;
-  overflow:hidden;
-  position:relative;
-  margin-bottom:40px;
+  margin-top: 16px;
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 0;
 }
 
-.exp-map-header {
-  padding:14px 20px 12px;
-  border-bottom:1px solid var(--b);
-  display:flex;
-  align-items:baseline;
-  gap:12px;
+/* ── Search overlay: inside the map, top-right ── */
+.map-search-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  width: 280px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 42px;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  backdrop-filter: blur(6px);
+  transition: box-shadow 0.15s;
 }
+.map-search-overlay:focus-within {
+  box-shadow: 0 0 0 3px rgba(31,111,235,0.2), 0 4px 16px rgba(0,0,0,0.14);
+  border-color: rgba(31,111,235,0.5);
+}
+.map-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.84rem;
+  color: #1a1714;
+  outline: none;
+  min-width: 0;
+}
+.map-search-input::placeholder { color: rgba(0,0,0,0.38); }
+.map-search-clear {
+  background: rgba(0,0,0,0.08);
+  border: none;
+  border-radius: 99px;
+  width: 20px;
+  height: 20px;
+  font-size: 0.6rem;
+  color: rgba(0,0,0,0.5);
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.map-search-clear:hover { background: rgba(0,0,0,0.16); }
+
+.map-search-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+  overflow: hidden;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.msd-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.11s;
+}
+.msd-item:hover { background: #f4f8ff; }
+.msd-item + .msd-item { border-top: 1px solid #f1f5f9; }
+.msd-name { font-size: 0.83rem; font-weight: 700; color: #1a1714; }
+.msd-meta { font-size: 0.69rem; color: #6b7280; margin-top: 1px; }
+
+.msd-enter-active { transition: opacity 0.13s ease, transform 0.13s ease; }
+.msd-leave-active { transition: opacity 0.1s ease; }
+.msd-enter-from { opacity: 0; transform: translateY(-4px); }
+.msd-leave-to  { opacity: 0; }
+
+/* ── Progress rail ── */
+.explorer-flow {
+  position: relative;
+  padding-left: 2rem;
+  margin-top: 32px;
+}
+.explorer-flow:first-child {
+  margin-top: 0;
+}
+/* Line running from just below this node down to the next node */
+.explorer-flow::before {
+  content: '';
+  position: absolute;
+  left: 0.44rem;
+  top: 1.6rem;
+  bottom: -32px;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(31,111,235,0.22), rgba(31,111,235,0.06));
+}
+/* Last section: fade the line out partway, don't extend below */
+.explorer-flow--last::before {
+  bottom: 60%;
+  background: linear-gradient(180deg, rgba(31,111,235,0.18), transparent);
+}
+.flow-node {
+  position: absolute;
+  left: 0;
+  top: 0.8rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid rgba(31,111,235,0.6);
+  box-shadow: 0 0 0 5px rgba(31,111,235,0.08);
+}
+.esh-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 0 0;
+  padding-top: 0.6rem;
+}
+.esh-hint {
+  font-size: 0.73rem;
+  color: var(--ink3);
+  margin: 0.25rem 0 0.9rem;
+}
+.map-flow-trail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  flex-wrap: wrap;
+}
+.mft-step {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--ink3);
+}
+.mft-arrow {
+  font-size: 0.7rem;
+  color: rgba(0,0,0,0.2);
+}
+
+/* ── Guide card ── */
+.guide-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 40px;
+  padding: 24px 28px;
+  border-radius: 18px;
+  background: linear-gradient(120deg, #f0f6ff 0%, #e8f0fe 100%);
+  border: 1px solid rgba(31,111,235,0.15);
+  box-shadow: 0 4px 20px rgba(31,111,235,0.07);
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+.guide-card:hover {
+  box-shadow: 0 10px 32px rgba(31,111,235,0.14);
+  transform: translateY(-2px);
+}
+.gc-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(31,111,235,0.12);
+}
+.gc-body {
+  flex: 1;
+  min-width: 0;
+}
+.gc-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.gc-sub {
+  font-size: 0.78rem;
+  color: var(--ink2);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+.gc-outcomes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.gc-outcome-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(31,111,235,0.09);
+  color: #1f6feb;
+  border-radius: 99px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.gc-btn {
+  flex-shrink: 0;
+  padding: 11px 22px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.15s;
+  box-shadow: 0 4px 14px rgba(31,111,235,0.3);
+}
+.gc-btn:hover { background: #1a56c4; transform: translateX(2px); }
+
+/* legacy guide-strip — kept for any remaining references */
+.guide-strip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+  margin-bottom: 40px;
+  padding: 18px 22px;
+  background: var(--s);
+  border: 1px solid var(--b);
+  border-left: 4px solid var(--blue);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s;
+  box-shadow: 0 4px 16px rgba(13,31,60,0.06);
+}
+.guide-strip:hover {
+  box-shadow: 0 8px 28px rgba(13,31,60,0.12);
+  transform: translateY(-2px);
+}
+.guide-strip-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--blue-s);
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.guide-strip-body { flex: 1; min-width: 0; }
+.guide-strip-title { font-size: 0.92rem; font-weight: 800; color: var(--ink); margin-bottom: 3px; }
+.guide-strip-sub { font-size: 0.78rem; color: var(--ink2); line-height: 1.5; }
+.guide-strip-cta { flex-shrink: 0; font-size: 0.82rem; font-weight: 800; color: var(--blue); white-space: nowrap; }
 
 .exp-map-label {
   font-size:0.84rem;
@@ -1485,6 +1996,36 @@ const q3opts = [
 .nsw-grad { background:linear-gradient(to right,#4ade80,#14532d); }
 .ml-grad-labels { display:flex; justify-content:space-between; font-size:0.62rem; color:var(--ink3,#9ca3af); }
 .ml-grad-state { font-size:0.7rem; font-weight:700; color:var(--ink2,#374151); margin-top:1px; }
+
+/* ── Map status chip (bottom-left of map section) ── */
+.map-status-chip {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 999;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.map-status-chip.msc-personalised {
+  background: rgba(22,163,74,0.92);
+  color: #fff;
+  border: 1px solid rgba(22,163,74,0.4);
+}
+.map-status-chip.msc-max {
+  background: rgba(255,255,255,0.92);
+  color: #6b7280;
+  border: 1px solid rgba(0,0,0,0.1);
+}
 
 :global(.school-tooltip) {
   background:#0D1F3C !important;
@@ -1948,6 +2489,38 @@ const q3opts = [
 }
 .cmp-apply-btn:hover { background: var(--blue-d); }
 
+.cmp-breakdown-section {
+  border-top: 1px solid var(--b);
+}
+.cmp-sec-row {
+  background: var(--blue-s);
+  color: var(--blue-d);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 10px 16px;
+}
+.cmp-breakdown-grid {
+  display: grid;
+  gap: 0;
+}
+.cmp-breakdown-col {
+  padding: 16px;
+  border-right: 1px solid var(--b);
+  min-width: 0;
+}
+.cmp-breakdown-col:last-child { border-right: none; }
+.cmp-breakdown-school-name {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--ink2);
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .cmp-lifestyle-row {
   display:flex;
   align-items:center;
@@ -2016,6 +2589,42 @@ const q3opts = [
   .exp-stats-bar { flex-direction: column; gap: 14px; }
   .exp-stat-div { display: none; }
   .cmp-tbl { display:block; overflow-x:auto; }
+
+  .guide-card { flex-direction: column; align-items: flex-start; padding: 20px 18px; gap: 14px; }
+  .gc-btn { align-self: stretch; text-align: center; }
+  .gc-outcomes { gap: 6px; }
+  /* Hide the progress rail gutter on mobile */
+  .explorer-flow { padding-left: 0; margin-top: 24px; }
+  .explorer-flow::before { display: none; }
+  .flow-node { display: none; }
+
+  /* Search bar flows above the map on mobile */
+  .exp-map-section {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+  .map-search-overlay {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    order: -1;
+  }
+  .exp-map-container {
+    order: 0;
+  }
+  .map-status-chip {
+    bottom: 8px;
+    left: 8px;
+  }
+  .map-legend {
+    bottom: 8px;
+    right: 8px;
+  }
 }
 
 @keyframes shimmer {
