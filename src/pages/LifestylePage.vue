@@ -147,7 +147,7 @@
               <span class="lrk">Healthcare grade</span>
               <span class="lrv">
                 <span class="grade-tip-wrap">
-                <span class="gbadge" :class="GC[insSchool.healthcare_grade] || 'gd'">{{ insSchool.healthcare_grade || '—' }}</span>
+                <span class="gbadge" :class="GC[insSchool.healthcare_grade] || 'gd'" :title="gradeTooltip(healthcareScale, insSchool.healthcare_grade, 'Healthcare')">{{ insSchool.healthcare_grade || '—' }}</span>
                 <div class="grade-tip">
                   <div v-for="g in healthcareScale" :key="g.grade" class="grade-tip-row">
                     <span class="gbadge" :class="GC[g.grade] || 'gd'">{{ g.grade }}</span>
@@ -158,7 +158,14 @@
                 <span style="color:var(--ink3);font-size:0.72rem;margin-left:4px">{{ n(metricVal(insSchool, 'healthcare_count')) }} facilities</span>
               </span>
             </div>
-            <div class="lr"><span class="lrk">Crime rank <span style="font-weight:400;color:var(--ink3);font-size:0.62rem">(lower = safer)</span></span><span class="lrv" :class="crimeClass(n(insSchool.crime_rank))">{{ n(metricVal(insSchool, 'crime_rank')) > 0 ? n(metricVal(insSchool, 'crime_rank')) + ' / 130' : 'No data' }}</span></div>
+            <div class="lr">
+              <span class="lrk metric-label">
+                Crime safety rank
+                <button class="metric-help" type="button" title="Ranked against 130 comparison areas in this lifestyle dataset. 1 is the safest rank; a lower number means lower crime.">i</button>
+                <small>1 = safest of 130 areas</small>
+              </span>
+              <span class="lrv" :class="crimeClass(n(insSchool.crime_rank))">{{ n(metricVal(insSchool, 'crime_rank')) > 0 ? n(metricVal(insSchool, 'crime_rank')) + ' / 130' : 'No data' }}</span>
+            </div>
           </div>
           <div class="life-card">
             <div class="lc-title">Education & Nature</div>
@@ -166,7 +173,7 @@
               <span class="lrk">Education grade</span>
               <span class="lrv">
                 <span class="grade-tip-wrap">
-                <span class="gbadge" :class="GC[insSchool.education_grade] || 'gd'">{{ insSchool.education_grade || '—' }}</span>
+                <span class="gbadge" :class="GC[insSchool.education_grade] || 'gd'" :title="gradeTooltip(educationScale, insSchool.education_grade, 'Education')">{{ insSchool.education_grade || '—' }}</span>
                 <div class="grade-tip">
                   <div v-for="g in educationScale" :key="g.grade" class="grade-tip-row">
                     <span class="gbadge" :class="GC[g.grade] || 'gd'">{{ g.grade }}</span>
@@ -319,7 +326,7 @@
                 <td>Healthcare grade</td>
                 <td v-for="s in cmpSchools" :key="s.id">
                   <span class="grade-tip-wrap">
-                    <span class="gbadge" :class="GC[s.healthcare_grade] || 'gd'">{{ s.healthcare_grade }}</span>
+                    <span class="gbadge" :class="GC[s.healthcare_grade] || 'gd'" :title="gradeTooltip(healthcareScale, s.healthcare_grade, 'Healthcare')">{{ s.healthcare_grade }}</span>
                     <div class="grade-tip">
                       <div v-for="g in healthcareScale" :key="g.grade" class="grade-tip-row">
                         <span class="gbadge" :class="GC[g.grade] || 'gd'">{{ g.grade }}</span>
@@ -331,7 +338,7 @@
                 </td>
               </tr>
               <tr>
-                <td>Crime rank (lower=safer)</td>
+                <td>Crime safety rank<br><span class="sbs-factor-note">1 = safest of 130 areas</span></td>
                 <td v-for="(s, i) in cmpSchools" :key="s.id" :class="bestIdx(cmpSchools.map(x => n(metricVal(x, 'crime_rank'))), false) === i ? 'sbs-best' : 'sbs-lo'">{{ n(metricVal(s, 'crime_rank')) > 0 ? n(metricVal(s, 'crime_rank')) + '/130' : 'No data' }}</td>
               </tr>
               <tr class="sbs-sec"><td :colspan="cmpSchools.length + 1">🎓 Education & Nature</td></tr>
@@ -339,7 +346,7 @@
                 <td>Education grade</td>
                 <td v-for="s in cmpSchools" :key="s.id">
                   <span class="grade-tip-wrap">
-                    <span class="gbadge" :class="GC[s.education_grade] || 'gd'">{{ s.education_grade }}</span>
+                    <span class="gbadge" :class="GC[s.education_grade] || 'gd'" :title="gradeTooltip(educationScale, s.education_grade, 'Education')">{{ s.education_grade }}</span>
                     <div class="grade-tip">
                       <div v-for="g in educationScale" :key="g.grade" class="grade-tip-row">
                         <span class="gbadge" :class="GC[g.grade] || 'gd'">{{ g.grade }}</span>
@@ -664,6 +671,11 @@ const educationScale = [
   { grade: 'D',  label: '1–7' },
   { grade: 'F',  label: 'None' },
 ]
+
+function gradeTooltip(scale, grade, label) {
+  const row = scale.find((item) => item.grade === grade)
+  return row ? `${label} grade ${grade}: ${row.label}` : `${label} grade unavailable`
+}
 
 function bestIdx(vals, hi) {
   const ns = vals.map(v => parseFloat(v) || 0)
@@ -1121,6 +1133,37 @@ function applyUrl(school) {
   font-family: 'DM Sans', sans-serif;
   font-size: 0.78rem;
   color: var(--ink2);
+}
+.metric-label {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.metric-label small {
+  flex-basis: 100%;
+  color: var(--ink3);
+  font-size: 0.62rem;
+}
+.metric-help {
+  width: 15px;
+  height: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--b2);
+  border-radius: 50%;
+  background: var(--s);
+  color: var(--ink2);
+  font: inherit;
+  font-size: 0.58rem;
+  font-weight: 900;
+  cursor: help;
+}
+.sbs-factor-note {
+  color: var(--ink3);
+  font-size: 0.64rem;
+  font-weight: 500;
 }
 
 .sbs-legend {

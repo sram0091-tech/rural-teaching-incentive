@@ -1,5 +1,5 @@
 <template>
-  <div class="page active">
+  <div :class="['page', 'active', `home-${homeVisualMode}`]">
 
     <!-- SCROLL PROGRESS BAR -->
     <div class="scroll-progress" :style="{ width: scrollPct + '%' }"></div>
@@ -15,85 +15,23 @@
           <div class="cin-eyebrow">for australian teachers</div>
           <h1 class="cin-hero-h1">Rural teaching isn't a compromise.<br>It's an <em>opportunity</em>.</h1>
           <p class="cin-hero-sub">Find schools across <strong style="color:#FFD166">New South Wales</strong> and <strong style="color:#FFD166">Queensland</strong>, compare financial incentives, and understand the Neighbourhood before you decide.</p>
-          <div class="cin-hero-acts">
-            <button class="btn-hero-p" @click="$emit('navigate', 'explorer')">Find your school</button>
-          </div>
         </div>
 
       </div>
 
       <div class="cin-photo-credit">Photo: <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a></div>
 
-      <div class="hero-trust-strip">
-        <div class="trust-item">
-          <div class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <div class="trust-title">Government data only</div>
-          <div class="trust-text">ACARA, ABS Census, QLD Directive 16/18, NSW RTI Review 2020</div>
+      <div class="hero-offer-strip">
+        <div v-if="homeVisualMode === 'legacy'" class="hero-offer-intro">
+          <div class="hero-offer-eyebrow">What regional can offer</div>
+          <div class="hero-offer-title">Look beyond the incentive figure.</div>
         </div>
-        <div class="hero-trust-div"></div>
-        <div class="trust-item">
-          <div class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-          <div class="trust-title">645 schools</div>
-          <div class="trust-text">Government, Catholic, and Independent across QLD and NSW</div>
-        </div>
-        <div class="hero-trust-div"></div>
-        <div class="trust-item">
-          <div class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-          <div class="trust-title">Your decision</div>
-          <div class="trust-text">We show differences, not recommendations. You decide.</div>
-        </div>
-        <div class="hero-trust-div"></div>
-        <div class="trust-item">
-          <div class="trust-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
-          <div class="trust-title">No sign-up required</div>
-          <div class="trust-text">Free and open access. No account or registration needed.</div>
-        </div>
+        <button class="hero-offer-item offer-financial" type="button" @click="openModal('financial')"><span class="hero-offer-mark mark-green">$</span><span><strong>A real pay difference</strong></span></button>
+        <button class="hero-offer-item offer-cost" type="button" @click="openModal('cost')"><span class="hero-offer-mark mark-blue">⌂</span><span><strong>Your salary stretches</strong></span></button>
+        <button class="hero-offer-item offer-career" type="button" @click="openModal('career')"><span class="hero-offer-mark mark-amber">↗</span><span><strong>Broader roles sooner</strong></span></button>
+        <button class="hero-offer-item offer-community" type="button" @click="openModal('community')"><span class="hero-offer-mark mark-purple">○</span><span><strong>Known in community</strong></span></button>
       </div>
 
-    </section>
-
-    <!-- REGIONAL BENEFITS -->
-    <section class="regional-section">
-      <div class="how-inner">
-        <div class="section-header centered">
-          <div class="section-eyebrow">What regional can offer</div>
-          <h2>Look beyond the incentive figure.</h2>
-        </div>
-        <div class="proof-card-grid">
-          <button class="proof-card" type="button" @click="openModal('financial')">
-            <div class="proof-card-icon proof-icon-green">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-            <div class="proof-card-cat cat-green">Financial</div>
-            <div class="proof-card-title">A real pay difference</div>
-            <div class="proof-card-link">See the breakdown →</div>
-          </button>
-          <button class="proof-card" type="button" @click="openModal('cost')">
-            <div class="proof-card-icon proof-icon-blue">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            <div class="proof-card-cat cat-blue">Cost of Living</div>
-            <div class="proof-card-title">Your salary stretches further</div>
-            <div class="proof-card-link">What the data shows →</div>
-          </button>
-          <button class="proof-card" type="button" @click="openModal('career')">
-            <div class="proof-card-icon proof-icon-amber">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            </div>
-            <div class="proof-card-cat cat-amber">Career Pace</div>
-            <div class="proof-card-title">Smaller schools, broader role</div>
-            <div class="proof-card-link">How careers progress →</div>
-          </button>
-          <button class="proof-card" type="button" @click="openModal('community')">
-            <div class="proof-card-icon proof-icon-purple">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div class="proof-card-cat cat-purple">Community</div>
-            <div class="proof-card-title">You are not anonymous</div>
-            <div class="proof-card-link">What this means in practice →</div>
-          </button>
-        </div>
-      </div>
     </section>
 
     <!-- TEACHER STORY -->
@@ -113,7 +51,7 @@
           </div>
         </div>
         <div class="story-plain-text">
-          <div class="section-eyebrow story-title-blue story-eyebrow-centered">Why Teachers Stay</div>
+          <div class="section-eyebrow story-title-blue">Why Teachers Stay</div>
           <p class="story-plain-context">Many teachers who move regional report stronger career growth, community connection, and better work-life balance.</p>
           <h2 class="story-plain-h">Meet Katie.</h2>
           <p class="story-plain-desc">Katie moved from the city to teach at a remote school in <strong>Cooktown, Cape York Peninsula, Far North Queensland</strong>. It changed everything.</p>
@@ -126,63 +64,13 @@
       </div>
     </div>
 
-    <!-- STATE SPLIT -->
-    <section class="state-split-section">
-      <div class="state-split-header">
-        <div class="section-eyebrow">Incentive Programs by State</div>
-        <h2>Choose your state</h2>
-        <p>Queensland and NSW each run their own rural incentive program — same goal, different structures.</p>
-      </div>
-      <div class="state-split-grid">
-        <div class="state-card" @click="$emit('navigate', 'explorer')">
-          <div class="state-card-bg state-bg-qld"></div>
-          <div class="state-card-overlay"></div>
-          <div class="state-card-content">
-            <div class="state-chip state-chip-qld">QLD</div>
-            <h3 class="state-card-h">Queensland</h3>
-            <p class="state-card-desc">Locality Allowance paid fortnightly to all eligible government school teachers, based on location zone.</p>
-            <div class="state-stats">
-              <div class="state-stat">
-                <div class="state-stat-val">$11,470/yr</div>
-                <div class="state-stat-lab">Max annual incentive</div>
-              </div>
-              <div class="state-stat-div"></div>
-              <div class="state-stat">
-                <div class="state-stat-val">All gov schools</div>
-                <div class="state-stat-lab">In eligible zones</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="state-card" @click="$emit('navigate', 'explorer')">
-          <div class="state-card-bg state-bg-nsw"></div>
-          <div class="state-card-overlay"></div>
-          <div class="state-card-content">
-            <div class="state-chip state-chip-nsw">NSW</div>
-            <h3 class="state-card-h">New South Wales</h3>
-            <p class="state-card-desc">Rural Teaching Incentive scales with remoteness. Retention bonus adds $5k/yr for up to 10 years on top.</p>
-            <div class="state-stats">
-              <div class="state-stat">
-                <div class="state-stat-val">$30,000/yr</div>
-                <div class="state-stat-lab">Max annual incentive</div>
-              </div>
-              <div class="state-stat-div"></div>
-              <div class="state-stat">
-                <div class="state-stat-val">All gov schools</div>
-                <div class="state-stat-lab">In eligible zones</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- HOW IT WORKS -->
-    <section class="how-section">
+    <section class="journey-section">
+    <div class="how-section journey-how">
       <div class="how-inner">
-        <div class="section-header centered">
+        <div class="journey-steps-head">
           <div class="section-eyebrow">How it works</div>
-          <h2>Three steps to your decision</h2>
+          <h3>Three steps to your decision</h3>
         </div>
         <div class="how-cards">
           <div class="how-card" @click="openModal('search')">
@@ -190,8 +78,7 @@
             <div class="how-card-body">
               <div class="how-card-num">01</div>
               <div class="how-card-title">Find by incentive</div>
-              <p class="how-card-text">Search 645 schools. Filter by state, remoteness, and role. Sort by highest incentive package.</p>
-              <span class="how-card-learn">Learn how it works ↗</span>
+              <p class="how-card-text">Filter schools by state, role, remoteness, and incentive package.</p>
             </div>
           </div>
           <div class="how-connector">›</div>
@@ -200,8 +87,7 @@
             <div class="how-card-body">
               <div class="how-card-num">02</div>
               <div class="how-card-title">Explore the lifestyle</div>
-              <p class="how-card-text">Every school links to its Neighbourhood profile: healthcare, rent, distance to city, and nature access.</p>
-              <span class="how-card-learn">See what's measured ↗</span>
+              <p class="how-card-text">See the Neighbourhood details that shape life around each school.</p>
             </div>
           </div>
           <div class="how-connector">›</div>
@@ -210,12 +96,12 @@
             <div class="how-card-body">
               <div class="how-card-num">03</div>
               <div class="how-card-title">Compare side by side</div>
-              <p class="how-card-text">Save up to 4 schools and compare incentives side by side.</p>
-              <span class="how-card-learn">How comparing works ↗</span>
+              <p class="how-card-text">Save up to four schools and compare your options side by side.</p>
             </div>
           </div>
         </div>
       </div>
+    </div>
     </section>
 
     <!-- READY TO EXPLORE CTA -->
@@ -264,6 +150,7 @@ const emit = defineEmits(['navigate', 'view-lifestyle'])
 
 const scrollPct = ref(0)
 const heroParallaxY = ref(0)
+const homeVisualMode = import.meta.env.VITE_HOME_VISUAL_MODE === 'legacy' ? 'legacy' : 'refined'
 
 const heroVideoStyle = computed(() => ({
   backgroundImage: `url(${heroImage})`,
@@ -434,28 +321,28 @@ onUnmounted(() => {
 
 /* TEACHER STORY — plain split layout, no box */
 .story-plain-wrap {
-  padding: 48px 80px;
+  padding: 20px 64px;
   background: var(--bg);
 }
 .story-plain-card {
-  max-width: 1080px;
+  max-width: 1160px;
   margin: 0 auto;
   background: var(--s2);
   border: 1px solid var(--b);
   border-radius: 20px;
-  padding: 36px 48px 48px;
+  padding: 18px 28px;
   box-shadow: 0 2px 12px rgba(26,23,20,0.06);
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 14px;
 }
 .story-plain-split {
   display: flex;
   align-items: stretch;
-  gap: 48px;
+  gap: 24px;
 }
 .story-plain-player {
-  flex: 0 0 34%;
+  flex: 0 0 clamp(200px, 20vw, 260px);
   aspect-ratio: 9 / 16;
 }
 .story-video-card {
@@ -476,44 +363,41 @@ onUnmounted(() => {
   flex: 1;
   display: grid;
   align-content: center;
-  gap: 12px;
-}
-.story-eyebrow-centered {
-  text-align: center;
+  gap: 5px;
 }
 .story-plain-context {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   color: var(--ink3);
-  line-height: 1.6;
+  line-height: 1.45;
   margin: 0;
 }
 .story-plain-h {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-size: clamp(1.8rem, 2.6vw, 2.45rem);
   font-weight: 900;
   color: var(--ink);
   line-height: 1.1;
   margin: 2px 0 0;
 }
 .story-plain-desc {
-  font-size: 0.94rem;
+  font-size: 0.88rem;
   color: var(--ink2);
-  line-height: 1.65;
+  line-height: 1.5;
   margin: 0;
 }
 .story-plain-points {
   list-style: none;
   padding: 0;
-  margin: 4px 0 0;
+  margin: 3px 0 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 6px;
 }
 .story-plain-points li {
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.93rem;
+  font-size: 0.86rem;
   color: var(--ink2);
-  line-height: 1.55;
+  line-height: 1.45;
   padding-left: 1.1em;
   position: relative;
 }
@@ -527,16 +411,16 @@ onUnmounted(() => {
 .story-plain-points li strong { color: var(--ink); font-weight: 700; }
 
 @media (max-width: 900px) {
-  .story-plain-wrap { padding: 32px 24px; }
-  .story-plain-card { padding: 32px; }
-  .story-plain-player { flex: 0 0 38%; }
-  .story-plain-split { gap: 32px; }
+  .story-plain-wrap { padding: 24px; }
+  .story-plain-card { padding: 24px; }
+  .story-plain-player { flex: 0 0 clamp(190px, 32vw, 240px); }
+  .story-plain-split { gap: 22px; }
 }
 @media (max-width: 640px) {
-  .story-plain-wrap { padding: 24px 16px; }
-  .story-plain-card { padding: 24px 20px; }
-  .story-plain-split { flex-direction: column; gap: 24px; }
-  .story-plain-player { flex: 0 0 auto; width: 72vw; max-width: 260px; }
+  .story-plain-wrap { padding: 18px 16px; }
+  .story-plain-card { padding: 18px; }
+  .story-plain-split { flex-direction: column; gap: 16px; }
+  .story-plain-player { flex: 0 0 auto; width: min(62vw, 220px); }
 }
 
 /* SCROLL PROGRESS */
@@ -1213,7 +1097,7 @@ onUnmounted(() => {
 .how-card-body { padding: 24px 28px; display: flex; flex-direction: column; flex: 1; }
 .how-card-num { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; color: var(--b); line-height: 1; margin-bottom: 6px; }
 .how-card-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 900; margin-bottom: 8px; }
-.how-card-text { font-size: 0.84rem; color: var(--ink2); line-height: 1.68; margin-bottom: 16px; flex: 1; }
+.how-card-text { font-size: 0.92rem; color: var(--ink2); line-height: 1.58; margin-bottom: 0; flex: 1; }
 .how-card-learn { font-size: 0.8rem; font-weight: 700; color: var(--blue); align-self: flex-start; }
 .btn-ghost { padding: 9px 20px; background: transparent; color: var(--blue); border: 1.5px solid var(--blue); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.14s; align-self: flex-start; }
 .btn-ghost:hover { background: var(--blue-s); }
@@ -1356,6 +1240,228 @@ onUnmounted(() => {
 .hero-trust-strip .trust-text { color: rgba(255,255,255,0.85); font-size: 0.72rem; text-shadow: 0 1px 6px rgba(0,0,0,0.5); }
 .hero-trust-div { width: 1px; height: 32px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
 
+.hero-offer-strip {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(200px,1.2fr) repeat(4,minmax(150px,1fr));
+  align-items: stretch;
+  gap: 0;
+  background:
+    linear-gradient(90deg, rgba(10,31,60,0.98), rgba(11,54,76,0.96)),
+    rgba(255,255,255,0.14);
+  border-top: 1px solid rgba(255,255,255,0.22);
+  box-shadow: 0 -16px 42px rgba(3,12,28,0.26);
+}
+.hero-offer-intro,
+.hero-offer-item {
+  min-height: 94px;
+  background: transparent;
+}
+.hero-offer-intro {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px 28px 18px 80px;
+  border-right: 1px solid rgba(255,255,255,0.14);
+}
+.hero-offer-eyebrow {
+  color: #9ee7da;
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.hero-offer-title {
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.hero-offer-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border: 0;
+  border-right: 1px solid rgba(255,255,255,0.12);
+  padding: 14px 16px;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.hero-offer-item:last-child { border-right: 0; }
+.hero-offer-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.16;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+.offer-financial::before { background: linear-gradient(135deg, #10b981, transparent 68%); }
+.offer-cost::before { background: linear-gradient(135deg, #60a5fa, transparent 68%); }
+.offer-career::before { background: linear-gradient(135deg, #f59e0b, transparent 68%); }
+.offer-community::before { background: linear-gradient(135deg, #a78bfa, transparent 68%); }
+.hero-offer-item::after {
+  content: '>';
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.84rem;
+  font-weight: 900;
+  transform: translateY(-50%);
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+.hero-offer-item:hover,
+.hero-offer-item:focus-visible {
+  background: rgba(255,255,255,0.1);
+  outline: none;
+  transform: translateY(-2px);
+}
+.hero-offer-item:hover::before,
+.hero-offer-item:focus-visible::before { opacity: 0.34; }
+.hero-offer-item:hover::after,
+.hero-offer-item:focus-visible::after {
+  color: #fff;
+  transform: translate(3px, -50%);
+}
+.hero-offer-item strong,
+.hero-offer-item small { display: block; }
+.hero-offer-item strong {
+  position: relative;
+  font-size: 0.84rem;
+  line-height: 1.3;
+  padding-right: 16px;
+}
+.hero-offer-item small {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.hero-offer-item small em {
+  color: #fff;
+  font-style: normal;
+  opacity: 0.72;
+}
+.hero-offer-mark {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+  font-weight: 900;
+}
+.mark-green { background: rgba(16,185,129,0.18); color: #6ee7b7; }
+.mark-blue { background: rgba(96,165,250,0.18); color: #93c5fd; }
+.mark-amber { background: rgba(245,158,11,0.18); color: #fcd34d; }
+.mark-purple { background: rgba(167,139,250,0.18); color: #c4b5fd; }
+
+/* Refined homepage mode. Set VITE_HOME_VISUAL_MODE=legacy to restore the denser treatment above. */
+.home-refined .cin-section {
+  padding-bottom: 24px;
+}
+.home-refined .cin-content {
+  padding-bottom: 42px;
+}
+.home-refined .cin-photo-credit {
+  bottom: 38px;
+}
+.home-refined .hero-offer-strip {
+  width: min(1280px, calc(100% - 64px));
+  margin: 0 auto;
+  grid-template-columns: repeat(4,minmax(150px,1fr));
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, rgba(8,33,61,0.9), rgba(11,60,73,0.86));
+  box-shadow: 0 20px 50px rgba(5,14,31,0.26);
+  backdrop-filter: blur(12px);
+}
+.home-refined .hero-offer-intro,
+.home-refined .hero-offer-item {
+  min-height: 74px;
+}
+.home-refined .hero-offer-intro {
+  padding: 12px 20px;
+}
+.home-refined .hero-offer-eyebrow {
+  font-size: 0.61rem;
+}
+.home-refined .hero-offer-title {
+  font-size: 0.98rem;
+  max-width: 180px;
+}
+.home-refined .hero-offer-item {
+  gap: 9px;
+  padding: 11px 14px;
+}
+.home-refined .hero-offer-item strong {
+  font-size: 0.75rem;
+}
+.home-refined .hero-offer-item small {
+  font-size: 0.56rem;
+}
+.home-refined .hero-offer-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+}
+.home-refined .story-plain-wrap {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+.home-refined .story-plain-card {
+  max-width: 1020px;
+  padding: 16px 22px;
+}
+.home-refined .story-plain-split {
+  gap: 20px;
+}
+.home-refined .story-plain-player {
+  flex-basis: clamp(180px, 18vw, 220px);
+}
+.home-refined .story-plain-text {
+  max-width: 660px;
+}
+.home-refined .story-video-card {
+  border-radius: 14px;
+}
+.home-refined .story-plain-points li {
+  max-width: 610px;
+}
+.home-refined .img-search {
+  background-image: url('../assets/hero.jpg');
+  background-position: center 38%;
+  filter: saturate(0.84) brightness(0.82);
+}
+.home-refined .img-rural {
+  background-image: url('https://commons.wikimedia.org/wiki/Special:FilePath/1%20-%20Atherton%20Tableland%2C%20Queensland%2C%20Australia.jpg');
+  background-position: center 54%;
+  filter: saturate(0.88) brightness(0.8);
+}
+.home-refined .img-compare {
+  background-position: center 36%;
+  filter: saturate(0.82) brightness(0.86);
+}
+
 /* FINAL CTA */
 .final-cta {
   position: relative;
@@ -1383,8 +1489,40 @@ onUnmounted(() => {
 
 /* STATE SPLIT SECTION */
 .state-split-section {
-  background: var(--bg);
-  padding: 0 24px 64px;
+  background: transparent;
+  padding: 0 24px 20px;
+}
+.journey-section {
+  background:
+    linear-gradient(180deg, #f9f7f2 0%, var(--bg) 34%, #f6f2ea 100%);
+  border-top: 1px solid var(--b);
+  border-bottom: 1px solid var(--b);
+  padding: 46px 0;
+}
+.journey-how {
+  background: transparent;
+  border-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.journey-steps-head {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin: 4px 0 22px;
+  text-align: center;
+}
+.journey-steps-head .section-eyebrow {
+  margin: 0;
+}
+.journey-steps-head h3 {
+  color: var(--ink);
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.65rem, 2.8vw, 2.3rem);
+  font-weight: 900;
+  line-height: 1.12;
+  margin: 0;
 }
 .state-split-header {
   max-width: 580px;
@@ -1534,6 +1672,21 @@ onUnmounted(() => {
     min-width: 132px;
   }
   .hero-trust-div { display: none; }
+  .hero-offer-strip { grid-template-columns: 1fr 1fr; }
+  .hero-offer-intro {
+    grid-column: 1 / -1;
+    min-height: auto;
+    padding: 16px 20px;
+  }
+  .hero-offer-item { min-height: 74px; }
+  .home-refined .cin-section { padding-bottom: 16px; }
+  .home-refined .hero-offer-strip {
+    width: 100%;
+    margin: 28px 0 0;
+    border-radius: 12px;
+  }
+  .home-refined .cin-photo-credit { bottom: 24px; }
+  .home-refined .story-plain-text { max-width: none; }
   .cin-stats-bar { padding: 16px 20px; flex-wrap: wrap; gap: 12px; }
   .hstat { min-width: 90px; }
   .hstat-sep { display: none; }
@@ -1547,7 +1700,7 @@ onUnmounted(() => {
   .proof-card-grid { grid-template-columns: 1fr 1fr; }
   .proof-row { min-height: 0; }
   .process-row { min-height: 0; }
-  .state-split-section { padding: 0 16px 44px; }
+  .journey-section { padding: 34px 0; }
   .state-split-grid { grid-template-columns: 1fr; gap: 14px; }
   .state-card { min-height: 230px; }
   .state-card-content { padding: 18px 20px; min-height: 230px; }
@@ -1557,8 +1710,13 @@ onUnmounted(() => {
   .decision-panel { padding: 14px; }
   .cin-headline { font-size: 2.6rem; }
   /* ── How-cards: horizontal swipe ── */
-  .how-section { padding: 48px 0; }
+  .how-section { padding: 22px 0 0; }
   .how-section .section-header { padding: 0 24px; }
+  .journey-steps-head {
+    display: grid;
+    margin: 2px 24px 16px;
+  }
+  .journey-steps-head h3 { margin-top: 6px; }
   .how-cards {
     flex-direction: row;
     overflow-x: auto;
@@ -1601,11 +1759,23 @@ onUnmounted(() => {
   .btn-hero-p, .btn-hero-s { width: 100%; display: block; text-align: center; }
   .cin-hero-acts { flex-direction: column; }
   .hero-trust-strip .trust-item { flex-basis: 100%; }
+  .hero-offer-strip { grid-template-columns: 1fr; }
+  .hero-offer-item { min-height: 62px; }
+  .hero-offer-item small em { display: none; }
+  .home-refined .hero-offer-strip {
+    width: 100%;
+    margin-top: 20px;
+  }
+  .home-refined .hero-offer-intro,
+  .home-refined .hero-offer-item { min-height: 58px; }
+  .home-refined .hero-offer-title { max-width: none; }
+  .home-refined .story-plain-card { padding: 16px; }
+  .home-refined .story-plain-player { width: min(56vw, 200px); }
   .state-stats { flex-direction: column; align-items:flex-start; gap:12px; }
   .state-stat-div { width:100%; height:1px; }
-  .story-plain-wrap { padding: 28px 16px 36px; }
-  .story-plain-split { flex-direction: column; gap: 20px; }
-  .story-plain-h { font-size: 1.8rem; }
+  .story-plain-wrap { padding: 18px 16px 24px; }
+  .story-plain-split { flex-direction: column; gap: 16px; }
+  .story-plain-h { font-size: 1.65rem; }
   .how-step-body { padding: 28px 20px; }
 }
 </style>
